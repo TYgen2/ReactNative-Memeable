@@ -12,6 +12,7 @@ import "../strategies/jwt.mjs";
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
 import dotenv from "dotenv";
+import axios from "axios";
 
 dotenv.config();
 
@@ -49,10 +50,12 @@ router.post(
       const savedUser = await newUser.save();
       const token = generateJWT({ id: savedUser.id });
 
-      res.status(201).send({ token: token, refreshToken: signedRefreshToken });
+      return res
+        .status(201)
+        .send({ token: token, refreshToken: signedRefreshToken });
     } catch (error) {
       console.log("Cannot create new user wtf?", error);
-      res.status(400).send(error);
+      return res.status(400).send(error);
     }
   }
 );
@@ -64,7 +67,9 @@ router.post("/api/auth/login", async (req, res) => {
   try {
     // validate email existence
     let user = await User.findOne({ email });
-    if (!user) {
+    // user haven't registered with the email /
+    // user registered with this email but not local
+    if (!user || user.authMethod != "local") {
       return res.status(400).send({ msg: "Invalid credentials" });
     }
 
@@ -81,9 +86,11 @@ router.post("/api/auth/login", async (req, res) => {
     user.refreshToken = signedRefreshToken;
     await user.save();
 
-    res.status(201).send({ token: token, refreshToken: signedRefreshToken });
+    return res
+      .status(201)
+      .send({ token: token, refreshToken: signedRefreshToken });
   } catch (error) {
-    res.status(400).send(error);
+    return res.status(400).send(error);
   }
 });
 
@@ -104,7 +111,7 @@ router.post("/api/auth/google", async (req, res) => {
     const signedRefreshToken = generateRefreshToken();
 
     // check whether the user is exist or not by using googleId
-    let user = await User.findOne({ googleId: payload.sub });
+    let user = await User.findOne({ email: payload.email });
     // if not exist yet, create one
     if (!user) {
       user = new User({
@@ -113,6 +120,11 @@ router.post("/api/auth/google", async (req, res) => {
         googleId: payload.sub,
         authMethod: "google",
         refreshToken: signedRefreshToken,
+      });
+    } else if (user && user.authMethod != "google") {
+      // user already used the same email to register an account with other methods
+      return res.status(400).send({
+        msg: `You have used this email to register an account before! Method: ${user.authMethod}`,
       });
     } else {
       // if exist, update the refreshToken in db
@@ -123,10 +135,59 @@ router.post("/api/auth/google", async (req, res) => {
     // return the generated JWT to client
     const token = generateJWT({ id: user.id });
 
-    res.status(201).send({ token: token, refreshToken: signedRefreshToken });
+    return res
+      .status(201)
+      .send({ token: token, refreshToken: signedRefreshToken });
   } catch (err) {
     console.log("Invalid google token WTF??", err);
-    res.status(400).send(err);
+    return res
+      .status(400)
+      .send({ msg: "My backend said you're fucked (GOOGLE LOGIN)" });
+  }
+});
+
+router.post("/api/auth/facebook", async (req, res) => {
+  const { accessToken } = req.body;
+
+  try {
+    // check whether the receieved accessToken is valid
+    const response = await axios.get(
+      `https://graph.facebook.com/me?access_token=${accessToken}&fields=email,name`
+    );
+
+    // if success, response.data will contains the user's info
+    // if failed, the error will be catched by the trycatch
+    const signedRefreshToken = generateRefreshToken();
+
+    let user = await User.findOne({ email: response.data.email });
+    if (!user) {
+      user = new User({
+        email: response.data.email,
+        displayName: response.data.name,
+        facebookId: response.data.id,
+        authMethod: "facebook",
+        refreshToken: signedRefreshToken,
+      });
+    } else if (user && user.authMethod != "facebook") {
+      console.log(
+        `You have used this email to register an account before! Method: ${user.authMethod}`
+      );
+      return res.status(400).send({
+        msg: `You have used this email to register an account before! Method: ${user.authMethod}`,
+      });
+    } else {
+      user.refreshToken = signedRefreshToken;
+    }
+    await user.save();
+
+    const token = generateJWT({ id: user.id });
+
+    return res
+      .status(201)
+      .send({ token: token, refreshToken: signedRefreshToken });
+  } catch (err) {
+    console.log("Invalid facebook token WTF??", err);
+    return res.status(400).send(err);
   }
 });
 

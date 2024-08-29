@@ -16,47 +16,42 @@ import { googleLoginConfig, screenWidth } from "../utils/constants";
 import { loginReviewSchema } from "../utils/validationSchema";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { googleLogin, userLogin } from "../api/auth";
+import { facebookLogin, googleLogin, userLogin } from "../api/auth";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import { useEffect } from "react";
 import { setJwt, setRefresh } from "../store/tokenReducer";
 import { reduxLogin } from "../store/userReducer";
+import { LoginManager, AccessToken } from "react-native-fbsdk-next";
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default Login = ({ navigation }) => {
   const dispatch = useDispatch();
 
-  const updateJWTinGlobal = async () => {
-    const token = await AsyncStorage.getItem("jwt");
-    dispatch(setJwt(token));
-  };
-
-  const handleLogin = async (json) => {
+  const handleLogin = async (method, payload) => {
+    let res;
     // calling login API for getting JWT token
-    const res = await userLogin(json);
-
-    // retreive the saved JWT token from localStorage
-    // and store it to global state
-    if (res.success) {
-      await updateJWTinGlobal();
-      dispatch(setRefresh(res.refreshToken));
-      dispatch(reduxLogin());
-    } else {
-      Alert.alert("Login failed: ", res.message);
+    if (method == "Local") {
+      res = await userLogin(payload);
     }
-  };
-
-  const handleGoogleLogin = async (idToken) => {
-    const res = await googleLogin(idToken);
+    if (method == "Google") {
+      res = await googleLogin(payload);
+    }
+    if (method == "Facebook") {
+      res = await facebookLogin(payload);
+    }
 
     if (res.success) {
-      await updateJWTinGlobal();
+      // retreive the saved JWT token from localStorage
+      // and store it to global state
+      const token = await AsyncStorage.getItem("jwt");
+      dispatch(setJwt(token));
       dispatch(setRefresh(res.refreshToken));
       dispatch(reduxLogin());
+      console.log(`Logged in with ${method} method!`);
     } else {
-      Alert.alert("Google login failed: ", res.message);
+      Alert.alert(`${method} login failed: `, res.message);
     }
   };
 
@@ -69,9 +64,23 @@ export default Login = ({ navigation }) => {
       const { authentication } = response;
       const idToken = authentication?.idToken;
 
-      handleGoogleLogin(idToken);
+      handleLogin("Google", idToken);
     }
   }, [response]);
+
+  const handleFacebook = async () => {
+    LoginManager.logInWithPermissions(["public_profile", "email"]).then(
+      (res) => {
+        if (res.grantedPermissions) {
+          AccessToken.getCurrentAccessToken().then((data) => {
+            handleLogin("Facebook", data.accessToken);
+          });
+        } else {
+          console.log("Facebook login failed WTF???");
+        }
+      }
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -92,7 +101,7 @@ export default Login = ({ navigation }) => {
             email: values.email,
             password: values.password,
           };
-          handleLogin(handleJSON);
+          handleLogin("Local", handleJSON);
         }}
       >
         {(props) => (
@@ -174,7 +183,10 @@ export default Login = ({ navigation }) => {
           Continue with the following methods
         </Text>
         <View style={styles.methodContainer}>
-          <TouchableOpacity style={styles.methodIcon}>
+          <TouchableOpacity
+            style={styles.methodIcon}
+            onPress={() => handleFacebook()}
+          >
             <Image
               source={require("../assets/facebook.png")}
               style={{ width: 50, height: 50, borderRadius: 50 }}

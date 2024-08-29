@@ -32,6 +32,12 @@ export const createUserValidationSchema = {
       errorMessage: "googleId have to be string",
     },
   },
+  facebookId: {
+    optional: true,
+    isString: {
+      errorMessage: "facebookId have to be string",
+    },
+  },
   authMethod: {
     notEmpty: {
       errorMessage: "authMethod cannnot be empty",
@@ -40,8 +46,8 @@ export const createUserValidationSchema = {
       errorMessage: "authMethod have to be string",
     },
     isIn: {
-      options: [["local", "google"]],
-      errorMessage: "authMethod must be either local or google",
+      options: [["local", "google", "facebook"]],
+      errorMessage: "authMethod must be either local, google or facebook",
     },
   },
 };

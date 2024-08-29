@@ -12,7 +12,6 @@ export const userRegiser = async (json) => {
     console.log("User registered and logged in successfully!");
     return { success: true, refreshToken };
   } catch (error) {
-    console.error("WTF is wrong with the registration???", error.response.data);
     return { success: false, message: error.response.data.msg };
   }
 };
@@ -27,7 +26,6 @@ export const userLogin = async (json) => {
     console.log("User logged in successfully!");
     return { success: true, refreshToken };
   } catch (error) {
-    console.error("WTF is wrong with the login???", error.response.data);
     return { success: false, message: error.response.data.msg };
   }
 };
@@ -44,7 +42,21 @@ export const googleLogin = async (idToken) => {
     console.log("User logged in successfully!");
     return { success: true, refreshToken };
   } catch (error) {
-    console.error("WTF is wrong with the google login???", error.response.data);
+    return { success: false, message: error.response.data.msg };
+  }
+};
+
+export const facebookLogin = async (accessToken) => {
+  try {
+    const res = await axios.post(`${LOCAL_HOST}/api/auth/facebook`, {
+      accessToken,
+    });
+    const { token, refreshToken } = res.data;
+    await AsyncStorage.setItem("jwt", token);
+
+    console.log("User logged in successfully!");
+    return { success: true, refreshToken };
+  } catch (error) {
     return { success: false, message: error.response.data.msg };
   }
 };
@@ -81,7 +93,6 @@ export const validateTokens = async (oldJwtToken, oldRefreshToken) => {
       };
     }
   } catch (error) {
-    console.error("TOKEN INVALID!!!!!???", error.response.data);
     return { success: false, message: error.response.data.msg };
   }
 };

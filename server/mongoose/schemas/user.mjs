@@ -13,6 +13,9 @@ const UserSchema = new mongoose.Schema({
   googleId: {
     type: mongoose.Schema.Types.String,
   },
+  facebookId: {
+    type: mongoose.Schema.Types.String,
+  },
   authMethod: {
     type: mongoose.Schema.Types.String,
     required: true,

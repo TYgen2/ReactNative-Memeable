@@ -30,6 +30,17 @@
         "projectId": "9203708c-9d1a-4702-ab67-a806199306f8"
       }
     },
-    "scheme": "com.tychow45.memeable"
+    "scheme": "com.tychow45.memeable",
+    "plugins": [
+      [
+        "react-native-fbsdk-next",
+        {
+          "appID": "1528470658043650",
+          "displayName": "Memeable",
+          "clientToken": "059b3f2f422c6cf5637cf185a89a4915",
+          "scheme": "com.tychow45.memeable"
+        }
+      ]
+    ]
   }
 }
