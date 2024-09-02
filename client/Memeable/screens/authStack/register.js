@@ -10,13 +10,13 @@ import {
   View,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { barOffset, screenWidth } from "../utils/constants";
-import { userRegiser } from "../api/auth";
-import { registerReviewSchema } from "../utils/validationSchema";
+import { barOffset, screenWidth } from "../../utils/constants";
+import { userRegiser } from "../../api/auth";
+import { registerReviewSchema } from "../../utils/validationSchema";
 import { useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { setJwt, setRefresh } from "../store/tokenReducer";
-import { reduxLogin } from "../store/userReducer";
+import { setJwt, setRefresh } from "../../store/tokenReducer";
+import { reduxLogin } from "../../store/userReducer";
 
 export default Register = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -52,7 +52,7 @@ export default Register = ({ navigation }) => {
       {/* thinking icon */}
       <View style={styles.appIcon}>
         <ImageBackground
-          source={require("../assets/thinking.png")}
+          source={require("../../assets/thinking.png")}
           style={styles.thinking}
           resizeMode="contain"
         />
@@ -155,7 +155,7 @@ export default Register = ({ navigation }) => {
       <View style={styles.gif}>
         <Text style={styles.omg}>OhmyGotto{"\n"}it's new user!</Text>
         <Image
-          source={require("../assets/dance1.gif")}
+          source={require("../../assets/dance1.gif")}
           style={{
             flex: 1,
             width: 235,
@@ -163,7 +163,7 @@ export default Register = ({ navigation }) => {
           }}
         />
         <Image
-          source={require("../assets/dance2.gif")}
+          source={require("../../assets/dance2.gif")}
           style={{ flex: 1, width: 250, height: 250 }}
         />
       </View>

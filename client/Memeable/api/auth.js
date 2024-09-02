@@ -46,6 +46,7 @@ export const googleLogin = async (idToken) => {
   }
 };
 
+// facebook login
 export const facebookLogin = async (accessToken) => {
   try {
     const res = await axios.post(`${LOCAL_HOST}/api/auth/facebook`, {

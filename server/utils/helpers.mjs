@@ -27,3 +27,7 @@ export const generateRefreshToken = () => {
     expiresIn: "30d",
   });
 };
+
+export const randomImageName = () => {
+  return crypto.randomBytes(32).toString("hex");
+};

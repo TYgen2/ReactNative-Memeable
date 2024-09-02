@@ -1,19 +1,115 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import home from "./screens/home";
+import Splash from "./screens/splash";
+import login from "./screens/authStack/login";
+import register from "./screens/authStack/register";
+import home from "./screens/mainStack/home";
+import viewPost from "./screens/mainStack/viewPost";
+import search from "./screens/mainStack/search";
+import userProfile from "./screens/mainStack/userProfile";
+import notify from "./screens/mainStack/notification";
+import upload from "./screens/uploadStack/upload";
 import { useContext } from "react";
-import login from "./screens/login";
-import register from "./screens/register";
-import { StatusBar } from "react-native";
+import { StatusBar, StyleSheet, Text } from "react-native";
 import { store } from "./store/store";
 import { Provider, useSelector } from "react-redux";
-import Splash from "./screens/splash";
 import { LoadingContextProvider, UpdateContext } from "./context/loading";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistStore } from "redux-persist";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import CustomTab from "./components/customTab";
+import { EventProvider } from "react-native-outside-press";
 
-const Stack = createNativeStackNavigator();
 const persistor = persistStore(store);
+
+// Bottom tab navigation
+const Tab = createBottomTabNavigator();
+
+const AuthStack = createNativeStackNavigator();
+const UserStack = createNativeStackNavigator();
+
+const MainStack = createNativeStackNavigator();
+const UploadStack = createNativeStackNavigator();
+
+// For login and register
+const AuthStackScreen = () => {
+  return (
+    <AuthStack.Navigator>
+      <AuthStack.Screen
+        name="Login"
+        component={login}
+        options={{ headerShown: false }}
+      />
+      <AuthStack.Screen
+        name="Register"
+        component={register}
+        options={{ headerShown: false }}
+      />
+    </AuthStack.Navigator>
+  );
+};
+
+// For logged in users
+const UserStackScreen = () => {
+  return (
+    <UserStack.Navigator screenOptions={{ headerShown: false }}>
+      <UserStack.Screen name="Home" component={home} />
+      <UserStack.Screen name="ViewPost" component={viewPost} />
+    </UserStack.Navigator>
+  );
+};
+
+// For main screen UI
+const MainStackScreen = () => {
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+      tabBar={(props) => <CustomTab {...props} />}
+    >
+      <Tab.Screen
+        name="UserStack"
+        component={UserStackScreen}
+        options={{ title: "Home" }}
+      />
+      <Tab.Screen
+        name="Search"
+        component={search}
+        options={{ title: "Search" }}
+      />
+      <Tab.Screen
+        name="Notify"
+        component={notify}
+        options={{ title: "Noti" }}
+      />
+      <Tab.Screen
+        name="UserProfile"
+        component={userProfile}
+        options={{ title: "me" }}
+      />
+    </Tab.Navigator>
+  );
+};
+
+// For upload procedures
+const UploadStackScreen = () => {
+  return (
+    <UploadStack.Navigator screenOptions={{ headerShown: false }}>
+      <UploadStack.Screen name="Upload" component={upload} />
+    </UploadStack.Navigator>
+  );
+};
+
+// Wrapper of authenticated users' screen
+const MainStackNavigator = () => {
+  return (
+    <MainStack.Navigator screenOptions={{ headerShown: false }}>
+      <MainStack.Screen name="MainStack" component={MainStackScreen} />
+      <MainStack.Screen name="UploadStack" component={UploadStackScreen} />
+    </MainStack.Navigator>
+  );
+};
 
 const App = () => {
   const { isLoading } = useContext(UpdateContext);
@@ -30,36 +126,21 @@ const App = () => {
         translucent={true}
         backgroundColor="transparent"
       />
-      <Stack.Navigator>
-        {loginStatus ? (
-          <Stack.Screen name="Home" component={home} />
-        ) : (
-          <>
-            <Stack.Screen
-              name="Login"
-              component={login}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="Register"
-              component={register}
-              options={{ headerShown: false }}
-            />
-          </>
-        )}
-      </Stack.Navigator>
+      {loginStatus ? <MainStackNavigator /> : <AuthStackScreen />}
     </NavigationContainer>
   );
 };
 
 export default function Root() {
   return (
-    <Provider store={store}>
-      <PersistGate persistor={persistor}>
-        <LoadingContextProvider>
-          <App />
-        </LoadingContextProvider>
-      </PersistGate>
-    </Provider>
+    <EventProvider>
+      <Provider store={store}>
+        <PersistGate persistor={persistor}>
+          <LoadingContextProvider>
+            <App />
+          </LoadingContextProvider>
+        </PersistGate>
+      </Provider>
+    </EventProvider>
   );
 }

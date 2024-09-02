@@ -14,3 +14,16 @@ export const registerReviewSchema = yup.object({
     .oneOf([yup.ref("password"), null], "Passwords do not match")
     .required("Passwords do not match"),
 });
+
+export const uploadReviewSchema = yup.object({
+  title: yup
+    .string()
+    .max(100, "Description can't be longer than 100 characters"),
+  description: yup
+    .string()
+    .max(1000, "Description can't be longer than 1000 characters"),
+  hashtag: yup
+    .string()
+    .matches(/^(#\w+\s?)*$/, "Hashtags must be in the format #tag1 #tag2")
+    .nullable(),
+});

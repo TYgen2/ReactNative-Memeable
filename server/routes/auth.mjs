@@ -146,6 +146,7 @@ router.post("/api/auth/google", async (req, res) => {
   }
 });
 
+// facebook login
 router.post("/api/auth/facebook", async (req, res) => {
   const { accessToken } = req.body;
 

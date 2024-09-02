@@ -12,16 +12,16 @@ import {
 } from "react-native";
 import { Formik } from "formik";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { googleLoginConfig, screenWidth } from "../utils/constants";
-import { loginReviewSchema } from "../utils/validationSchema";
+import { googleLoginConfig, screenWidth } from "../../utils/constants";
+import { loginReviewSchema } from "../../utils/validationSchema";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { facebookLogin, googleLogin, userLogin } from "../api/auth";
+import { facebookLogin, googleLogin, userLogin } from "../../api/auth";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import { useEffect } from "react";
-import { setJwt, setRefresh } from "../store/tokenReducer";
-import { reduxLogin } from "../store/userReducer";
+import { setJwt, setRefresh } from "../../store/tokenReducer";
+import { reduxLogin } from "../../store/userReducer";
 import { LoginManager, AccessToken } from "react-native-fbsdk-next";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -86,7 +86,7 @@ export default Login = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.appIcon}>
         <ImageBackground
-          source={require("../assets/popcat.png")}
+          source={require("../../assets/popcat.png")}
           style={styles.popcat}
           resizeMode="contain"
         />
@@ -188,7 +188,7 @@ export default Login = ({ navigation }) => {
             onPress={() => handleFacebook()}
           >
             <Image
-              source={require("../assets/facebook.png")}
+              source={require("../../assets/facebook.png")}
               style={{ width: 50, height: 50, borderRadius: 50 }}
             />
           </TouchableOpacity>
@@ -197,7 +197,7 @@ export default Login = ({ navigation }) => {
             onPress={() => promptAsync()}
           >
             <Image
-              source={require("../assets/google.png")}
+              source={require("../../assets/google.png")}
               style={{ width: 50, height: 50, borderRadius: 50 }}
             />
           </TouchableOpacity>

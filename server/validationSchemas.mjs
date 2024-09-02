@@ -51,3 +51,23 @@ export const createUserValidationSchema = {
     },
   },
 };
+
+export const createPostValidationSchema = {
+  title: {
+    optional: true,
+    isLength: {
+      options: { max: 10 },
+      errorMessage: "Title length should not exceeds 100 characters",
+    },
+  },
+  description: {
+    optional: true,
+    isLength: {
+      options: { max: 1000 },
+      errorMessage: "Description length should not exceeds 1000 characters",
+    },
+  },
+  hashtag: {
+    optional: true,
+  },
+};
