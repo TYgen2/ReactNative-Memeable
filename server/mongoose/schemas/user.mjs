@@ -23,6 +23,20 @@ const UserSchema = new mongoose.Schema({
   refreshToken: {
     type: mongoose.Schema.Types.String,
   },
+  icon: {
+    id: {
+      type: mongoose.Schema.Types.String,
+      default: null,
+    },
+    bgColor: {
+      type: mongoose.Schema.Types.String,
+      default: null,
+    },
+    customIcon: {
+      type: mongoose.Schema.Types.String,
+      default: null,
+    },
+  },
 });
 
 export const User = mongoose.model("User", UserSchema);

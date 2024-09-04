@@ -1,16 +1,16 @@
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LOCAL_HOST } from "@env";
+import { storeTokens } from "../utils/helper";
 
 // local register
-export const userRegiser = async (json) => {
+export const userRegister = async (json) => {
   try {
     const res = await axios.post(`${LOCAL_HOST}/api/auth/register`, json);
-    const { token, refreshToken } = res.data;
-    await AsyncStorage.setItem("jwt", token);
+    const { token, refreshToken, isNew, userId } = res.data;
+    await storeTokens(token, refreshToken);
 
     console.log("User registered and logged in successfully!");
-    return { success: true, refreshToken };
+    return { success: true, refreshToken, isNew, userId };
   } catch (error) {
     return { success: false, message: error.response.data.msg };
   }
@@ -20,11 +20,11 @@ export const userRegiser = async (json) => {
 export const userLogin = async (json) => {
   try {
     const res = await axios.post(`${LOCAL_HOST}/api/auth/login`, json);
-    const { token, refreshToken } = res.data;
-    await AsyncStorage.setItem("jwt", token);
+    const { token, refreshToken, isNew, userId } = res.data;
+    await storeTokens(token, refreshToken);
 
     console.log("User logged in successfully!");
-    return { success: true, refreshToken };
+    return { success: true, refreshToken, isNew, userId };
   } catch (error) {
     return { success: false, message: error.response.data.msg };
   }
@@ -36,11 +36,11 @@ export const googleLogin = async (idToken) => {
     const res = await axios.post(`${LOCAL_HOST}/api/auth/google`, {
       idToken,
     });
-    const { token, refreshToken } = res.data;
-    await AsyncStorage.setItem("jwt", token);
+    const { token, refreshToken, isNew, userId } = res.data;
+    await storeTokens(token, refreshToken);
 
     console.log("User logged in successfully!");
-    return { success: true, refreshToken };
+    return { success: true, refreshToken, isNew, userId };
   } catch (error) {
     return { success: false, message: error.response.data.msg };
   }
@@ -52,11 +52,11 @@ export const facebookLogin = async (accessToken) => {
     const res = await axios.post(`${LOCAL_HOST}/api/auth/facebook`, {
       accessToken,
     });
-    const { token, refreshToken } = res.data;
-    await AsyncStorage.setItem("jwt", token);
+    const { token, refreshToken, isNew, userId } = res.data;
+    await storeTokens(token, refreshToken);
 
     console.log("User logged in successfully!");
-    return { success: true, refreshToken };
+    return { success: true, refreshToken, isNew, userId };
   } catch (error) {
     return { success: false, message: error.response.data.msg };
   }
@@ -86,7 +86,7 @@ export const validateTokens = async (oldJwtToken, oldRefreshToken) => {
       // proceed to generatea new pair of token, and then
       // store it in localStorage and global state
       const { token, refreshToken } = res.data;
-      await AsyncStorage.setItem("jwt", token);
+      await storeTokens(token, refreshToken);
       return {
         success: true,
         refreshToken,

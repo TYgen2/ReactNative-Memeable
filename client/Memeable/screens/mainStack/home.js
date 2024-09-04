@@ -1,8 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { reduxLogout } from "../../store/userReducer";
-import { clearToken } from "../../store/tokenReducer";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { clearTokens } from "../../utils/helper";
 
 export default Home = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -12,9 +11,8 @@ export default Home = ({ navigation }) => {
       <TouchableOpacity
         style={styles.testingBox}
         onPress={async () => {
-          await AsyncStorage.removeItem("jwt");
+          await clearTokens();
           dispatch(reduxLogout());
-          dispatch(clearToken());
         }}
       >
         <Text>LOGOUT</Text>

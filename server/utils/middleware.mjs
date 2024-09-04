@@ -23,7 +23,6 @@ export const authenticateToken = async (req, res, next) => {
       .status(400)
       .send({ msg: "Invalid refresh token / User not exist" });
   }
-  req.userId = user.id;
 
   try {
     jwt.verify(jwtToken, process.env.JWT_SECRET);

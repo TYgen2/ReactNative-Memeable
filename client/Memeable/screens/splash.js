@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { UpdateContext } from "../context/loading";
 import { validateTokens } from "../api/auth";
 import { setRefresh } from "../store/tokenReducer";
+import { getTokens } from "../utils/helper";
 
 export default Splash = () => {
   const { setIsLoading } = useContext(UpdateContext);
@@ -17,7 +18,8 @@ export default Splash = () => {
 
   const dispatch = useDispatch();
   const checkStatus = async () => {
-    const res = await validateTokens(jwtToken, refreshToken);
+    const tokens = await getTokens();
+    const res = await validateTokens(tokens.jwtToken, tokens.refreshToken);
 
     // JWT expired, receiving a new pair of tokens,
     // store them in global state (local already stored

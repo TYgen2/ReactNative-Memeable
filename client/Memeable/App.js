@@ -9,16 +9,18 @@ import search from "./screens/mainStack/search";
 import userProfile from "./screens/mainStack/userProfile";
 import notify from "./screens/mainStack/notification";
 import upload from "./screens/uploadStack/upload";
-import { useContext } from "react";
+import editProfile from "./screens/authStack/editProfile";
+import { useContext, useEffect, useState } from "react";
 import { StatusBar, StyleSheet, Text } from "react-native";
 import { store } from "./store/store";
-import { Provider, useSelector } from "react-redux";
+import { Provider, useDispatch, useSelector } from "react-redux";
 import { LoadingContextProvider, UpdateContext } from "./context/loading";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistStore } from "redux-persist";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import CustomTab from "./components/customTab";
 import { EventProvider } from "react-native-outside-press";
+import { checkAuthState, getTokens } from "./utils/helper";
 
 const persistor = persistStore(store);
 
@@ -34,17 +36,10 @@ const UploadStack = createNativeStackNavigator();
 // For login and register
 const AuthStackScreen = () => {
   return (
-    <AuthStack.Navigator>
-      <AuthStack.Screen
-        name="Login"
-        component={login}
-        options={{ headerShown: false }}
-      />
-      <AuthStack.Screen
-        name="Register"
-        component={register}
-        options={{ headerShown: false }}
-      />
+    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+      <AuthStack.Screen name="Login" component={login} />
+      <AuthStack.Screen name="Register" component={register} />
+      <AuthStack.Screen name="Edit Profile" component={editProfile} />
     </AuthStack.Navigator>
   );
 };

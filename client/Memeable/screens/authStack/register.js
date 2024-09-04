@@ -11,26 +11,23 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { barOffset, screenWidth } from "../../utils/constants";
-import { userRegiser } from "../../api/auth";
+import { userRegister } from "../../api/auth";
 import { registerReviewSchema } from "../../utils/validationSchema";
-import { useDispatch } from "react-redux";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { setJwt, setRefresh } from "../../store/tokenReducer";
-import { reduxLogin } from "../../store/userReducer";
+import { useDispatch, useSelector } from "react-redux";
+import { reduxSetUserId } from "../../store/userReducer";
 
 export default Register = ({ navigation }) => {
   const dispatch = useDispatch();
+
   const handleRegister = async (json) => {
     // calling register API for getting JWT token
-    const res = await userRegiser(json);
+    const res = await userRegister(json);
 
     // retreive the saved JWT token from localStorage
     // and store it to global state
     if (res.success) {
-      const token = await AsyncStorage.getItem("jwt");
-      dispatch(setJwt(token));
-      dispatch(setRefresh(res.refreshToken));
-      dispatch(reduxLogin());
+      dispatch(reduxSetUserId(res.userId));
+      navigation.replace("Edit Profile");
     } else {
       Alert.alert("Register failed: ", res.message);
     }

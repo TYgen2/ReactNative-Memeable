@@ -1,6 +1,5 @@
 import {
   Alert,
-  Button,
   Image,
   ImageBackground,
   Pressable,
@@ -15,13 +14,11 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { googleLoginConfig, screenWidth } from "../../utils/constants";
 import { loginReviewSchema } from "../../utils/validationSchema";
 import { useDispatch, useSelector } from "react-redux";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { facebookLogin, googleLogin, userLogin } from "../../api/auth";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import { useEffect } from "react";
-import { setJwt, setRefresh } from "../../store/tokenReducer";
-import { reduxLogin } from "../../store/userReducer";
+import { reduxLogin, reduxSetUserId } from "../../store/userReducer";
 import { LoginManager, AccessToken } from "react-native-fbsdk-next";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -31,27 +28,32 @@ export default Login = ({ navigation }) => {
 
   const handleLogin = async (method, payload) => {
     let res;
-    // calling login API for getting JWT token
-    if (method == "Local") {
-      res = await userLogin(payload);
-    }
-    if (method == "Google") {
-      res = await googleLogin(payload);
-    }
-    if (method == "Facebook") {
-      res = await facebookLogin(payload);
+    switch (method) {
+      case "Local":
+        res = await userLogin(payload);
+        break;
+      case "Google":
+        res = await googleLogin(payload);
+        break;
+      case "Facebook":
+        res = await facebookLogin(payload);
+        break;
+      default:
+        return;
     }
 
-    if (res.success) {
-      // retreive the saved JWT token from localStorage
-      // and store it to global state
-      const token = await AsyncStorage.getItem("jwt");
-      dispatch(setJwt(token));
-      dispatch(setRefresh(res.refreshToken));
-      dispatch(reduxLogin());
-      console.log(`Logged in with ${method} method!`);
-    } else {
+    if (!res.success) {
       Alert.alert(`${method} login failed: `, res.message);
+      return;
+    }
+
+    dispatch(reduxSetUserId(res.userId));
+    console.log(`Logged in with ${method} method!`);
+
+    if (res.isNew) {
+      navigation.replace("Edit Profile");
+    } else {
+      dispatch(reduxLogin());
     }
   };
 

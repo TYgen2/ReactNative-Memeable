@@ -23,13 +23,7 @@ export const popInAnimations = (icon_bottom, icon_opacity, icon_1, icon_2) => {
   }).start();
 };
 
-export const popOutAnimations = (
-  icon_bottom,
-  icon_opacity,
-  icon_1,
-  icon_2,
-  icon_3
-) => {
+export const popOutAnimations = (icon_bottom, icon_opacity, icon_1, icon_2) => {
   Animated.timing(icon_bottom, {
     toValue: 70,
     duration: 500,
@@ -48,6 +42,22 @@ export const popOutAnimations = (
   Animated.timing(icon_2, {
     toValue: 170,
     duration: 500,
+    useNativeDriver: false,
+  }).start();
+};
+
+export const showGIF = (gif) => {
+  Animated.timing(gif, {
+    toValue: 1,
+    duration: 500,
+    useNativeDriver: false,
+  }).start();
+};
+
+export const hideGIF = (gif) => {
+  Animated.timing(gif, {
+    toValue: 0,
+    duration: 10,
     useNativeDriver: false,
   }).start();
 };

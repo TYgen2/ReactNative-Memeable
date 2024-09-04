@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Animated } from "react-native";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import IonIcon from "react-native-vector-icons/Ionicons";
-import { popInAnimations, popOutAnimations } from "./animation";
+import { popInAnimations, popOutAnimations } from "../utils/animation";
 import OutsidePressHandler from "react-native-outside-press";
-import { selectImage } from "../utils/helper";
+import { selectImageForUpload } from "../utils/helper";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 
 export default PostButton = () => {
@@ -63,7 +63,9 @@ export default PostButton = () => {
           { bottom: icon_bottom, left: icon_camera, opacity: icon_opacity },
         ]}
       >
-        <TouchableOpacity onPress={() => selectImage(setImageUri, navigation)}>
+        <TouchableOpacity
+          onPress={() => selectImageForUpload(setImageUri, navigation)}
+        >
           <IonIcon name="folder-open-outline" size={30} color="white" />
         </TouchableOpacity>
       </Animated.View>

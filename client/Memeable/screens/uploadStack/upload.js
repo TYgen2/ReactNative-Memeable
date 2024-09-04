@@ -10,7 +10,7 @@ import { screenWidth } from "../../utils/constants";
 import { Formik } from "formik";
 import { uploadReviewSchema } from "../../utils/validationSchema";
 import { useDispatch, useSelector } from "react-redux";
-import { handleUpload } from "../../api/userActions";
+import { handlePostUpload, handleUpload } from "../../api/userActions";
 import { setJwt, setRefresh } from "../../store/tokenReducer";
 import Icon from "react-native-vector-icons/Ionicons";
 
@@ -48,7 +48,7 @@ export default Upload = ({ route, navigation }) => {
         }}
         validationSchema={uploadReviewSchema}
         onSubmit={(values) => {
-          handleUpload(
+          handlePostUpload(
             imageUri,
             values.title,
             values.description,

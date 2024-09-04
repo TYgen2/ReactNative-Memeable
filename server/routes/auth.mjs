@@ -44,15 +44,22 @@ router.post(
 
     const signedRefreshToken = generateRefreshToken();
 
-    const newUser = new User({ ...data, refreshToken: signedRefreshToken });
+    const newUser = new User({
+      ...data,
+      refreshToken: signedRefreshToken,
+      icon: {},
+    });
 
     try {
       const savedUser = await newUser.save();
       const token = generateJWT({ id: savedUser.id });
 
-      return res
-        .status(201)
-        .send({ token: token, refreshToken: signedRefreshToken });
+      return res.status(201).send({
+        token: token,
+        refreshToken: signedRefreshToken,
+        isNew: true,
+        userId: savedUser.id,
+      });
     } catch (error) {
       console.log("Cannot create new user wtf?", error);
       return res.status(400).send(error);
@@ -86,9 +93,12 @@ router.post("/api/auth/login", async (req, res) => {
     user.refreshToken = signedRefreshToken;
     await user.save();
 
-    return res
-      .status(201)
-      .send({ token: token, refreshToken: signedRefreshToken });
+    return res.status(201).send({
+      token: token,
+      refreshToken: signedRefreshToken,
+      isNew: false,
+      userId: user.id,
+    });
   } catch (error) {
     return res.status(400).send(error);
   }
@@ -112,14 +122,17 @@ router.post("/api/auth/google", async (req, res) => {
 
     // check whether the user is exist or not by using googleId
     let user = await User.findOne({ email: payload.email });
+    let isNew;
     // if not exist yet, create one
     if (!user) {
+      isNew = true;
       user = new User({
         email: payload.email,
         displayName: payload.name,
         googleId: payload.sub,
         authMethod: "google",
         refreshToken: signedRefreshToken,
+        icon: {},
       });
     } else if (user && user.authMethod != "google") {
       // user already used the same email to register an account with other methods
@@ -127,6 +140,7 @@ router.post("/api/auth/google", async (req, res) => {
         msg: `You have used this email to register an account before! Method: ${user.authMethod}`,
       });
     } else {
+      isNew = false;
       // if exist, update the refreshToken in db
       user.refreshToken = signedRefreshToken;
     }
@@ -135,9 +149,12 @@ router.post("/api/auth/google", async (req, res) => {
     // return the generated JWT to client
     const token = generateJWT({ id: user.id });
 
-    return res
-      .status(201)
-      .send({ token: token, refreshToken: signedRefreshToken });
+    return res.status(201).send({
+      token: token,
+      refreshToken: signedRefreshToken,
+      isNew,
+      userId: user.id,
+    });
   } catch (err) {
     console.log("Invalid google token WTF??", err);
     return res
@@ -161,13 +178,16 @@ router.post("/api/auth/facebook", async (req, res) => {
     const signedRefreshToken = generateRefreshToken();
 
     let user = await User.findOne({ email: response.data.email });
+    let isNew;
     if (!user) {
+      isNew = true;
       user = new User({
         email: response.data.email,
         displayName: response.data.name,
         facebookId: response.data.id,
         authMethod: "facebook",
         refreshToken: signedRefreshToken,
+        icon: {},
       });
     } else if (user && user.authMethod != "facebook") {
       console.log(
@@ -177,15 +197,19 @@ router.post("/api/auth/facebook", async (req, res) => {
         msg: `You have used this email to register an account before! Method: ${user.authMethod}`,
       });
     } else {
+      isNew = false;
       user.refreshToken = signedRefreshToken;
     }
     await user.save();
 
     const token = generateJWT({ id: user.id });
 
-    return res
-      .status(201)
-      .send({ token: token, refreshToken: signedRefreshToken });
+    return res.status(201).send({
+      token: token,
+      refreshToken: signedRefreshToken,
+      isNew,
+      userId: user.id,
+    });
   } catch (err) {
     console.log("Invalid facebook token WTF??", err);
     return res.status(400).send(err);
