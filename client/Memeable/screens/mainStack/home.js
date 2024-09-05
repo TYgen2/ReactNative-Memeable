@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { reduxLogout } from "../../store/userReducer";
-import { clearTokens } from "../../utils/helper";
+import { clearTokens } from "../../utils/tokenActions";
 
 export default Home = ({ navigation }) => {
   const dispatch = useDispatch();

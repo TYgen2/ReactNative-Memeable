@@ -13,12 +13,8 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { barOffset, screenWidth } from "../../utils/constants";
 import { userRegister } from "../../api/auth";
 import { registerReviewSchema } from "../../utils/validationSchema";
-import { useDispatch, useSelector } from "react-redux";
-import { reduxSetUserId } from "../../store/userReducer";
 
 export default Register = ({ navigation }) => {
-  const dispatch = useDispatch();
-
   const handleRegister = async (json) => {
     // calling register API for getting JWT token
     const res = await userRegister(json);
@@ -26,8 +22,7 @@ export default Register = ({ navigation }) => {
     // retreive the saved JWT token from localStorage
     // and store it to global state
     if (res.success) {
-      dispatch(reduxSetUserId(res.userId));
-      navigation.replace("Edit Profile");
+      navigation.replace("Edit Profile", { userId: res.userId });
     } else {
       Alert.alert("Register failed: ", res.message);
     }

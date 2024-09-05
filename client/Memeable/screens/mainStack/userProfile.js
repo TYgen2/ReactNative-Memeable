@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSelector } from "react-redux";
 
 export default UserProfile = () => {
   return (

@@ -18,13 +18,16 @@ import { facebookLogin, googleLogin, userLogin } from "../../api/auth";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import { useEffect } from "react";
-import { reduxLogin, reduxSetUserId } from "../../store/userReducer";
+import { reduxSetUserInfo } from "../../store/userReducer";
 import { LoginManager, AccessToken } from "react-native-fbsdk-next";
+import { handleLoginFetch } from "../../utils/helper";
+import { getTokens } from "../../utils/tokenActions";
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default Login = ({ navigation }) => {
   const dispatch = useDispatch();
+  const { userInfo } = useSelector((state) => state.user);
 
   const handleLogin = async (method, payload) => {
     let res;
@@ -46,15 +49,26 @@ export default Login = ({ navigation }) => {
       Alert.alert(`${method} login failed: `, res.message);
       return;
     }
-
-    dispatch(reduxSetUserId(res.userId));
     console.log(`Logged in with ${method} method!`);
 
-    if (res.isNew) {
-      navigation.replace("Edit Profile");
-    } else {
-      dispatch(reduxLogin());
+    // After using Google or Facebook to login/register, if
+    // found user is new, then navigate to edit profile, OR
+    // User registered and exist, but accidentally
+    // closed app before setting profile
+    if (res.isNew || !userInfo) {
+      navigation.replace("Edit Profile", { userId: res.userId });
+      return;
     }
+
+    // User exist, proceed to login
+    const tokens = await getTokens();
+    await handleLoginFetch(
+      tokens.jwtToken,
+      tokens.refreshToken,
+      res.userId,
+      dispatch,
+      reduxSetUserInfo
+    );
   };
 
   const [request, response, promptAsync] =

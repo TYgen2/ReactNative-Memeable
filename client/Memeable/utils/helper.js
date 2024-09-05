@@ -1,21 +1,21 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
-import * as Keychain from "react-native-keychain";
+import { fetchUserInfo } from "../api/userActions";
 
 // validate whether JWT and refreshToken expired or not
-export const checkLoginStatus = async () => {
-  try {
-    const token = await AsyncStorage.getItem("jwt");
-    if (token) {
-      return true;
-    } else {
-      return false;
-    }
-  } catch (error) {
-    console.error("Error checking login status!!", error);
-    return false;
-  }
-};
+// export const checkLoginStatus = async () => {
+//   try {
+//     const token = await AsyncStorage.getItem("jwt");
+//     if (token) {
+//       return true;
+//     } else {
+//       return false;
+//     }
+//   } catch (error) {
+//     console.error("Error checking login status!!", error);
+//     return false;
+//   }
+// };
 
 // select image from album
 export const selectImageForUpload = async (setImageUri, navigation) => {
@@ -62,26 +62,18 @@ export const selectImageForProfile = async (setCustomIcon) => {
   }
 };
 
-export const storeTokens = async (jwtToken, refreshToken) => {
-  await Keychain.setGenericPassword("jwtToken", jwtToken, {
-    service: "jwtToken",
+// after login, handlle the fetched data by updating global
+export const handleLoginFetch = async (
+  jwtToken,
+  refreshToken,
+  userId,
+  dispatch,
+  reduxSetUserInfo
+) => {
+  const userInfo = await fetchUserInfo({
+    jwtToken,
+    refreshToken,
+    userId,
   });
-  await Keychain.setGenericPassword("refreshToken", refreshToken, {
-    service: "refreshToken",
-  });
-};
-
-export const getTokens = async () => {
-  const jwt = await Keychain.getGenericPassword({
-    service: "jwtToken",
-  });
-  const refresh = await Keychain.getGenericPassword({
-    service: "refreshToken",
-  });
-  return { jwtToken: jwt.password, refreshToken: refresh.password };
-};
-
-export const clearTokens = async () => {
-  await Keychain.resetGenericPassword({ service: "jwtToken" });
-  await Keychain.resetGenericPassword({ service: "refreshToken" });
+  dispatch(reduxSetUserInfo(userInfo));
 };

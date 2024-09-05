@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   loginStatus: false,
-  userId: "",
+  userInfo: null,
 };
 
 export const userSlice = createSlice({
@@ -14,15 +14,15 @@ export const userSlice = createSlice({
     },
     reduxLogout: (state) => {
       state.loginStatus = false;
-      state.userId = "";
+      state.userInfo = null;
     },
-    reduxSetUserId: (state, action) => {
-      state.userId = action.payload;
+    reduxSetUserInfo: (state, action) => {
+      state.userInfo = action.payload;
     },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { reduxLogin, reduxLogout, reduxSetUserId } = userSlice.actions;
+export const { reduxLogin, reduxLogout, reduxSetUserInfo } = userSlice.actions;
 
 export default userSlice.reducer;

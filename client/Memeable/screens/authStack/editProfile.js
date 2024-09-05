@@ -15,19 +15,20 @@ import {
 } from "../../utils/constants";
 import EffectiveGIF from "../../components/effectiveGIF";
 import { hideGIF, showGIF } from "../../utils/animation";
-import { getTokens, selectImageForProfile } from "../../utils/helper";
-import { reduxLogin } from "../../store/userReducer";
+import { handleLoginFetch, selectImageForProfile } from "../../utils/helper";
+import { reduxSetUserInfo } from "../../store/userReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { handleIconUpload } from "../../api/userActions";
+import { getTokens } from "../../utils/tokenActions";
 
-export default EditProfile = () => {
+export default EditProfile = ({ route }) => {
+  const { userId } = route.params;
   const [icon, setIcon] = useState(DEFAULT_ICONS[0]);
   const [customIcon, setCustomIcon] = useState(null);
   const [bgColor, setBgColor] = useState("white");
   const [gif] = useState(new Animated.Value(0));
 
   const dispatch = useDispatch();
-  const { userId } = useSelector((state) => state.user);
 
   // Flatlist render item (Icons)
   const renderIcons = ({ item }) => {
@@ -188,13 +189,19 @@ export default EditProfile = () => {
               bgColor,
               customIcon,
             };
-            handleIconUpload(
+            await handleIconUpload(
               userId,
               iconJSON,
               tokens.jwtToken,
               tokens.refreshToken
             );
-            dispatch(reduxLogin());
+            await handleLoginFetch(
+              tokens.jwtToken,
+              tokens.refreshToken,
+              userId,
+              dispatch,
+              reduxSetUserInfo
+            );
           }}
         >
           <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>

@@ -3,6 +3,7 @@ import routes from "./routes/index.mjs";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import mongoose from "mongoose";
+import morgan from "morgan";
 
 const app = express();
 
@@ -13,6 +14,7 @@ mongoose
 
 app.use(express.json());
 app.use(cookieParser("helloworld"));
+app.use(morgan("dev"));
 
 app.use(passport.initialize());
 app.use(routes);

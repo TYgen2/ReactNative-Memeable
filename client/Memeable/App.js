@@ -11,7 +11,7 @@ import notify from "./screens/mainStack/notification";
 import upload from "./screens/uploadStack/upload";
 import editProfile from "./screens/authStack/editProfile";
 import { useContext, useEffect, useState } from "react";
-import { StatusBar, StyleSheet, Text } from "react-native";
+import { StatusBar } from "react-native";
 import { store } from "./store/store";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { LoadingContextProvider, UpdateContext } from "./context/loading";
@@ -20,7 +20,7 @@ import { persistStore } from "redux-persist";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import CustomTab from "./components/customTab";
 import { EventProvider } from "react-native-outside-press";
-import { checkAuthState, getTokens } from "./utils/helper";
+import { reduxLogin } from "./store/userReducer";
 
 const persistor = persistStore(store);
 
@@ -108,7 +108,18 @@ const MainStackNavigator = () => {
 
 const App = () => {
   const { isLoading } = useContext(UpdateContext);
-  const { loginStatus } = useSelector((state) => state.user);
+  const [isUserInfoReady, setIsUserInfoReady] = useState(false);
+  const { loginStatus, userInfo } = useSelector((state) => state.user);
+
+  const dispatch = useDispatch();
+
+  // when user info is ready, login user
+  useEffect(() => {
+    if (userInfo) {
+      dispatch(reduxLogin());
+      setIsUserInfoReady(true);
+    }
+  }, [userInfo]);
 
   if (isLoading) {
     return <Splash />;
@@ -121,7 +132,11 @@ const App = () => {
         translucent={true}
         backgroundColor="transparent"
       />
-      {loginStatus ? <MainStackNavigator /> : <AuthStackScreen />}
+      {loginStatus && isUserInfoReady ? (
+        <MainStackNavigator />
+      ) : (
+        <AuthStackScreen />
+      )}
     </NavigationContainer>
   );
 };

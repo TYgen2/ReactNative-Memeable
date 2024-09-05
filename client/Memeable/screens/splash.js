@@ -6,17 +6,13 @@ import Animated, {
   withTiming,
   runOnJS,
 } from "react-native-reanimated";
-import { useDispatch, useSelector } from "react-redux";
 import { UpdateContext } from "../context/loading";
 import { validateTokens } from "../api/auth";
-import { setRefresh } from "../store/tokenReducer";
-import { getTokens } from "../utils/helper";
+import { getTokens } from "../utils/tokenActions";
 
 export default Splash = () => {
   const { setIsLoading } = useContext(UpdateContext);
-  const { jwtToken, refreshToken } = useSelector((state) => state.token);
 
-  const dispatch = useDispatch();
   const checkStatus = async () => {
     const tokens = await getTokens();
     const res = await validateTokens(tokens.jwtToken, tokens.refreshToken);
@@ -25,10 +21,9 @@ export default Splash = () => {
     // store them in global state (local already stored
     // in the validateTokens API)
     if (res.success === true && res.refreshToken) {
-      dispatch(setRefresh(res.refreshToken));
       console.log(res.message);
     } else if (res.success) {
-      // JWT still valid, stay login
+      // JWT still valid
       console.log(res.message);
     } else {
       // not login in yet / both JWT and refreshToken are expired

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { LOCAL_HOST } from "@env";
-import { storeTokens } from "../utils/helper";
+import { storeTokens } from "../utils/tokenActions";
 
 // local register
 export const userRegister = async (json) => {

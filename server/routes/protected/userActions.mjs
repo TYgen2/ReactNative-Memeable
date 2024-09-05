@@ -162,4 +162,18 @@ router.post(
   }
 );
 
+router.post("/api/fetchUserInfo", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.body.userId });
+    return res.status(200).send({
+      email: user.email,
+      userId: user.id,
+      displayName: user.displayName,
+      userIcon: user.icon,
+    });
+  } catch (error) {
+    return res.status(400).send({ msg: error });
+  }
+});
+
 export default router;

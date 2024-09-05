@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, View, Image, Text } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Image } from "react-native";
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -7,10 +7,19 @@ import Animated, {
 } from "react-native-reanimated";
 import MCIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import IonIcon from "react-native-vector-icons/Ionicons";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { DEFAULT_ICONS } from "../utils/constants";
 
 export default TabItem = ({ onPress, isFocused, routeName, label }) => {
   const scale = useSharedValue(0);
+  const { userInfo } = useSelector((state) => state.user);
+  const iconBgColor = userInfo?.userIcon?.bgColor || "transparent";
+  const iconSource = userInfo
+    ? userInfo.userIcon.customIcon
+      ? { uri: userInfo.userIcon.customIcon }
+      : DEFAULT_ICONS.find((icon) => icon.id === userInfo.userIcon.id)?.source
+    : DEFAULT_ICONS[0].source;
 
   const icon = {
     UserStack: (props) => <MCIcon name="home" size={30} {...props} />,
@@ -34,7 +43,6 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
       top: top,
     };
   });
-
   const animatedTextStyle = useAnimatedStyle(() => {
     const opacity = interpolate(scale.value, [0, 1], [1, 0]);
 
@@ -89,8 +97,9 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
                   height: 40,
                   width: 40,
                   borderRadius: 40,
+                  backgroundColor: iconBgColor,
                 }}
-                source={require("../assets/notification_icon.png")}
+                source={iconSource}
               />
             </View>
           </View>

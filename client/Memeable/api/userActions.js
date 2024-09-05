@@ -1,6 +1,9 @@
 import axios from "axios";
+import axiosRetry from "axios-retry";
 import { LOCAL_HOST } from "@env";
-import { storeTokens } from "../utils/helper";
+import { storeTokens } from "../utils/tokenActions";
+
+axiosRetry(axios, { retries: 3 });
 
 // send image data to backend for posting
 export const handlePostUpload = async (
@@ -49,6 +52,7 @@ export const handlePostUpload = async (
   }
 };
 
+// send icon data to backend for update profile icon
 export const handleIconUpload = async (
   userId,
   icon,
@@ -106,7 +110,28 @@ export const handleIconUpload = async (
       }
       console.log(res.data.msg);
     } catch (error) {
-      console.error(error);
+      if (error.response) {
+        // Server responded with a status other than 200 range
+        console.error("Response error:", error.response.data);
+      } else if (error.request) {
+        // Request was made but no response received
+        console.error("Request error:", error.request);
+      } else {
+        // Something else happened
+        console.error("Error:", error.message);
+      }
     }
+  }
+};
+
+export const fetchUserInfo = async (json) => {
+  try {
+    const res = await axios.post(`${LOCAL_HOST}/api/fetchUserInfo`, json);
+    const { email, userId, displayName, userIcon } = res.data;
+
+    console.log("User info fetched!");
+    return { email, userId, displayName, userIcon };
+  } catch (error) {
+    return { message: error.response.data.msg };
   }
 };
