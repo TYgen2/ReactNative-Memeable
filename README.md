@@ -15,4 +15,4 @@ Still under development.
 <img src="https://github.com/user-attachments/assets/c8ace98f-b813-487b-a605-675c80ff26e0" width="200" height="400"/>
 <img src="https://github.com/user-attachments/assets/8c80b238-87a8-4824-85c4-9ddeb97b8266" width="200" height="400"/>
 <img src="https://github.com/user-attachments/assets/ee405c91-831e-4d23-82bf-e6c1db4995fa" width="200" height="400"/>
-<img src="https://github.com/user-attachments/assets/ba9a3738-e05d-438b-96d9-08eae226f620" width="200" height="400"/>
+<img src="https://github.com/user-attachments/assets/1570d012-0e1f-4b5d-9a16-dd0063d83956" width="200" height="400"/>
