@@ -12,10 +12,7 @@ export const handlePostUpload = async (
   description,
   hashtag,
   jwtToken,
-  refreshToken,
-  dispatch,
-  setJwt,
-  setRefresh
+  refreshToken
 ) => {
   if (imageUri) {
     const formData = new FormData();
@@ -32,7 +29,7 @@ export const handlePostUpload = async (
     formData.append("refreshToken", refreshToken);
 
     try {
-      const res = await axios.post(`${LOCAL_HOST}/api/create`, formData, {
+      const res = await axios.post(`${LOCAL_HOST}/api/uploadPost`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -41,9 +38,8 @@ export const handlePostUpload = async (
       // when user's jwtToken is expired, but refreshToken is still valid,
       // backend will return a new pair of token, and needs update global
       if (res.data.token && res.data.refreshToken) {
-        dispatch(setJwt(res.data.token));
-        dispatch(setRefresh(res.data.refreshToken));
-        console.log("Tokens updated in Global");
+        await storeTokens(res.data.token, res.data.refreshToken);
+        console.log("Tokens updated");
       }
       console.log(res.data.msg);
     } catch (error) {
@@ -124,6 +120,7 @@ export const handleIconUpload = async (
   }
 };
 
+// fetch user info before login
 export const fetchUserInfo = async (json) => {
   try {
     const res = await axios.post(`${LOCAL_HOST}/api/fetchUserInfo`, json);
@@ -131,6 +128,16 @@ export const fetchUserInfo = async (json) => {
 
     console.log("User info fetched!");
     return { email, userId, displayName, userIcon };
+  } catch (error) {
+    return { message: error.response.data.msg };
+  }
+};
+
+export const handleLike = async (json) => {
+  try {
+    const res = await axios.post(`${LOCAL_HOST}/api/handleLike`, json);
+
+    return { msg: res.data.msg };
   } catch (error) {
     return { message: error.response.data.msg };
   }

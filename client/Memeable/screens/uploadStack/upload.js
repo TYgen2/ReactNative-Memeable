@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Image,
   StyleSheet,
   Text,
@@ -9,18 +10,22 @@ import {
 import { screenWidth } from "../../utils/constants";
 import { Formik } from "formik";
 import { uploadReviewSchema } from "../../utils/validationSchema";
-import { useDispatch, useSelector } from "react-redux";
-import { handlePostUpload, handleUpload } from "../../api/userActions";
-import { setJwt, setRefresh } from "../../store/tokenReducer";
+import { handlePostUpload } from "../../api/userActions";
 import Icon from "react-native-vector-icons/Ionicons";
+import { getTokens } from "../../utils/tokenActions";
+import { useState } from "react";
 
 export default Upload = ({ route, navigation }) => {
   const { imageUri } = route.params;
-  const dispatch = useDispatch();
-  const { jwtToken, refreshToken } = useSelector((state) => state.token);
+  const [isUploading, setIsUploading] = useState(false);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: "white" }]}>
+      {isUploading && (
+        <View style={styles.overlay}>
+          <ActivityIndicator size="large" color="#fff" />
+        </View>
+      )}
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => navigation.pop()}
@@ -47,18 +52,20 @@ export default Upload = ({ route, navigation }) => {
           hashtag: "",
         }}
         validationSchema={uploadReviewSchema}
-        onSubmit={(values) => {
-          handlePostUpload(
+        onSubmit={async (values) => {
+          setIsUploading(true);
+          const tokens = await getTokens();
+          await handlePostUpload(
             imageUri,
             values.title,
             values.description,
             values.hashtag,
-            jwtToken,
-            refreshToken,
-            dispatch,
-            setJwt,
-            setRefresh
-          ).then(() => {});
+            tokens.jwtToken,
+            tokens.refreshToken
+          ).then(() => {
+            setIsUploading(false);
+            navigation.pop();
+          });
         }}
       >
         {(props) => (
@@ -128,6 +135,16 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  overlay: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
+    elevation: 1,
   },
   backButton: {
     justifyContent: "center",

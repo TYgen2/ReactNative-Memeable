@@ -18,6 +18,7 @@ export const authenticateToken = async (req, res, next) => {
   }
 
   const user = await User.findOne({ refreshToken });
+  req.userId = user.id;
   if (!user) {
     return res
       .status(400)

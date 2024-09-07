@@ -51,11 +51,7 @@ export default Login = ({ navigation }) => {
     }
     console.log(`Logged in with ${method} method!`);
 
-    // After using Google or Facebook to login/register, if
-    // found user is new, then navigate to edit profile, OR
-    // User registered and exist, but accidentally
-    // closed app before setting profile
-    if (res.isNew || !userInfo) {
+    if (res.isNew) {
       navigation.replace("Edit Profile", { userId: res.userId });
       return;
     }

@@ -5,9 +5,18 @@ const PostSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
+    index: true,
   },
-  imageKey: {
+  imageUri: {
     type: mongoose.Schema.Types.String,
+    required: true,
+  },
+  width: {
+    type: mongoose.Schema.Types.Number,
+    required: true,
+  },
+  height: {
+    type: mongoose.Schema.Types.Number,
     required: true,
   },
   title: {
@@ -21,7 +30,11 @@ const PostSchema = new mongoose.Schema({
   },
   createDate: {
     type: mongoose.Schema.Types.Date,
-    default: Date.now(),
+    default: Date.now,
+  },
+  likes: {
+    type: mongoose.Schema.Types.Number,
+    default: 0,
   },
 });
 

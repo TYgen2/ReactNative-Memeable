@@ -1,21 +1,5 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { fetchUserInfo } from "../api/userActions";
-
-// validate whether JWT and refreshToken expired or not
-// export const checkLoginStatus = async () => {
-//   try {
-//     const token = await AsyncStorage.getItem("jwt");
-//     if (token) {
-//       return true;
-//     } else {
-//       return false;
-//     }
-//   } catch (error) {
-//     console.error("Error checking login status!!", error);
-//     return false;
-//   }
-// };
 
 // select image from album
 export const selectImageForUpload = async (setImageUri, navigation) => {
@@ -76,4 +60,14 @@ export const handleLoginFetch = async (
     userId,
   });
   dispatch(reduxSetUserInfo(userInfo));
+};
+
+export const displayLikes = (count) => {
+  if (count < 1000) {
+    return count.toString();
+  } else if (count < 1000000) {
+    return (count / 1000).toFixed(1) + "k";
+  } else {
+    return (count / 1000000).toFixed(1) + "M";
+  }
 };

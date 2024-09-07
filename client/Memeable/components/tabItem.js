@@ -14,11 +14,15 @@ import { DEFAULT_ICONS } from "../utils/constants";
 export default TabItem = ({ onPress, isFocused, routeName, label }) => {
   const scale = useSharedValue(0);
   const { userInfo } = useSelector((state) => state.user);
-  const iconBgColor = userInfo?.userIcon?.bgColor || "transparent";
+  const iconBgColor = userInfo?.userIcon?.bgColor || "orange";
+  // check customIcon, if null, check defaultIcon. If still null,
+  // it means user accidentally closed app during editting profile,
+  // fallback using a default icon with orange background and doge.
   const iconSource = userInfo
     ? userInfo.userIcon.customIcon
       ? { uri: userInfo.userIcon.customIcon }
-      : DEFAULT_ICONS.find((icon) => icon.id === userInfo.userIcon.id)?.source
+      : DEFAULT_ICONS.find((icon) => icon.id === userInfo.userIcon.id)
+          ?.source || DEFAULT_ICONS[0].source
     : DEFAULT_ICONS[0].source;
 
   const icon = {
