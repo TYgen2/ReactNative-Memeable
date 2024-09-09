@@ -13,11 +13,13 @@ import { uploadReviewSchema } from "../../utils/validationSchema";
 import { handlePostUpload } from "../../api/userActions";
 import Icon from "react-native-vector-icons/Ionicons";
 import { getTokens } from "../../utils/tokenActions";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { UpdateContext } from "../../context/loading";
 
 export default Upload = ({ route, navigation }) => {
   const { imageUri } = route.params;
   const [isUploading, setIsUploading] = useState(false);
+  const { shouldFetch, setShouldFetch } = useContext(UpdateContext);
 
   return (
     <View style={[styles.container, { backgroundColor: "white" }]}>
@@ -64,6 +66,7 @@ export default Upload = ({ route, navigation }) => {
             tokens.refreshToken
           ).then(() => {
             setIsUploading(false);
+            setShouldFetch(true);
             navigation.pop();
           });
         }}

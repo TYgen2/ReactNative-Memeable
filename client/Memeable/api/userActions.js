@@ -25,12 +25,12 @@ export const handlePostUpload = async (
     formData.append("title", title);
     formData.append("description", description);
     formData.append("hashtag", hashtag);
-    formData.append("jwtToken", jwtToken);
-    formData.append("refreshToken", refreshToken);
 
     try {
       const res = await axios.post(`${LOCAL_HOST}/api/uploadPost`, formData, {
         headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          "x-refresh-token": refreshToken,
           "Content-Type": "multipart/form-data",
         },
       });
@@ -58,12 +58,19 @@ export const handleIconUpload = async (
   // using default icons
   if (icon.customIcon == null) {
     try {
-      const res = await axios.post(`${LOCAL_HOST}/api/uploadDefaultIcon`, {
-        userId,
-        icon,
-        jwtToken,
-        refreshToken,
-      });
+      const res = await axios.post(
+        `${LOCAL_HOST}/api/uploadDefaultIcon`,
+        {
+          userId,
+          icon,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+            "x-refresh-token": refreshToken,
+          },
+        }
+      );
       // when user's jwtToken is expired, but refreshToken is still valid,
       // backend will return a new pair of token, and needs update global
       if (res.data.token && res.data.refreshToken) {
@@ -86,8 +93,6 @@ export const handleIconUpload = async (
     });
     formData.append("userId", userId);
     formData.append("icon", imageUri);
-    formData.append("jwtToken", jwtToken);
-    formData.append("refreshToken", refreshToken);
 
     try {
       const res = await axios.post(
@@ -95,6 +100,8 @@ export const handleIconUpload = async (
         formData,
         {
           headers: {
+            Authorization: `Bearer ${jwtToken}`,
+            "x-refresh-token": refreshToken,
             "Content-Type": "multipart/form-data",
           },
         }
@@ -121,9 +128,18 @@ export const handleIconUpload = async (
 };
 
 // fetch user info before login
-export const fetchUserInfo = async (json) => {
+export const fetchUserInfo = async (id, jwtToken, refreshToken) => {
   try {
-    const res = await axios.post(`${LOCAL_HOST}/api/fetchUserInfo`, json);
+    const res = await axios.post(
+      `${LOCAL_HOST}/api/fetchUserInfo`,
+      { id },
+      {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          "x-refresh-token": refreshToken,
+        },
+      }
+    );
     const { email, userId, displayName, userIcon } = res.data;
 
     console.log("User info fetched!");
@@ -133,9 +149,88 @@ export const fetchUserInfo = async (json) => {
   }
 };
 
-export const handleLike = async (json) => {
+// fetch additional user info in user profile
+export const fetchAdditional = async (userId, jwtToken, refreshToken) => {
   try {
-    const res = await axios.post(`${LOCAL_HOST}/api/handleLike`, json);
+    const res = await axios.get(`${LOCAL_HOST}/api/fetchAdditionalInfo`, {
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+        "x-refresh-token": refreshToken,
+      },
+      params: { userId },
+    });
+    const { followersCount, followingCount, postsCount } = res.data;
+
+    return { followersCount, followingCount, postsCount };
+  } catch (error) {
+    return { message: error.response.data.msg };
+  }
+};
+
+// handle like / unlike
+export const handleLike = async (userId, postId, jwtToken, refreshToken) => {
+  try {
+    const res = await axios.post(
+      `${LOCAL_HOST}/api/handleLike`,
+      { userId, postId },
+      {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          "x-refresh-token": refreshToken,
+        },
+      }
+    );
+
+    return { msg: res.data.msg };
+  } catch (error) {
+    return { message: error.response.data.msg };
+  }
+};
+
+// fetch posts
+export const handleFetchPosts = async (
+  page,
+  limit,
+  userId,
+  mode,
+  jwtToken,
+  refreshToken
+) => {
+  try {
+    const res = await axios.get(`${LOCAL_HOST}/api/fetchPosts`, {
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+        "x-refresh-token": refreshToken,
+      },
+      params: { page, limit, userId, mode },
+    });
+    const postData = res.data;
+
+    return { postData };
+  } catch (error) {
+    return { message: error.response.data.msg };
+  }
+};
+
+// handle follow / unfollow
+export const handleFollow = async (
+  userId,
+  targetId,
+  action,
+  jwtToken,
+  refreshToken
+) => {
+  try {
+    const res = await axios.post(
+      `${LOCAL_HOST}/api/handleFollow`,
+      { userId, targetId, action },
+      {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          "x-refresh-token": refreshToken,
+        },
+      }
+    );
 
     return { msg: res.data.msg };
   } catch (error) {

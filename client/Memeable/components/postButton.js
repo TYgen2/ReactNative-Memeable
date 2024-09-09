@@ -42,7 +42,7 @@ export default PostButton = () => {
       style={{
         flex: 1,
         elevation: 5,
-        zIndex: 2,
+        zIndex: 5,
         shadowColor: "transparent",
       }}
     >

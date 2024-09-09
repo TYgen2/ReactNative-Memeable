@@ -7,19 +7,19 @@ import Animated, {
 } from "react-native-reanimated";
 import MCIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import IonIcon from "react-native-vector-icons/Ionicons";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { DEFAULT_ICONS } from "../utils/constants";
 
 export default TabItem = ({ onPress, isFocused, routeName, label }) => {
   const scale = useSharedValue(0);
   const { userInfo } = useSelector((state) => state.user);
-  const iconBgColor = userInfo?.userIcon?.bgColor || "orange";
+  const iconBgColor = userInfo?.userIcon?.bgColor || "transparent";
   // check customIcon, if null, check defaultIcon. If still null,
   // it means user accidentally closed app during editting profile,
   // fallback using a default icon with orange background and doge.
   const iconSource = userInfo
-    ? userInfo.userIcon.customIcon
+    ? userInfo?.userIcon?.customIcon
       ? { uri: userInfo.userIcon.customIcon }
       : DEFAULT_ICONS.find((icon) => icon.id === userInfo.userIcon.id)
           ?.source || DEFAULT_ICONS[0].source
@@ -69,12 +69,12 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
           style={[{ flex: 1, alignItems: "center" }, animatedIconStyle]}
         >
           {icon[routeName]({
-            color: isFocused ? "#5D3FD3" : "black",
+            color: isFocused ? "#96DED1" : "white",
           })}
           <Animated.Text
             style={[
               {
-                color: isFocused ? "red" : "black",
+                color: "white",
               },
               animatedTextStyle,
             ]}
@@ -92,7 +92,7 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
           <View
             style={[
               styles.iconBorder1,
-              { backgroundColor: isFocused ? "#5D3FD3" : "black" },
+              { backgroundColor: isFocused ? "#96DED1" : "black" },
             ]}
           >
             <View style={styles.iconBorder2}>

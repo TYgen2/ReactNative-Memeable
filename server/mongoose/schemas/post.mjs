@@ -31,11 +31,14 @@ const PostSchema = new mongoose.Schema({
   createDate: {
     type: mongoose.Schema.Types.Date,
     default: Date.now,
+    index: true,
   },
   likes: {
     type: mongoose.Schema.Types.Number,
     default: 0,
   },
 });
+
+PostSchema.index({ createDate: -1 });
 
 export const Post = mongoose.model("Post", PostSchema);

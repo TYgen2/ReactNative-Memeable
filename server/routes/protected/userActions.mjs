@@ -10,6 +10,7 @@ import { checkSchema, validationResult } from "express-validator";
 import { createPostValidationSchema } from "../../validationSchemas.mjs";
 import { User } from "../../mongoose/schemas/user.mjs";
 import { Like } from "../../mongoose/schemas/like.mjs";
+import { Follow } from "../../mongoose/schemas/follow.mjs";
 dotenv.config();
 
 const router = Router();
@@ -168,21 +169,7 @@ router.post(
   }
 );
 
-// fetch user info
-router.post("/api/fetchUserInfo", authenticateToken, async (req, res) => {
-  try {
-    const user = await User.findOne({ _id: req.body.userId });
-    return res.status(200).send({
-      email: user.email,
-      userId: user.id,
-      displayName: user.displayName,
-      userIcon: user.icon,
-    });
-  } catch (error) {
-    return res.status(400).send({ msg: error });
-  }
-});
-
+// user like / unlike posts
 router.post("/api/handleLike", authenticateToken, async (req, res) => {
   const { userId, postId } = req.body;
 
@@ -200,6 +187,25 @@ router.post("/api/handleLike", authenticateToken, async (req, res) => {
       .send({ msg: target ? "Unliked the post!" : "Liked the post!" });
   } catch (error) {
     res.status(400).send({ msg: "Error when handling the like function" });
+  }
+});
+
+// user follow / unfollow other users
+router.post("/api/handleFollow", authenticateToken, async (req, res) => {
+  const { userId, targetUserId, action } = req.body;
+
+  try {
+    if (action === "follow") {
+      await Follow.create({ userId: targetUserId, followerId: userId });
+      return res.status(200).send({ msg: "Followed successfully!" });
+    } else if (action === "unfollow") {
+      await Follow.deleteOne({ userId: targetUserId, followerId: userId });
+      return res.status(200).send({ msg: "Unfollowed successfully!" });
+    } else {
+      return res.status(400).send({ msg: "Invalid action" });
+    }
+  } catch (error) {
+    res.status(400).send({ msg: "Error when handling follow/unfollow" });
   }
 });
 

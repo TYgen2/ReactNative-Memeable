@@ -21,6 +21,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import CustomTab from "./components/customTab";
 import { EventProvider } from "react-native-outside-press";
 import { reduxLogin } from "./store/userReducer";
+import BackButton from "./components/backButton";
 
 const persistor = persistStore(store);
 
@@ -50,6 +51,7 @@ const UserStackScreen = () => {
     <UserStack.Navigator screenOptions={{ headerShown: false }}>
       <UserStack.Screen name="Home" component={home} />
       <UserStack.Screen name="ViewPost" component={viewPost} />
+      <UserStack.Screen name="UserProfile" component={userProfile} />
     </UserStack.Navigator>
   );
 };
@@ -71,7 +73,7 @@ const MainStackScreen = () => {
       <Tab.Screen
         name="Search"
         component={search}
-        options={{ title: "Search" }}
+        options={{ title: "Explore" }}
       />
       <Tab.Screen
         name="Notify"
@@ -130,7 +132,7 @@ const App = () => {
       <StatusBar
         barStyle="dark-content"
         translucent={true}
-        backgroundColor="transparent"
+        backgroundColor="white"
       />
       {loginStatus && isUserInfoReady ? (
         <MainStackNavigator />

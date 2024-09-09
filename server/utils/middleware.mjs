@@ -10,8 +10,8 @@ const storage = multer.memoryStorage();
 export const upload = multer({ storage });
 
 export const authenticateToken = async (req, res, next) => {
-  // receive tokens from user's local storage
-  const { jwtToken, refreshToken } = req.body;
+  const jwtToken = req.headers.authorization?.split(" ")[1];
+  const refreshToken = req.headers["x-refresh-token"];
 
   if (!jwtToken || !refreshToken) {
     return res.status(401).send({ msg: "Missing token" });

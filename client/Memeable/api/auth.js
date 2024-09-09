@@ -73,10 +73,16 @@ export const validateTokens = async (oldJwtToken, oldRefreshToken) => {
   }
 
   try {
-    const res = await axios.post(`${LOCAL_HOST}/api/auth/token-validation`, {
-      jwtToken: oldJwtToken,
-      refreshToken: oldRefreshToken,
-    });
+    const res = await axios.post(
+      `${LOCAL_HOST}/api/auth/token-validation`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${oldJwtToken}`,
+          "x-refresh-token": oldRefreshToken,
+        },
+      }
+    );
 
     // if JWT is still valid, nothing will be returned, proceed to stay login
     if (!res.data.refreshToken) {

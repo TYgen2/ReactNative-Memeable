@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { Follow } from "../mongoose/schemas/follow.mjs";
 
 dotenv.config();
 
@@ -48,4 +49,13 @@ export const getTimeDifference = (date) => {
     const days = Math.floor(diffInSeconds / 86400);
     return `${days}d`;
   }
+};
+
+export const getFollowingIds = async (userId) => {
+  const following = await Follow.find({ followerId: userId })
+    .select("userId")
+    .lean();
+  const followingIds = following.map((follow) => follow.userId.toString());
+  followingIds.push(userId);
+  return followingIds;
 };

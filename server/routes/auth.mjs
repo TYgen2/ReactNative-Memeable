@@ -218,7 +218,8 @@ router.post("/api/auth/facebook", async (req, res) => {
 
 // tokens validation
 router.post("/api/auth/token-validation", async (req, res) => {
-  const { jwtToken, refreshToken } = req.body;
+  const jwtToken = req.headers.authorization?.split(" ")[1];
+  const refreshToken = req.headers["x-refresh-token"];
 
   // check whether there is a matched refreshToken in db
   const user = await User.findOne({ refreshToken });

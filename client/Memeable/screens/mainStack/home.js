@@ -1,60 +1,32 @@
 import { FlatList, Image, StyleSheet, Text, View } from "react-native";
 import { barOffset, screenWidth } from "../../utils/constants";
-import { useCallback, useState } from "react";
-import { handleFetchPosts } from "../../api/publicActions";
-import UserPost from "../../components/userPost";
+import MainPost from "../../components/mainPost";
 import { useSelector } from "react-redux";
-import { useFocusEffect } from "@react-navigation/native";
+import useFetchPosts from "../../hooks/useFetchPosts";
+import { UpdateContext } from "../../context/loading";
+import { useContext, useEffect } from "react";
 
-export default Home = ({}) => {
-  const [posts, setPosts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+export default Home = ({ navigation }) => {
   const { userInfo } = useSelector((state) => state.user);
+  const { shouldFetch, setShouldFetch } = useContext(UpdateContext);
 
-  const fetchInitialPosts = async () => {
-    setIsLoading(true);
-    try {
-      const { postData } = await handleFetchPosts(1, 5, userInfo.userId);
-      setPosts(postData);
-      setCurrentPage(1);
-      setHasMore(postData.length > 0);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loadMorePosts = async () => {
-    if (isLoading || !hasMore) return;
-    setIsLoading(true);
-    try {
-      const { postData } = await handleFetchPosts(
-        currentPage + 1,
-        5,
-        userInfo.userId
-      );
-      setPosts((prev) => [...prev, ...postData]);
-      setCurrentPage(currentPage + 1);
-      setHasMore(postData.length > 0);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { posts, isLoading, fetchPosts, loadMorePosts } = useFetchPosts(
+    userInfo.userId,
+    "main"
+  );
 
   const renderPost = ({ item }) => {
-    return <UserPost item={item} userId={userInfo.userId} />;
+    return (
+      <MainPost item={item} userId={userInfo.userId} navigation={navigation} />
+    );
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchInitialPosts();
-    }, [])
-  );
+  useEffect(() => {
+    if (shouldFetch) {
+      fetchPosts(1);
+      setShouldFetch(false);
+    }
+  }, [shouldFetch]);
 
   return (
     <View style={styles.container}>
@@ -70,9 +42,8 @@ export default Home = ({}) => {
           data={posts}
           refreshing={isLoading}
           renderItem={renderPost}
-          onRefresh={fetchInitialPosts}
+          onRefresh={fetchPosts}
           onEndReached={loadMorePosts}
-          onEndReachedThreshold={0.5}
           overScrollMode="never"
           contentContainerStyle={{
             flexGrow: 1,
@@ -116,6 +87,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: barOffset,
+    backgroundColor: "white",
   },
   appName: {
     flex: 1,

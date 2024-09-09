@@ -54,11 +54,7 @@ export const handleLoginFetch = async (
   dispatch,
   reduxSetUserInfo
 ) => {
-  const userInfo = await fetchUserInfo({
-    jwtToken,
-    refreshToken,
-    userId,
-  });
+  const userInfo = await fetchUserInfo(userId, jwtToken, refreshToken);
   dispatch(reduxSetUserInfo(userInfo));
 };
 
