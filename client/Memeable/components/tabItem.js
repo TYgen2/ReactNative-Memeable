@@ -26,8 +26,8 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
     : DEFAULT_ICONS[0].source;
 
   const icon = {
-    UserStack: (props) => <MCIcon name="home" size={30} {...props} />,
-    Search: (props) => <IonIcon name="search" size={30} {...props} />,
+    HomeStack: (props) => <MCIcon name="home" size={30} {...props} />,
+    SearchStack: (props) => <IonIcon name="search" size={30} {...props} />,
     Notify: (props) => <IonIcon name="notifications" size={30} {...props} />,
   };
 

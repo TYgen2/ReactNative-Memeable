@@ -13,39 +13,52 @@ import { useSelector } from "react-redux";
 import { DEFAULT_ICONS } from "../../utils/constants";
 import UserPost from "../../components/userPost";
 import useFetchPosts from "../../hooks/useFetchPosts";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import useFetchProfileInfo from "../../hooks/useFetchProfileInfo";
 import BackButton from "../../components/backButton";
+import { UpdateContext } from "../../context/loading";
+import { handleFollow } from "../../api/userActions";
+import { getTokens } from "../../utils/tokenActions";
 
 export default UserProfile = ({ route, navigation }) => {
   const { userInfo } = useSelector((state) => state.user);
-  const { fromHome } = route.params || {};
+  const { isStack, targetId } = route.params || {};
+  const { shouldFetch, setShouldFetch } = useContext(UpdateContext);
+  const isMe = userInfo.userId === targetId;
 
   const { posts, isLoading, fetchPosts, loadMorePosts } = useFetchPosts(
-    userInfo.userId,
+    targetId,
     "user"
   );
 
-  const { userData, isInfoLoading, fetchUserAdditional } = useFetchProfileInfo(
-    userInfo.userId
-  );
+  const { userData, isInfoLoading, fetchUserProfile, handleFollowersCount } =
+    useFetchProfileInfo(userInfo.userId, targetId);
 
   const renderPost = ({ item }) => {
     return <UserPost item={item} />;
   };
 
   useEffect(() => {
-    fetchUserAdditional();
-    fetchPosts(1);
+    // when visiting other users' profile,
+    // won't refresh after pressed follow / unfollow
+    if (!isMe) {
+      fetchUserProfile();
+      fetchPosts(1);
+      setShouldFetch(false);
+    }
   }, []);
 
-  const username = userInfo ? userInfo.displayName : "";
-  const iconSource = userInfo
-    ? userInfo?.userIcon?.customIcon
-      ? { uri: userInfo.userIcon.customIcon }
-      : DEFAULT_ICONS.find((icon) => icon.id === userInfo.userIcon.id)
-          ?.source || DEFAULT_ICONS[0].source
-    : DEFAULT_ICONS[0].source;
+  useEffect(() => {
+    // when should refresh the userprofile:
+    // 1 - After user upload a post
+    // 2 - User performed follow / unfollow action
+    // Note: Should not refresh when user is in other user profile
+    if (isMe && (shouldFetch || isInfoLoading)) {
+      fetchUserProfile();
+      fetchPosts(1);
+      setShouldFetch(false);
+    }
+  }, [shouldFetch]);
 
   if (isInfoLoading) {
     return (
@@ -56,6 +69,11 @@ export default UserProfile = ({ route, navigation }) => {
       />
     );
   } else {
+    const iconBgColor = userData.userIcon.bgColor || "transparent";
+    const iconSource = userData.userIcon.customIcon
+      ? { uri: userData.userIcon.customIcon }
+      : DEFAULT_ICONS.find((icon) => icon.id === userData.userIcon.id).source;
+
     return (
       <FlatList
         data={posts}
@@ -71,9 +89,25 @@ export default UserProfile = ({ route, navigation }) => {
             enabled={false}
           />
         }
+        ListEmptyComponent={
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <Text
+              style={{
+                fontWeight: "bold",
+                fontSize: 24,
+                color: "grey",
+                paddingBottom: 100,
+              }}
+            >
+              This user has no posts
+            </Text>
+          </View>
+        }
         ListHeaderComponent={
           <>
-            {fromHome && <BackButton navigation={navigation} />}
+            {isStack && <BackButton navigation={navigation} />}
             <ImageBackground
               source={require("../../assets/alya.jpg")}
               style={styles.backgroundImage}
@@ -81,9 +115,12 @@ export default UserProfile = ({ route, navigation }) => {
             />
             <View style={styles.userInfo}>
               <View style={styles.iconBorder}>
-                <Image style={styles.icon} source={iconSource} />
+                <Image
+                  style={[styles.icon, { backgroundColor: iconBgColor }]}
+                  source={iconSource}
+                />
               </View>
-              <Text style={styles.username}>{username}</Text>
+              <Text style={styles.username}>{userData.displayName}</Text>
               <Text style={styles.userBio}>anime lover!! follow for more</Text>
               <View style={styles.moreInfo}>
                 <View
@@ -123,14 +160,41 @@ export default UserProfile = ({ route, navigation }) => {
                 <TouchableOpacity
                   style={styles.actionButton}
                   activeOpacity={0.8}
+                  onPress={async () => {
+                    if (isMe) {
+                      console.log("meeeeeee");
+                    } else {
+                      // handle follow or unfollow
+                      const tokens = await getTokens();
+                      await handleFollow(
+                        userInfo.userId,
+                        targetId,
+                        userData.isFollowing ? "unfollow" : "follow",
+                        tokens.jwtToken,
+                        tokens.refreshToken
+                      ).then(() => {
+                        handleFollowersCount(
+                          userData.isFollowing ? "unfollow" : "follow"
+                        );
+                      });
+                    }
+                  }}
                 >
-                  <Text style={styles.actionText}>Follow</Text>
+                  <Text style={styles.actionText}>
+                    {isMe
+                      ? "Edit profile"
+                      : userData.isFollowing
+                      ? "Unfollow"
+                      : "Follow"}
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.actionButton}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.actionText}>WTF</Text>
+                  <Text style={styles.actionText}>
+                    {isMe ? "Setting" : "Message"}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -143,6 +207,7 @@ export default UserProfile = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
     backgroundColor: "white",
   },
   backgroundImage: {

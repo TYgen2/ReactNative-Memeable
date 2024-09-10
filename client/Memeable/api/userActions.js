@@ -150,18 +150,37 @@ export const fetchUserInfo = async (id, jwtToken, refreshToken) => {
 };
 
 // fetch additional user info in user profile
-export const fetchAdditional = async (userId, jwtToken, refreshToken) => {
+export const fetchProfile = async (
+  userId,
+  targetId,
+  jwtToken,
+  refreshToken
+) => {
   try {
-    const res = await axios.get(`${LOCAL_HOST}/api/fetchAdditionalInfo`, {
+    const res = await axios.get(`${LOCAL_HOST}/api/fetchUserProfile`, {
       headers: {
         Authorization: `Bearer ${jwtToken}`,
         "x-refresh-token": refreshToken,
       },
-      params: { userId },
+      params: { userId, targetId },
     });
-    const { followersCount, followingCount, postsCount } = res.data;
+    const {
+      followersCount,
+      followingCount,
+      postsCount,
+      isFollowing,
+      displayName,
+      userIcon,
+    } = res.data;
 
-    return { followersCount, followingCount, postsCount };
+    return {
+      followersCount,
+      followingCount,
+      postsCount,
+      isFollowing,
+      displayName,
+      userIcon,
+    };
   } catch (error) {
     return { message: error.response.data.msg };
   }
@@ -233,6 +252,22 @@ export const handleFollow = async (
     );
 
     return { msg: res.data.msg };
+  } catch (error) {
+    return { message: error.response.data.msg };
+  }
+};
+
+export const handleSearch = async (query, jwtToken, refreshToken) => {
+  try {
+    const res = await axios.get(`${LOCAL_HOST}/api/searchUser`, {
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+        "x-refresh-token": refreshToken,
+      },
+      params: { query },
+    });
+    const searchRes = res.data;
+    return { searchRes };
   } catch (error) {
     return { message: error.response.data.msg };
   }

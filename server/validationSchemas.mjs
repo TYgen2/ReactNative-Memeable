@@ -56,7 +56,7 @@ export const createPostValidationSchema = {
   title: {
     optional: true,
     isLength: {
-      options: { max: 10 },
+      options: { max: 100 },
       errorMessage: "Title length should not exceeds 100 characters",
     },
   },

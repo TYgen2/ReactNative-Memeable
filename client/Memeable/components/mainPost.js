@@ -14,6 +14,7 @@ import { handleLike } from "../api/userActions";
 import { displayLikes } from "../utils/helper";
 
 export default MainPosts = ({ item, userId, navigation }) => {
+  const iconBgColor = item.userId.icon.bgColor || "transparent";
   const userIcon = item.userId.icon.customIcon
     ? { uri: item.userId.icon.customIcon }
     : DEFAULT_ICONS.find((icon) => icon.id === item.userId.icon.id).source;
@@ -37,15 +38,24 @@ export default MainPosts = ({ item, userId, navigation }) => {
         <View style={styles.uploaderContainer}>
           <Pressable
             onPress={() =>
-              navigation.navigate("UserProfile", { fromHome: true })
+              navigation.navigate("UserProfile", {
+                isStack: true,
+                targetId: item.userId,
+              })
             }
           >
-            <Image source={userIcon} style={styles.uploaderIcon} />
+            <Image
+              source={userIcon}
+              style={[styles.uploaderIcon, { backgroundColor: iconBgColor }]}
+            />
           </Pressable>
           <View style={{ flex: 1 }}>
             <Pressable
               onPress={() =>
-                navigation.navigate("UserProfile", { fromHome: true })
+                navigation.navigate("UserProfile", {
+                  isStack: true,
+                  targetId: item.userId,
+                })
               }
             >
               <Text style={styles.uploaderName}>{item.userId.displayName}</Text>
@@ -67,14 +77,17 @@ export default MainPosts = ({ item, userId, navigation }) => {
           <View style={{ flexDirection: "row", width: "95%", marginTop: 4 }}>
             <Pressable
               onPress={() =>
-                navigation.navigate("UserProfile", { fromHome: true })
+                navigation.navigate("UserProfile", {
+                  isStack: true,
+                  targetId: item.userId,
+                })
               }
             >
               <Text style={styles.uploaderName2}>
                 {item.userId.displayName}
               </Text>
             </Pressable>
-            <Text style={styles.description}>{" - " + item.description}</Text>
+            <Text style={styles.description}>{" ‧ " + item.description}</Text>
           </View>
         )}
         <Text style={styles.hashtag}>{item.hashtag}</Text>

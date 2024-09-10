@@ -16,9 +16,7 @@ export const registerReviewSchema = yup.object({
 });
 
 export const uploadReviewSchema = yup.object({
-  title: yup
-    .string()
-    .max(100, "Description can't be longer than 100 characters"),
+  title: yup.string().max(100, "Title can't be longer than 100 characters"),
   description: yup
     .string()
     .max(1000, "Description can't be longer than 1000 characters"),

@@ -66,20 +66,37 @@ router.post("/api/fetchUserInfo", authenticateToken, async (req, res) => {
 });
 
 // fetch user additional info (followers, following, posts)
-router.get("/api/fetchAdditionalInfo", authenticateToken, async (req, res) => {
-  const { userId } = req.query;
+router.get("/api/fetchUserProfile", authenticateToken, async (req, res) => {
+  const { userId, targetId } = req.query;
 
   try {
-    const user = await User.findById(userId).lean();
+    const user = await User.findById(targetId).lean();
     if (!user) {
       return res.status(400).send({ msg: "User not found" });
     }
 
-    const followersCount = await Follow.countDocuments({ userId });
-    const followingCount = await Follow.countDocuments({ followerId: userId });
-    const postsCount = await Post.countDocuments({ userId });
+    const followersCount = await Follow.countDocuments({ userId: targetId });
+    const followingCount = await Follow.countDocuments({
+      followerId: targetId,
+    });
+    const postsCount = await Post.countDocuments({ userId: targetId });
+    const isFollowing = Boolean(
+      await Follow.exists({
+        followerId: userId,
+        userId: targetId,
+      })
+    );
+    const displayName = user.displayName;
+    const userIcon = user.icon;
 
-    return res.status(200).send({ followersCount, followingCount, postsCount });
+    return res.status(200).send({
+      followersCount,
+      followingCount,
+      postsCount,
+      isFollowing,
+      displayName,
+      userIcon,
+    });
   } catch (error) {
     return res.status(400).send({ msg: "Error when fetching additional data" });
   }

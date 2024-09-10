@@ -4,7 +4,6 @@ import Splash from "./screens/splash";
 import login from "./screens/authStack/login";
 import register from "./screens/authStack/register";
 import home from "./screens/mainStack/home";
-import viewPost from "./screens/mainStack/viewPost";
 import search from "./screens/mainStack/search";
 import userProfile from "./screens/mainStack/userProfile";
 import notify from "./screens/mainStack/notification";
@@ -21,7 +20,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import CustomTab from "./components/customTab";
 import { EventProvider } from "react-native-outside-press";
 import { reduxLogin } from "./store/userReducer";
-import BackButton from "./components/backButton";
 
 const persistor = persistStore(store);
 
@@ -29,7 +27,8 @@ const persistor = persistStore(store);
 const Tab = createBottomTabNavigator();
 
 const AuthStack = createNativeStackNavigator();
-const UserStack = createNativeStackNavigator();
+const HomeStack = createNativeStackNavigator();
+const ExploreStack = createNativeStackNavigator();
 
 const MainStack = createNativeStackNavigator();
 const UploadStack = createNativeStackNavigator();
@@ -45,19 +44,30 @@ const AuthStackScreen = () => {
   );
 };
 
-// For logged in users
-const UserStackScreen = () => {
+// For logged in users, Home tab
+const HomeStackScreen = () => {
   return (
-    <UserStack.Navigator screenOptions={{ headerShown: false }}>
-      <UserStack.Screen name="Home" component={home} />
-      <UserStack.Screen name="ViewPost" component={viewPost} />
-      <UserStack.Screen name="UserProfile" component={userProfile} />
-    </UserStack.Navigator>
+    <HomeStack.Navigator screenOptions={{ headerShown: false }}>
+      <HomeStack.Screen name="Home" component={home} />
+      <HomeStack.Screen name="UserProfile" component={userProfile} />
+    </HomeStack.Navigator>
+  );
+};
+
+// Explore tab
+const ExploreScreen = () => {
+  return (
+    <ExploreStack.Navigator screenOptions={{ headerShown: false }}>
+      <ExploreStack.Screen name="Search" component={search} />
+      <ExploreStack.Screen name="UserProfile" component={userProfile} />
+    </ExploreStack.Navigator>
   );
 };
 
 // For main screen UI
 const MainStackScreen = () => {
+  const { userInfo } = useSelector((state) => state.user);
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -66,13 +76,13 @@ const MainStackScreen = () => {
       tabBar={(props) => <CustomTab {...props} />}
     >
       <Tab.Screen
-        name="UserStack"
-        component={UserStackScreen}
+        name="HomeStack"
+        component={HomeStackScreen}
         options={{ title: "Home" }}
       />
       <Tab.Screen
-        name="Search"
-        component={search}
+        name="SearchStack"
+        component={ExploreScreen}
         options={{ title: "Explore" }}
       />
       <Tab.Screen
@@ -83,6 +93,7 @@ const MainStackScreen = () => {
       <Tab.Screen
         name="UserProfile"
         component={userProfile}
+        initialParams={{ targetId: userInfo.userId }}
         options={{ title: "me" }}
       />
     </Tab.Navigator>

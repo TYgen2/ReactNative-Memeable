@@ -192,14 +192,14 @@ router.post("/api/handleLike", authenticateToken, async (req, res) => {
 
 // user follow / unfollow other users
 router.post("/api/handleFollow", authenticateToken, async (req, res) => {
-  const { userId, targetUserId, action } = req.body;
+  const { userId, targetId, action } = req.body;
 
   try {
     if (action === "follow") {
-      await Follow.create({ userId: targetUserId, followerId: userId });
+      await Follow.create({ userId: targetId, followerId: userId });
       return res.status(200).send({ msg: "Followed successfully!" });
     } else if (action === "unfollow") {
-      await Follow.deleteOne({ userId: targetUserId, followerId: userId });
+      await Follow.deleteOne({ userId: targetId, followerId: userId });
       return res.status(200).send({ msg: "Unfollowed successfully!" });
     } else {
       return res.status(400).send({ msg: "Invalid action" });

@@ -1,17 +1,22 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { getTokens } from "../utils/tokenActions";
-import { fetchAdditional } from "../api/userActions";
+import { fetchProfile } from "../api/userActions";
+import { UpdateContext } from "../context/loading";
 
-export default useFetchProfileInfo = (userId) => {
+export default useFetchProfileInfo = (userId, targetId) => {
   const [userData, setUserData] = useState(null);
   const [isInfoLoading, setIsInfoLoading] = useState(true);
+  const { shouldFetch, setShouldFetch } = useContext(UpdateContext);
 
-  const fetchUserAdditional = async () => {
+  if (!userId || !targetId) return;
+
+  const fetchUserProfile = async () => {
     setIsInfoLoading(true);
     try {
       const tokens = await getTokens();
-      const res = await fetchAdditional(
+      const res = await fetchProfile(
         userId,
+        targetId,
         tokens.jwtToken,
         tokens.refreshToken
       );
@@ -25,5 +30,27 @@ export default useFetchProfileInfo = (userId) => {
     }
   };
 
-  return { userData, isInfoLoading, fetchUserAdditional };
+  const handleFollowersCount = (action) => {
+    setUserData((prev) => {
+      switch (action) {
+        case "follow":
+          return {
+            ...prev,
+            followersCount: prev.followersCount + 1,
+            isFollowing: true,
+          };
+        case "unfollow":
+          return {
+            ...prev,
+            followersCount: prev.followersCount - 1,
+            isFollowing: false,
+          };
+        default:
+          return prev;
+      }
+    });
+    setShouldFetch(true);
+  };
+
+  return { userData, isInfoLoading, fetchUserProfile, handleFollowersCount };
 };

@@ -9,9 +9,10 @@ import { useContext, useEffect } from "react";
 export default Home = ({ navigation }) => {
   const { userInfo } = useSelector((state) => state.user);
   const { shouldFetch, setShouldFetch } = useContext(UpdateContext);
+  const userId = userInfo ? userInfo.userId : null;
 
   const { posts, isLoading, fetchPosts, loadMorePosts } = useFetchPosts(
-    userInfo.userId,
+    userId,
     "main"
   );
 
