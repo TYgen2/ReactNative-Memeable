@@ -1,10 +1,10 @@
 # 😎Memeable (React Native, Express, MongoDB)
-A social-media-like mobile app for posting and viewing memes. Unlike the
+A social-media-like mobile app for posting and viewing images. Unlike the
 previous project using Firebase service as the backend, I'm using Express
 to build some API for handling all the request (local development).
 
 The authentication uses the JWT-based method to handle login and register.
-Local login using Email&Password and Google login is supported. If user is
+Local login using Email&Password, Google and Facebook login is supported. If user is
 authenticated, they will receive a JWT token from the server for subsequent
 actions. Refresh token mechanism is also implenmented to keep user logged in.
 
