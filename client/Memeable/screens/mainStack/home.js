@@ -7,9 +7,9 @@ import { UpdateContext } from "../../context/loading";
 import { useContext, useEffect } from "react";
 
 export default Home = ({ navigation }) => {
-  const { userInfo } = useSelector((state) => state.user);
+  const { userDetails } = useSelector((state) => state.user);
   const { shouldFetch, setShouldFetch } = useContext(UpdateContext);
-  const userId = userInfo ? userInfo.userId : null;
+  const userId = userDetails.userId || null;
 
   const { posts, isLoading, fetchPosts, loadMorePosts } = useFetchPosts(
     userId,
@@ -18,7 +18,11 @@ export default Home = ({ navigation }) => {
 
   const renderPost = ({ item }) => {
     return (
-      <MainPost item={item} userId={userInfo.userId} navigation={navigation} />
+      <MainPost
+        item={item}
+        userId={userDetails.userId}
+        navigation={navigation}
+      />
     );
   };
 
@@ -40,7 +44,7 @@ export default Home = ({ navigation }) => {
       </View>
       <View style={styles.content}>
         <FlatList
-          data={posts}
+          data={[]}
           refreshing={isLoading}
           renderItem={renderPost}
           onRefresh={fetchPosts}

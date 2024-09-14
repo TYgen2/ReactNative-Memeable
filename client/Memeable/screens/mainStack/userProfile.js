@@ -9,56 +9,68 @@ import {
   View,
   RefreshControl,
 } from "react-native";
-import { useSelector } from "react-redux";
-import { DEFAULT_ICONS } from "../../utils/constants";
+import { useDispatch, useSelector } from "react-redux";
+import { DEFAULT_BGIMAGE } from "../../utils/constants";
 import UserPost from "../../components/userPost";
 import useFetchPosts from "../../hooks/useFetchPosts";
-import { useContext, useEffect } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import useFetchProfileInfo from "../../hooks/useFetchProfileInfo";
 import BackButton from "../../components/backButton";
 import { UpdateContext } from "../../context/loading";
-import { handleFollow } from "../../api/userActions";
 import { getTokens } from "../../utils/tokenActions";
+import { getBgImageSource, getIconSource } from "../../utils/helper";
+import { handleFollow } from "../../store/userActions";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default UserProfile = ({ route, navigation }) => {
-  const { userInfo } = useSelector((state) => state.user);
+  const { userDetails } = useSelector((state) => state.user);
   const { isStack, targetId } = route.params || {};
   const { shouldFetch, setShouldFetch } = useContext(UpdateContext);
-  const isMe = userInfo.userId === targetId;
+
+  const dispatch = useDispatch();
+
+  const { userData, setUserData, isInfoLoading, handleFollowersCount, isMe } =
+    useFetchProfileInfo(userDetails?.userId, targetId);
 
   const { posts, isLoading, fetchPosts, loadMorePosts } = useFetchPosts(
     targetId,
     "user"
   );
 
-  const { userData, isInfoLoading, fetchUserProfile, handleFollowersCount } =
-    useFetchProfileInfo(userInfo.userId, targetId);
-
   const renderPost = ({ item }) => {
     return <UserPost item={item} />;
   };
 
-  useEffect(() => {
-    // when visiting other users' profile,
-    // won't refresh after pressed follow / unfollow
-    if (!isMe) {
-      fetchUserProfile();
-      fetchPosts(1);
-      setShouldFetch(false);
-    }
-  }, []);
+  // handle instant UI reflect
+  useFocusEffect(
+    useCallback(() => {
+      if (isMe) {
+        setUserData(userDetails);
+      }
+    }, [userDetails])
+  );
 
-  useEffect(() => {
-    // when should refresh the userprofile:
-    // 1 - After user upload a post
-    // 2 - User performed follow / unfollow action
-    // Note: Should not refresh when user is in other user profile
-    if (isMe && (shouldFetch || isInfoLoading)) {
-      fetchUserProfile();
-      fetchPosts(1);
-      setShouldFetch(false);
-    }
-  }, [shouldFetch]);
+  // useEffect(() => {
+  //   // when visiting other users' profile,
+  //   // won't refresh after pressed follow / unfollow
+  //   if (!isMe) {
+  //     fetchUserProfile();
+  //     fetchPosts(1);
+  //     setShouldFetch(false);
+  //   }
+  // }, []);
+
+  // useEffect(() => {
+  //   // when should refresh the userprofile:
+  //   // 1 - After user upload a post
+  //   // 2 - User performed follow / unfollow action
+  //   // Note: Should not refresh when user is in other user profile
+  //   if (isMe && (shouldFetch || isInfoLoading)) {
+  //     fetchUserProfile();
+  //     fetchPosts(1);
+  //     setShouldFetch(false);
+  //   }
+  // }, [shouldFetch]);
 
   if (isInfoLoading) {
     return (
@@ -69,26 +81,27 @@ export default UserProfile = ({ route, navigation }) => {
       />
     );
   } else {
-    const iconBgColor = userData.userIcon.bgColor || "transparent";
-    const iconSource = userData.userIcon.customIcon
-      ? { uri: userData.userIcon.customIcon }
-      : DEFAULT_ICONS.find((icon) => icon.id === userData.userIcon.id).source;
+    // check whether icon and bgImage is found from database
+    // if not, fallback using default icon
+    const iconBgColor = userData.userIcon?.bgColor || "transparent";
+    const iconSource = getIconSource(userData?.userIcon);
+    const bgImageSource = getBgImageSource(userData?.bgImage);
 
     return (
       <FlatList
         data={posts}
-        renderItem={renderPost}
+        renderItem={[]}
         numColumns={3}
         contentContainerStyle={styles.container}
         overScrollMode="never"
-        onEndReached={loadMorePosts}
-        refreshControl={
-          <RefreshControl
-            refreshing={isLoading}
-            onRefresh={fetchPosts}
-            enabled={false}
-          />
-        }
+        // onEndReached={loadMorePosts}
+        // refreshControl={
+        //   <RefreshControl
+        //     refreshing={isLoading}
+        //     onRefresh={fetchPosts}
+        //     enabled={false}
+        //   />
+        // }
         ListEmptyComponent={
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -109,7 +122,7 @@ export default UserProfile = ({ route, navigation }) => {
           <>
             {isStack && <BackButton navigation={navigation} />}
             <ImageBackground
-              source={require("../../assets/alya.jpg")}
+              source={bgImageSource}
               style={styles.backgroundImage}
               resizeMode="cover"
             />
@@ -120,8 +133,9 @@ export default UserProfile = ({ route, navigation }) => {
                   source={iconSource}
                 />
               </View>
-              <Text style={styles.username}>{userData.displayName}</Text>
-              <Text style={styles.userBio}>anime lover!! follow for more</Text>
+              <Text style={styles.displayName}>{userData.displayName}</Text>
+              <Text style={styles.username}>@{userData.username}</Text>
+              <Text style={styles.userBio}>{userData.userBio}</Text>
               <View style={styles.moreInfo}>
                 <View
                   style={[
@@ -162,16 +176,26 @@ export default UserProfile = ({ route, navigation }) => {
                   activeOpacity={0.8}
                   onPress={async () => {
                     if (isMe) {
-                      console.log("meeeeeee");
+                      navigation.navigate("SettingStack", {
+                        screen: "EditUserProfile",
+                        params: {
+                          icon: iconSource,
+                          bgColor: iconBgColor,
+                          bgImage: bgImage,
+                          data: userData,
+                        },
+                      });
                     } else {
                       // handle follow or unfollow
                       const tokens = await getTokens();
-                      await handleFollow(
-                        userInfo.userId,
-                        targetId,
-                        userData.isFollowing ? "unfollow" : "follow",
-                        tokens.jwtToken,
-                        tokens.refreshToken
+                      // handle follow API, also update global state
+                      dispatch(
+                        handleFollow({
+                          targetId,
+                          action: userData.isFollowing ? "unfollow" : "follow",
+                          jwtToken: tokens.jwtToken,
+                          refreshToken: tokens.refreshToken,
+                        })
                       ).then(() => {
                         handleFollowersCount(
                           userData.isFollowing ? "unfollow" : "follow"
@@ -215,7 +239,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   userInfo: {
-    height: 250,
+    height: 300,
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
@@ -233,10 +257,18 @@ const styles = StyleSheet.create({
     width: 110,
     borderRadius: 110,
   },
-  username: {
+  displayName: {
     textAlign: "center",
     fontWeight: "bold",
     fontSize: 24,
+  },
+  username: {
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 12,
+    fontStyle: "italic",
+    color: "grey",
+    marginBottom: 10,
   },
   userBio: {
     color: "grey",

@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { getTokens } from "../utils/tokenActions";
-import { handleFetchPosts } from "../api/userActions";
+import { handleFetchPosts } from "../handleAPIs/userActions";
 
 export default useFetchPosts = (targetId, mode) => {
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-
-  if (!targetId) return;
 
   const fetchPosts = async (page) => {
     setIsLoading(true);

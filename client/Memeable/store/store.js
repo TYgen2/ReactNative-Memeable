@@ -1,6 +1,5 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import userReducer from "./userReducer";
-import tokenReducer from "./tokenReducer";
 import storage from "@react-native-async-storage/async-storage";
 import {
   persistReducer,
@@ -20,7 +19,6 @@ const persisConfig = {
 
 const reducer = combineReducers({
   user: userReducer,
-  token: tokenReducer,
 });
 
 const persistedReducer = persistReducer(persisConfig, reducer);

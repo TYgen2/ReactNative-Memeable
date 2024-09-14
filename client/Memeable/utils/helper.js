@@ -1,5 +1,9 @@
 import * as ImagePicker from "expo-image-picker";
-import { fetchUserInfo } from "../api/userActions";
+import {
+  DEFAULT_BGIMAGE,
+  DEFAULT_ICONS,
+  screenWidth,
+} from "../utils/constants";
 
 // select image from album
 export const selectImageForUpload = async (setImageUri, navigation) => {
@@ -46,16 +50,25 @@ export const selectImageForProfile = async (setCustomIcon) => {
   }
 };
 
-// after login, handlle the fetched data by updating global
-export const handleLoginFetch = async (
-  jwtToken,
-  refreshToken,
-  userId,
-  dispatch,
-  reduxSetUserInfo
-) => {
-  const userInfo = await fetchUserInfo(userId, jwtToken, refreshToken);
-  dispatch(reduxSetUserInfo(userInfo));
+// select image for profile bgImage
+export const selectImageForBgImage = async (setBgImage) => {
+  const result = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (result.granted === true) {
+    let res = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      selectionLimit: 1,
+      quality: 1,
+      aspect: [screenWidth, 250],
+    });
+
+    if (!res.canceled) {
+      const { uri } = res.assets[0];
+      setBgImage(uri);
+    }
+  } else {
+    console.log("Access denied / One time only");
+  }
 };
 
 export const displayLikes = (count) => {
@@ -66,4 +79,20 @@ export const displayLikes = (count) => {
   } else {
     return (count / 1000000).toFixed(1) + "M";
   }
+};
+
+export const getIconSource = (userIcon) => {
+  if (userIcon.customIcon) {
+    return { uri: userIcon.customIcon };
+  }
+
+  const defaultIcon = DEFAULT_ICONS.find((icon) => icon.id === userIcon.id);
+  return defaultIcon?.source || DEFAULT_ICONS[0].source;
+};
+
+export const getBgImageSource = (bgImage) => {
+  if (bgImage) {
+    return { uri: bgImage };
+  }
+  return DEFAULT_BGIMAGE;
 };

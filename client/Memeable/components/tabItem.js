@@ -9,21 +9,14 @@ import MCIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import IonIcon from "react-native-vector-icons/Ionicons";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { DEFAULT_ICONS } from "../utils/constants";
+import { getIconSource } from "../utils/helper";
 
 export default TabItem = ({ onPress, isFocused, routeName, label }) => {
   const scale = useSharedValue(0);
-  const { userInfo } = useSelector((state) => state.user);
-  const iconBgColor = userInfo?.userIcon?.bgColor || "transparent";
-  // check customIcon, if null, check defaultIcon. If still null,
-  // it means user accidentally closed app during editting profile,
-  // fallback using a default icon with orange background and doge.
-  const iconSource = userInfo
-    ? userInfo?.userIcon?.customIcon
-      ? { uri: userInfo.userIcon.customIcon }
-      : DEFAULT_ICONS.find((icon) => icon.id === userInfo.userIcon.id)
-          ?.source || DEFAULT_ICONS[0].source
-    : DEFAULT_ICONS[0].source;
+
+  const { userDetails } = useSelector((state) => state.user);
+  const iconBgColor = userDetails.userIcon?.bgColor || "transparent";
+  const iconSource = getIconSource(userDetails.userIcon);
 
   const icon = {
     HomeStack: (props) => <MCIcon name="home" size={30} {...props} />,

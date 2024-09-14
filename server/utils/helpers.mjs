@@ -33,6 +33,10 @@ export const randomImageName = () => {
   return crypto.randomBytes(32).toString("hex");
 };
 
+export const randomUserName = () => {
+  return crypto.randomBytes(8).toString("hex");
+};
+
 export const getTimeDifference = (date) => {
   const now = new Date();
   const diffInSeconds = Math.floor((now - new Date(date)) / 1000);

@@ -10,7 +10,7 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import { DEFAULT_ICONS } from "../utils/constants";
 import { getTokens } from "../utils/tokenActions";
-import { handleLike } from "../api/userActions";
+import { handleLike } from "../handleAPIs/userActions";
 import { displayLikes } from "../utils/helper";
 
 export default MainPosts = ({ item, userId, navigation }) => {

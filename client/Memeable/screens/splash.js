@@ -7,7 +7,7 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 import { UpdateContext } from "../context/loading";
-import { validateTokens } from "../api/auth";
+import { validateTokens } from "../handleAPIs/auth";
 import { getTokens } from "../utils/tokenActions";
 
 export default Splash = () => {

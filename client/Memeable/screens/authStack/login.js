@@ -14,7 +14,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { googleLoginConfig, screenWidth } from "../../utils/constants";
 import { loginReviewSchema } from "../../utils/validationSchema";
 import { useDispatch, useSelector } from "react-redux";
-import { facebookLogin, googleLogin, userLogin } from "../../api/auth";
+import { facebookLogin, googleLogin, userLogin } from "../../handleAPIs/auth";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import { useEffect } from "react";
@@ -22,6 +22,7 @@ import { reduxSetUserInfo } from "../../store/userReducer";
 import { LoginManager, AccessToken } from "react-native-fbsdk-next";
 import { handleLoginFetch } from "../../utils/helper";
 import { getTokens } from "../../utils/tokenActions";
+import { fetchUserInfo } from "../../store/userActions";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -58,12 +59,11 @@ export default Login = ({ navigation }) => {
 
     // User exist, proceed to login
     const tokens = await getTokens();
-    await handleLoginFetch(
-      tokens.jwtToken,
-      tokens.refreshToken,
-      res.userId,
-      dispatch,
-      reduxSetUserInfo
+    dispatch(
+      fetchUserInfo({
+        jwtToken: tokens.jwtToken,
+        refreshToken: tokens.refreshToken,
+      })
     );
   };
 

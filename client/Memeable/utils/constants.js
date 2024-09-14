@@ -56,3 +56,5 @@ export const ICON_BGCOLOR = [
   "pink",
   "grey",
 ];
+
+export const DEFAULT_BGIMAGE = require("../assets/default_bgImage.jpg");

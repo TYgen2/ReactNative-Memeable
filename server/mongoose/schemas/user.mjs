@@ -9,7 +9,15 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: mongoose.Schema.Types.String,
   },
-  displayName: mongoose.Schema.Types.String,
+  displayName: {
+    type: mongoose.Schema.Types.String,
+    required: true,
+  },
+  username: {
+    type: mongoose.Schema.Types.String,
+    required: true,
+    unique: true,
+  },
   googleId: {
     type: mongoose.Schema.Types.String,
   },
@@ -36,6 +44,14 @@ const UserSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.String,
       default: null,
     },
+  },
+  bio: {
+    type: mongoose.Schema.Types.String,
+    default: "Welcome to my world~~",
+  },
+  bgImage: {
+    type: mongoose.Schema.Types.String,
+    default: null,
   },
 });
 

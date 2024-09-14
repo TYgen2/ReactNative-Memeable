@@ -9,6 +9,7 @@ import userProfile from "./screens/mainStack/userProfile";
 import notify from "./screens/mainStack/notification";
 import upload from "./screens/uploadStack/upload";
 import editProfile from "./screens/authStack/editProfile";
+import editUserProfile from "./screens/mainStack/editUserProfile";
 import { useContext, useEffect, useState } from "react";
 import { StatusBar } from "react-native";
 import { store } from "./store/store";
@@ -20,8 +21,10 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import CustomTab from "./components/customTab";
 import { EventProvider } from "react-native-outside-press";
 import { reduxLogin } from "./store/userReducer";
+import { enableScreens } from "react-native-screens";
 
 const persistor = persistStore(store);
+enableScreens();
 
 // Bottom tab navigation
 const Tab = createBottomTabNavigator();
@@ -29,6 +32,7 @@ const Tab = createBottomTabNavigator();
 const AuthStack = createNativeStackNavigator();
 const HomeStack = createNativeStackNavigator();
 const ExploreStack = createNativeStackNavigator();
+const SettingStack = createNativeStackNavigator();
 
 const MainStack = createNativeStackNavigator();
 const UploadStack = createNativeStackNavigator();
@@ -45,7 +49,7 @@ const AuthStackScreen = () => {
 };
 
 // For logged in users, Home tab
-const HomeStackScreen = () => {
+const HomeScreen = () => {
   return (
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
       <HomeStack.Screen name="Home" component={home} />
@@ -64,9 +68,22 @@ const ExploreScreen = () => {
   );
 };
 
+// Setting tab
+const SettingScreen = () => {
+  return (
+    <SettingStack.Navigator screenOptions={{ headerShown: true }}>
+      <SettingStack.Screen
+        name="EditUserProfile"
+        component={editUserProfile}
+        options={{ title: "Edit user profile" }}
+      />
+    </SettingStack.Navigator>
+  );
+};
+
 // For main screen UI
 const MainStackScreen = () => {
-  const { userInfo } = useSelector((state) => state.user);
+  const { userDetails } = useSelector((state) => state.user);
 
   return (
     <Tab.Navigator
@@ -77,7 +94,7 @@ const MainStackScreen = () => {
     >
       <Tab.Screen
         name="HomeStack"
-        component={HomeStackScreen}
+        component={HomeScreen}
         options={{ title: "Home" }}
       />
       <Tab.Screen
@@ -93,7 +110,7 @@ const MainStackScreen = () => {
       <Tab.Screen
         name="UserProfile"
         component={userProfile}
-        initialParams={{ targetId: userInfo.userId }}
+        initialParams={{ targetId: userDetails.userId }}
         options={{ title: "me" }}
       />
     </Tab.Navigator>
@@ -115,6 +132,7 @@ const MainStackNavigator = () => {
     <MainStack.Navigator screenOptions={{ headerShown: false }}>
       <MainStack.Screen name="MainStack" component={MainStackScreen} />
       <MainStack.Screen name="UploadStack" component={UploadStackScreen} />
+      <MainStack.Screen name="SettingStack" component={SettingScreen} />
     </MainStack.Navigator>
   );
 };
@@ -122,17 +140,17 @@ const MainStackNavigator = () => {
 const App = () => {
   const { isLoading } = useContext(UpdateContext);
   const [isUserInfoReady, setIsUserInfoReady] = useState(false);
-  const { loginStatus, userInfo } = useSelector((state) => state.user);
+  const { loginStatus, userDetails } = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
 
   // when user info is ready, login user
   useEffect(() => {
-    if (userInfo) {
+    if (userDetails && Object.keys(userDetails).length > 0) {
       dispatch(reduxLogin());
       setIsUserInfoReady(true);
     }
-  }, [userInfo]);
+  }, [userDetails, dispatch]);
 
   if (isLoading) {
     return <Splash />;

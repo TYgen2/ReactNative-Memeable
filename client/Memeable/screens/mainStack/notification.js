@@ -16,7 +16,6 @@ export default Notify = () => {
         onPress={async () => {
           await clearTokens();
           dispatch(reduxLogout());
-          setShouldFetch(true);
         }}
       >
         <Text>LOGOUT</Text>

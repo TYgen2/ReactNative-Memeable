@@ -10,7 +10,7 @@ import {
 import { screenWidth } from "../../utils/constants";
 import { Formik } from "formik";
 import { uploadReviewSchema } from "../../utils/validationSchema";
-import { handlePostUpload } from "../../api/userActions";
+import { handlePostUpload } from "../../handleAPIs/userActions";
 import Icon from "react-native-vector-icons/Ionicons";
 import { getTokens } from "../../utils/tokenActions";
 import { useContext, useState } from "react";

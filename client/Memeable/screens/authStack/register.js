@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { barOffset, screenWidth } from "../../utils/constants";
-import { userRegister } from "../../api/auth";
+import { userRegister } from "../../handleAPIs/auth";
 import { registerReviewSchema } from "../../utils/validationSchema";
 
 export default Register = ({ navigation }) => {

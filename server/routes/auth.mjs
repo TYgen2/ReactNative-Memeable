@@ -7,6 +7,7 @@ import {
   generateJWT,
   generateRefreshToken,
   hashPassword,
+  randomUserName,
 } from "../utils/helpers.mjs";
 import "../strategies/jwt.mjs";
 import jwt from "jsonwebtoken";
@@ -46,6 +47,7 @@ router.post(
 
     const newUser = new User({
       ...data,
+      username: randomUserName(),
       refreshToken: signedRefreshToken,
       icon: {},
     });
@@ -129,6 +131,7 @@ router.post("/api/auth/google", async (req, res) => {
       user = new User({
         email: payload.email,
         displayName: payload.name,
+        username: randomUserName(),
         googleId: payload.sub,
         authMethod: "google",
         refreshToken: signedRefreshToken,
@@ -184,6 +187,7 @@ router.post("/api/auth/facebook", async (req, res) => {
       user = new User({
         email: response.data.email,
         displayName: response.data.name,
+        username: randomUserName(),
         facebookId: response.data.id,
         authMethod: "facebook",
         refreshToken: signedRefreshToken,

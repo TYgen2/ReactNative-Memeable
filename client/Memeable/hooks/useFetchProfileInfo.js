@@ -1,35 +1,50 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getTokens } from "../utils/tokenActions";
-import { fetchProfile } from "../api/userActions";
 import { UpdateContext } from "../context/loading";
+import { useSelector } from "react-redux";
+import { fetchProfile } from "../handleAPIs/fetchData";
 
 export default useFetchProfileInfo = (userId, targetId) => {
   const [userData, setUserData] = useState(null);
   const [isInfoLoading, setIsInfoLoading] = useState(true);
   const { shouldFetch, setShouldFetch } = useContext(UpdateContext);
+  const { userDetails } = useSelector((state) => state.user);
+  const isMe = userDetails?.userId === targetId;
 
-  if (!userId || !targetId) return;
+  useEffect(() => {
+    // prevent crash when user logout (reset userDetails)
+    if (userId === undefined) return;
 
-  const fetchUserProfile = async () => {
-    setIsInfoLoading(true);
-    try {
-      const tokens = await getTokens();
-      const res = await fetchProfile(
-        userId,
-        targetId,
-        tokens.jwtToken,
-        tokens.refreshToken
-      );
-      setUserData(res);
-    } catch (error) {
-      console.error(
-        error.response?.data?.msg || "Error when fetching additional info"
-      );
-    } finally {
+    if (isMe) {
+      setUserData(userDetails);
       setIsInfoLoading(false);
+      return;
     }
-  };
 
+    const fetchUserProfile = async () => {
+      setIsInfoLoading(true);
+
+      try {
+        const tokens = await getTokens();
+        const res = await fetchProfile(
+          targetId,
+          tokens.jwtToken,
+          tokens.refreshToken
+        );
+        setUserData(res.userData);
+      } catch (error) {
+        console.error(
+          error.response?.data?.msg || "Error when fetching additional info"
+        );
+      } finally {
+        setIsInfoLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [userId, targetId]);
+
+  // handle local UI state update
   const handleFollowersCount = (action) => {
     setUserData((prev) => {
       switch (action) {
@@ -49,8 +64,7 @@ export default useFetchProfileInfo = (userId, targetId) => {
           return prev;
       }
     });
-    setShouldFetch(true);
   };
 
-  return { userData, isInfoLoading, fetchUserProfile, handleFollowersCount };
+  return { userData, setUserData, isInfoLoading, handleFollowersCount, isMe };
 };

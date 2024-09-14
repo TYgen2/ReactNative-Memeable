@@ -18,8 +18,9 @@ import { hideGIF, showGIF } from "../../utils/animation";
 import { handleLoginFetch, selectImageForProfile } from "../../utils/helper";
 import { reduxSetUserInfo } from "../../store/userReducer";
 import { useDispatch, useSelector } from "react-redux";
-import { handleIconUpload } from "../../api/userActions";
+import { handleIconUpload } from "../../handleAPIs/userActions";
 import { getTokens } from "../../utils/tokenActions";
+import { fetchUserInfo } from "../../store/userActions";
 
 export default EditProfile = ({ route }) => {
   const { userId } = route.params;
@@ -195,12 +196,12 @@ export default EditProfile = ({ route }) => {
               tokens.jwtToken,
               tokens.refreshToken
             );
-            await handleLoginFetch(
-              tokens.jwtToken,
-              tokens.refreshToken,
-              userId,
-              dispatch,
-              reduxSetUserInfo
+
+            dispatch(
+              fetchUserInfo({
+                jwtToken: tokens.jwtToken,
+                refreshToken: tokens.refreshToken,
+              })
             );
           }}
         >

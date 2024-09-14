@@ -71,3 +71,30 @@ export const createPostValidationSchema = {
     optional: true,
   },
 };
+
+export const updateProfileValidationSchema = {
+  username: {
+    notEmpty: {
+      errorMessage: "Username cannnot be empty",
+    },
+    isLength: {
+      options: { max: 16 },
+      errorMessage: "Username length should not exceeds 16 characters",
+    },
+  },
+  displayName: {
+    notEmpty: {
+      errorMessage: "Display name cannnot be empty",
+    },
+    isLength: {
+      options: { max: 32 },
+      errorMessage: "Display name length should not exceeds 32 characters",
+    },
+  },
+  userBio: {
+    isLength: {
+      options: { max: 150 },
+      errorMessage: "Personal bio length should not exceeds 150 characters",
+    },
+  },
+};

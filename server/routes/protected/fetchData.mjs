@@ -10,24 +10,119 @@ dotenv.config();
 
 const router = Router();
 
-// fetch posts (user's or following's)
-router.get("/api/fetchPosts", authenticateToken, async (req, res) => {
-  const { page, limit, userId, mode } = req.query;
+// fetch local user info when login, store in Redux
+router.get("/api/fetchUserInfo", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).lean();
+    if (!user) {
+      return res.status(404).send({ msg: "User not found" });
+    }
+
+    const userId = req.userId;
+
+    const [followersCount, followingCount, postsCount, likedPosts, posts] =
+      await Promise.all([
+        Follow.countDocuments({ userId }),
+        Follow.countDocuments({
+          followerId: userId,
+        }),
+        Post.countDocuments({ userId }),
+        Like.find({ userId }).select("postId").lean(),
+        Post.find({ userId }).sort({ createDate: -1 }).limit(9).exec(),
+      ]);
+
+    const likedPostIds = likedPosts.map((like) => like.postId.toString());
+
+    const postData = posts.map((post) => {
+      const postObject = post.toObject();
+      postObject.timeAgo = getTimeDifference(postObject.createDate);
+      postObject.hasLiked = likedPostIds.includes(postObject._id.toString());
+      return postObject;
+    });
+
+    return res.status(200).send({
+      userDetails: {
+        email: user.email,
+        userId: user._id,
+        displayName: user.displayName,
+        username: user.username,
+        userIcon: user.icon,
+        userBio: user.bio,
+        bgImage: user.bgImage,
+        followersCount,
+        followingCount,
+        postsCount,
+      },
+      userPosts: postData,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ msg: "Internal server error (/api/fetchUserInfo)" });
+  }
+});
+
+// fetch User profile info
+router.get("/api/fetchUserProfile", authenticateToken, async (req, res) => {
+  const { targetId } = req.query;
 
   try {
-    const user = await User.findById(userId).select("following").lean();
+    const user = await User.findById(targetId).lean();
+    if (!user) {
+      return res.status(400).send({ msg: "User not found" });
+    }
+
+    const [followersCount, followingCount, postsCount, isFollowing] =
+      await Promise.all([
+        Follow.countDocuments({ userId: targetId }),
+        Follow.countDocuments({
+          followerId: targetId,
+        }),
+        Post.countDocuments({ userId: targetId }),
+        Follow.exists({
+          followerId: req.userId,
+          userId: targetId,
+        }),
+      ]);
+
+    return res.status(200).send({
+      displayName: user.displayName,
+      username: user.username,
+      userIcon: user.icon,
+      userBio: user.bio,
+      bgImage: user.bgImage,
+      followersCount,
+      followingCount,
+      postsCount,
+      isFollowing: Boolean(isFollowing),
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ msg: "Internal server error (/api/fetchUserProfile)" });
+  }
+});
+
+// fetch posts (user's or following's)
+router.get("/api/fetchPosts", authenticateToken, async (req, res) => {
+  const { page, limit, mode } = req.query;
+
+  try {
+    const user = await User.findById(req.userId).select("following").lean();
     if (!user) {
       res.status(400).send({ msg: "No user found, ERROR!!!" });
     }
 
-    const followingIds = await getFollowingIds(userId);
-    const likedPosts = await Like.find({ userId }).select("postId").lean();
+    const followingIds = await getFollowingIds(req.userId);
+    const likedPosts = await Like.find({ userId: req.userId })
+      .select("postId")
+      .lean();
     const likedPostIds = likedPosts.map((like) => like.postId.toString());
 
     const search =
       mode == "main"
         ? Post.find({ userId: { $in: followingIds } })
-        : Post.find({ userId });
+        : Post.find({ userId: req.userId });
 
     const posts = await search
       .sort({ createDate: -1 })
@@ -47,58 +142,6 @@ router.get("/api/fetchPosts", authenticateToken, async (req, res) => {
     return res.status(200).send(postData);
   } catch (error) {
     return res.status(400).send({ msg: "Error when fetching posts" });
-  }
-});
-
-// fetch user info
-router.post("/api/fetchUserInfo", authenticateToken, async (req, res) => {
-  try {
-    const user = await User.findOne({ _id: req.body.id });
-    return res.status(200).send({
-      email: user.email,
-      userId: user.id,
-      displayName: user.displayName,
-      userIcon: user.icon,
-    });
-  } catch (error) {
-    return res.status(400).send({ msg: error });
-  }
-});
-
-// fetch user additional info (followers, following, posts)
-router.get("/api/fetchUserProfile", authenticateToken, async (req, res) => {
-  const { userId, targetId } = req.query;
-
-  try {
-    const user = await User.findById(targetId).lean();
-    if (!user) {
-      return res.status(400).send({ msg: "User not found" });
-    }
-
-    const followersCount = await Follow.countDocuments({ userId: targetId });
-    const followingCount = await Follow.countDocuments({
-      followerId: targetId,
-    });
-    const postsCount = await Post.countDocuments({ userId: targetId });
-    const isFollowing = Boolean(
-      await Follow.exists({
-        followerId: userId,
-        userId: targetId,
-      })
-    );
-    const displayName = user.displayName;
-    const userIcon = user.icon;
-
-    return res.status(200).send({
-      followersCount,
-      followingCount,
-      postsCount,
-      isFollowing,
-      displayName,
-      userIcon,
-    });
-  } catch (error) {
-    return res.status(400).send({ msg: "Error when fetching additional data" });
   }
 });
 

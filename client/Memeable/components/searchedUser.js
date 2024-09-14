@@ -1,24 +1,22 @@
 import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { DEFAULT_ICONS, screenWidth } from "../utils/constants";
+import { screenWidth } from "../utils/constants";
+import { getIconSource } from "../utils/helper";
 import { View } from "react-native";
 
 export default SearchedUser = ({ item, navigation }) => {
-  const iconBgColor = item.icon.bgColor || "transparent";
-  const iconSource = item.icon.customIcon
-    ? { uri: item.icon.customIcon }
-    : DEFAULT_ICONS.find((icon) => icon.id === item.icon.id)?.source ||
-      DEFAULT_ICONS[0].source;
+  const iconBgColor = item.icon?.bgColor || "transparent";
+  const iconSource = getIconSource(item?.icon);
 
   return (
     <TouchableOpacity
       style={styles.container}
       activeOpacity={0.5}
-      onPress={() =>
+      onPress={() => {
         navigation.navigate("UserProfile", {
           isStack: true,
           targetId: item._id,
-        })
-      }
+        });
+      }}
     >
       <Image
         source={iconSource}
