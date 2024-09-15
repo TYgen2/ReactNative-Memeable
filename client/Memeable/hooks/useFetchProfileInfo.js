@@ -1,8 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import { getTokens } from "../utils/tokenActions";
 import { UpdateContext } from "../context/loading";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchProfile } from "../handleAPIs/fetchData";
+import { handleFollow } from "../store/userActions";
 
 export default useFetchProfileInfo = (userId, targetId) => {
   const [userData, setUserData] = useState(null);
@@ -10,17 +11,20 @@ export default useFetchProfileInfo = (userId, targetId) => {
   const { shouldFetch, setShouldFetch } = useContext(UpdateContext);
   const { userDetails } = useSelector((state) => state.user);
   const isMe = userDetails?.userId === targetId;
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // prevent crash when user logout (reset userDetails)
     if (userId === undefined) return;
 
+    // use global state userDetails for display
     if (isMe) {
       setUserData(userDetails);
       setIsInfoLoading(false);
       return;
     }
 
+    // fetching user profile data by API
     const fetchUserProfile = async () => {
       setIsInfoLoading(true);
 
@@ -66,5 +70,28 @@ export default useFetchProfileInfo = (userId, targetId) => {
     });
   };
 
-  return { userData, setUserData, isInfoLoading, handleFollowersCount, isMe };
+  // button actions for follow / unfollow in UserProfile
+  const handlePressed = async () => {
+    const tokens = await getTokens();
+    // handle follow API, also update global state
+    dispatch(
+      handleFollow({
+        targetId,
+        action: userData.isFollowing ? "unfollow" : "follow",
+        jwtToken: tokens.jwtToken,
+        refreshToken: tokens.refreshToken,
+      })
+    ).then(() => {
+      handleFollowersCount(userData.isFollowing ? "unfollow" : "follow");
+    });
+  };
+
+  return {
+    userData,
+    setUserData,
+    isInfoLoading,
+    handleFollowersCount,
+    isMe,
+    handlePressed,
+  };
 };

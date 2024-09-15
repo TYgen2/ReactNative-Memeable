@@ -30,7 +30,7 @@ export const selectImageForUpload = async (setImageUri, navigation) => {
 };
 
 // select image for profile icon
-export const selectImageForProfile = async (setCustomIcon) => {
+export const selectImageForProfile = async (setCustomIcon, update = false) => {
   const result = await ImagePicker.requestMediaLibraryPermissionsAsync();
   if (result.granted === true) {
     let res = await ImagePicker.launchImageLibraryAsync({
@@ -43,7 +43,16 @@ export const selectImageForProfile = async (setCustomIcon) => {
 
     if (!res.canceled) {
       const { uri } = res.assets[0];
-      setCustomIcon(uri);
+
+      if (update) {
+        setCustomIcon((prev) => ({
+          bgColor: null,
+          customIcon: uri,
+          id: null,
+        }));
+      } else {
+        setCustomIcon(uri);
+      }
     }
   } else {
     console.log("Access denied / One time only");
@@ -82,17 +91,20 @@ export const displayLikes = (count) => {
 };
 
 export const getIconSource = (userIcon) => {
-  if (userIcon.customIcon) {
+  if (userIcon?.customIcon) {
     return { uri: userIcon.customIcon };
   }
 
-  const defaultIcon = DEFAULT_ICONS.find((icon) => icon.id === userIcon.id);
+  const defaultIcon = DEFAULT_ICONS.find((icon) => icon.id === userIcon?.id);
   return defaultIcon?.source || DEFAULT_ICONS[0].source;
 };
 
 export const getBgImageSource = (bgImage) => {
-  if (bgImage) {
+  // user has set the bgImage before (must be an image uri)
+  if (bgImage !== null) {
     return { uri: bgImage };
   }
+
+  // bgImage is null by default
   return DEFAULT_BGIMAGE;
 };

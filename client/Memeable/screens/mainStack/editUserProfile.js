@@ -7,37 +7,42 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import useUpdateProfile from "../../hooks/useUpdateProfile";
 import {
+  getBgImageSource,
+  getIconSource,
   selectImageForBgImage,
   selectImageForProfile,
 } from "../../utils/helper";
 import Icon from "react-native-vector-icons/Ionicons";
+import useUpdateStrings from "../../hooks/updateUserProfile/useUpdateStrings";
+import useUpdateBgImage from "../../hooks/updateUserProfile/useUpdateBgImage";
+import useUpdateIcon from "../../hooks/updateUserProfile/useUpdateIcon";
 
 export default EditUserProfile = ({ route, navigation }) => {
-  const { icon, bgColor, bgImage, data } = route.params;
+  const { data } = route.params;
 
+  // handling udpate bgImage
+  const { newBgImage, setNewBgImage, updateBgImageInfo } = useUpdateBgImage(
+    data.bgImage
+  );
+
+  // handling udpate icon
+  const { newIcon, setNewIcon, updateIconInfo } = useUpdateIcon(data.userIcon);
+
+  // handling udpate of displayName, username and userBio
   const {
-    username,
-    setUsername,
     displayName,
     setdisplayName,
-    customIcon,
-    setCustomIcon,
-    prevIcon,
+    username,
+    setUsername,
     userBio,
     setUserBio,
-    newBgImage,
-    setNewBgImage,
-    prevBgImage,
-    updateInfo,
-    isUpdating,
-  } = useUpdateProfile(data, icon, bgImage);
-
-  // check whether icon and bgImage is updated by user (not yet save)
-  // if yes, display the new chosen image. If no, use the old one
-  const iconSource = customIcon ? { uri: customIcon } : prevIcon;
-  const bgImageSource = newBgImage ? { uri: newBgImage } : prevBgImage;
+    updateStringInfo,
+  } = useUpdateStrings({
+    displayName: data.displayName,
+    username: data.displayName,
+    userBio: data.userBio,
+  });
 
   return (
     <View style={styles.container}>
@@ -46,39 +51,48 @@ export default EditUserProfile = ({ route, navigation }) => {
         onPress={() => selectImageForBgImage(setNewBgImage)}
         style={{ justifyContent: "center", alignItems: "center" }}
       >
-        <View style={[styles.editLogo, { padding: 10 }]}>
-          <Icon name="create-outline" size={40} color="rgba(255,255,255,0.9)" />
-        </View>
+        <Icon
+          name="create-outline"
+          size={40}
+          color="white"
+          style={{ position: "absolute", zIndex: 1 }}
+        />
         <ImageBackground
-          source={bgImageSource}
+          source={getBgImageSource(newBgImage)}
           style={styles.backgroundImage}
         />
       </TouchableOpacity>
       <View style={styles.iconBorder}>
         <TouchableOpacity
           activeOpacity={0.9}
-          onPress={() => selectImageForProfile(setCustomIcon)}
+          onPress={() => selectImageForProfile(setNewIcon, true)}
           style={{ justifyContent: "center", alignItems: "center" }}
         >
-          <View style={[styles.editLogo, { padding: 8 }]}>
-            <Icon
-              name="create-outline"
-              size={30}
-              color="rgba(255,255,255,0.9)"
-            />
-          </View>
+          <Icon
+            name="create-outline"
+            size={30}
+            color="white"
+            style={{ position: "absolute", zIndex: 1 }}
+          />
           <Image
-            source={iconSource}
-            style={[styles.icon, { backgroundColor: bgColor }]}
+            source={getIconSource(newIcon)}
+            style={[styles.icon, { backgroundColor: newIcon.bgColor }]}
           />
         </TouchableOpacity>
       </View>
       <View style={styles.editInput}>
         <TouchableOpacity
           style={styles.saveButton}
-          onPress={() => {
-            updateInfo();
-            if (customIcon) {
+          onPress={async () => {
+            try {
+              await Promise.all([
+                updateStringInfo(),
+                updateBgImageInfo(),
+                updateIconInfo(),
+              ]);
+              navigation.pop();
+            } catch (error) {
+              console.log(error);
             }
           }}
         >
@@ -114,12 +128,8 @@ const styles = StyleSheet.create({
   backgroundImage: {
     height: 250,
     width: "100%",
-  },
-  editLogo: {
-    zIndex: 1,
-    borderRadius: 30,
-    position: "absolute",
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: "black",
+    opacity: 0.7,
   },
   iconBorder: {
     height: 100,
@@ -139,6 +149,8 @@ const styles = StyleSheet.create({
     width: 90,
     height: 90,
     borderRadius: 90,
+    backgroundColor: "black",
+    opacity: 0.7,
   },
   editInput: {
     flex: 3,

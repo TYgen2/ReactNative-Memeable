@@ -213,7 +213,7 @@ router.post("/api/handleFollow", authenticateToken, async (req, res) => {
 });
 
 router.post(
-  "/api/handleUpdate",
+  "/api/handleUpdateStrings",
   authenticateToken,
   checkSchema(updateProfileValidationSchema),
   async (req, res) => {
@@ -224,7 +224,7 @@ router.post(
       return res.status(400).send({
         msg: "Input data invalid",
         errorType: "validation",
-        data: result.array(),
+        invalidData: result.array(),
       });
     }
 
@@ -260,7 +260,7 @@ router.post(
 
 // update bgImage in user profile
 router.post(
-  "/api/updateBgImage",
+  "/api/handleUpdateBgImage",
   upload.single("file"),
   authenticateToken,
   async (req, res) => {
@@ -292,7 +292,10 @@ router.post(
           .send({ msg: "User not found when uploading bgImage" });
       }
 
-      const response = { msg: "bgImage uploaded to S3 successfully!!" };
+      const response = {
+        updatedBgImage,
+        msg: "bgImage updated and uploaded to S3 successfully!!",
+      };
 
       // when new pair of tokens are generated from authenticateToken middleware
       if (req.newToken && req.newRefreshToken) {
@@ -313,7 +316,7 @@ router.post(
 
 // update icon in user profile
 router.post(
-  "/api/updateIcon",
+  "/api/handleUpdateIcon",
   upload.single("file"),
   authenticateToken,
   async (req, res) => {
@@ -337,7 +340,13 @@ router.post(
       // update icon field in database
       const updatedIcon = await User.findByIdAndUpdate(
         req.userId,
-        { $set: { "icon.customIcon": `${CDN}` + `${imageKey}` } },
+        {
+          $set: {
+            "icon.customIcon": `${CDN}` + `${imageKey}`,
+            "icon.bgColor": null,
+            "icon.id": null,
+          },
+        },
         { new: true }
       );
       if (!updatedIcon) {
@@ -347,6 +356,7 @@ router.post(
       }
 
       const response = {
+        updatedIcon,
         msg: "Icon updated to database and uploaded to S3!!",
       };
 

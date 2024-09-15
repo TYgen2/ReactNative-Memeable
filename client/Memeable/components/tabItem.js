@@ -16,7 +16,7 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
 
   const { userDetails } = useSelector((state) => state.user);
   const iconBgColor = userDetails.userIcon?.bgColor || "transparent";
-  const iconSource = getIconSource(userDetails.userIcon);
+  const iconSource = getIconSource(userDetails?.userIcon);
 
   const icon = {
     HomeStack: (props) => <MCIcon name="home" size={30} {...props} />,

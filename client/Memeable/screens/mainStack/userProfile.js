@@ -9,27 +9,21 @@ import {
   View,
   RefreshControl,
 } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { DEFAULT_BGIMAGE } from "../../utils/constants";
+import { useSelector } from "react-redux";
 import UserPost from "../../components/userPost";
 import useFetchPosts from "../../hooks/useFetchPosts";
-import { useCallback, useContext, useEffect } from "react";
+import { useCallback, useRef } from "react";
 import useFetchProfileInfo from "../../hooks/useFetchProfileInfo";
 import BackButton from "../../components/backButton";
-import { UpdateContext } from "../../context/loading";
-import { getTokens } from "../../utils/tokenActions";
 import { getBgImageSource, getIconSource } from "../../utils/helper";
-import { handleFollow } from "../../store/userActions";
 import { useFocusEffect } from "@react-navigation/native";
 
 export default UserProfile = ({ route, navigation }) => {
-  const { userDetails } = useSelector((state) => state.user);
+  const { userDetails, status } = useSelector((state) => state.user);
   const { isStack, targetId } = route.params || {};
-  const { shouldFetch, setShouldFetch } = useContext(UpdateContext);
+  const prevUserDetailsRef = useRef(userDetails);
 
-  const dispatch = useDispatch();
-
-  const { userData, setUserData, isInfoLoading, handleFollowersCount, isMe } =
+  const { userData, setUserData, isMe, isInfoLoading, handlePressed } =
     useFetchProfileInfo(userDetails?.userId, targetId);
 
   const { posts, isLoading, fetchPosts, loadMorePosts } = useFetchPosts(
@@ -44,35 +38,16 @@ export default UserProfile = ({ route, navigation }) => {
   // handle instant UI reflect
   useFocusEffect(
     useCallback(() => {
-      if (isMe) {
+      if (isMe && prevUserDetailsRef.current !== userDetails) {
+        console.log("UserProfile re-rendered!!");
         setUserData(userDetails);
+        prevUserDetailsRef.current = userDetails;
       }
     }, [userDetails])
   );
 
-  // useEffect(() => {
-  //   // when visiting other users' profile,
-  //   // won't refresh after pressed follow / unfollow
-  //   if (!isMe) {
-  //     fetchUserProfile();
-  //     fetchPosts(1);
-  //     setShouldFetch(false);
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   // when should refresh the userprofile:
-  //   // 1 - After user upload a post
-  //   // 2 - User performed follow / unfollow action
-  //   // Note: Should not refresh when user is in other user profile
-  //   if (isMe && (shouldFetch || isInfoLoading)) {
-  //     fetchUserProfile();
-  //     fetchPosts(1);
-  //     setShouldFetch(false);
-  //   }
-  // }, [shouldFetch]);
-
-  if (isInfoLoading) {
+  // handle first mount by local loading state
+  if (isInfoLoading || status === "loading") {
     return (
       <ActivityIndicator
         size={30}
@@ -179,28 +154,12 @@ export default UserProfile = ({ route, navigation }) => {
                       navigation.navigate("SettingStack", {
                         screen: "EditUserProfile",
                         params: {
-                          icon: iconSource,
                           bgColor: iconBgColor,
-                          bgImage: bgImage,
                           data: userData,
                         },
                       });
                     } else {
-                      // handle follow or unfollow
-                      const tokens = await getTokens();
-                      // handle follow API, also update global state
-                      dispatch(
-                        handleFollow({
-                          targetId,
-                          action: userData.isFollowing ? "unfollow" : "follow",
-                          jwtToken: tokens.jwtToken,
-                          refreshToken: tokens.refreshToken,
-                        })
-                      ).then(() => {
-                        handleFollowersCount(
-                          userData.isFollowing ? "unfollow" : "follow"
-                        );
-                      });
+                      handlePressed();
                     }
                   }}
                 >
