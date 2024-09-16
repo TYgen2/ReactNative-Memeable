@@ -2,6 +2,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { clearTokens } from "../../utils/tokenActions";
 import { reduxLogout } from "../../store/userReducer";
+import { clearPosts } from "../../store/postReducer";
 import { useContext } from "react";
 import { UpdateContext } from "../../context/loading";
 
@@ -16,6 +17,7 @@ export default Notify = () => {
         onPress={async () => {
           await clearTokens();
           dispatch(reduxLogout());
+          dispatch(clearPosts());
         }}
       >
         <Text>LOGOUT</Text>

@@ -2,7 +2,6 @@ import axios from "axios";
 import axiosRetry from "axios-retry";
 import { LOCAL_HOST } from "@env";
 import { storeTokens } from "../utils/tokenActions";
-import { Alert } from "react-native";
 
 axiosRetry(axios, { retries: 3 });
 

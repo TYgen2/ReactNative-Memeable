@@ -9,7 +9,7 @@ import userProfile from "./screens/mainStack/userProfile";
 import notify from "./screens/mainStack/notification";
 import upload from "./screens/uploadStack/upload";
 import editProfile from "./screens/authStack/editProfile";
-import editUserProfile from "./screens/mainStack/editUserProfile";
+import editUserProfile from "./screens/settingStack/editUserProfile";
 import { useContext, useEffect, useState } from "react";
 import { StatusBar } from "react-native";
 import { store } from "./store/store";

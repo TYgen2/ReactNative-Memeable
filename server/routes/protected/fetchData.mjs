@@ -105,12 +105,12 @@ router.get("/api/fetchUserProfile", authenticateToken, async (req, res) => {
 
 // fetch posts (user's or following's)
 router.get("/api/fetchPosts", authenticateToken, async (req, res) => {
-  const { page, limit, mode } = req.query;
+  const { page, limit, mode, since } = req.query;
 
   try {
     const user = await User.findById(req.userId).select("following").lean();
     if (!user) {
-      res.status(400).send({ msg: "No user found, ERROR!!!" });
+      res.status(404).send({ msg: "No user found, ERROR!!!" });
     }
 
     const followingIds = await getFollowingIds(req.userId);
@@ -119,19 +119,26 @@ router.get("/api/fetchPosts", authenticateToken, async (req, res) => {
       .lean();
     const likedPostIds = likedPosts.map((like) => like.postId.toString());
 
-    const search =
-      mode == "main"
-        ? Post.find({ userId: { $in: followingIds } })
-        : Post.find({ userId: req.userId });
+    let search;
+    if (mode === "main") {
+      search = Post.find({ userId: { $in: followingIds } });
+    } else {
+      search = Post.find({ userId: req.userId });
+    }
+
+    if (since) {
+      search = search.where("createDate").gt(new Date(since));
+    } else {
+      search = search.skip((page - 1) * limit).limit(Number(limit) + 1);
+    }
 
     const posts = await search
       .sort({ createDate: -1 })
       .populate({ path: "userId", select: "icon displayName" })
-      .skip((page - 1) * limit)
-      .limit(Number(limit))
       .exec();
 
-    const postData = posts.map((post) => {
+    const hasMore = posts.length > limit;
+    const postData = posts.slice(0, limit).map((post) => {
       const postObject = post.toObject();
       delete postObject.__v;
       postObject.timeAgo = getTimeDifference(postObject.createDate);
@@ -139,7 +146,7 @@ router.get("/api/fetchPosts", authenticateToken, async (req, res) => {
       return postObject;
     });
 
-    return res.status(200).send(postData);
+    return res.status(200).send({ postData, hasMore });
   } catch (error) {
     return res.status(400).send({ msg: "Error when fetching posts" });
   }

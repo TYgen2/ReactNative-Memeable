@@ -5,12 +5,12 @@ import {
   handleUpdateBgImage,
   handleUpdateIcon,
   handleUpdateStrings,
+  handleUploadPost,
 } from "./userActions";
 
 const initialState = {
   loginStatus: false,
   userDetails: {},
-  userPosts: [],
   status: "idle",
   error: null,
 };
@@ -34,7 +34,6 @@ export const userSlice = createSlice({
       .addCase(fetchUserInfo.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.userDetails = action.payload.userDetails;
-        state.userPosts = action.payload.userPosts;
       })
       .addCase(fetchUserInfo.rejected, (state, action) => {
         state.status = "failed";
@@ -97,6 +96,17 @@ export const userSlice = createSlice({
         state.userDetails.userIcon.id = updatedIcon.id;
       })
       .addCase(handleUpdateIcon.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(handleUploadPost.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(handleUploadPost.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.userDetails.postsCount += 1;
+      })
+      .addCase(handleUploadPost.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

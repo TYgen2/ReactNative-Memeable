@@ -3,35 +3,30 @@ import { barOffset, screenWidth } from "../../utils/constants";
 import MainPost from "../../components/mainPost";
 import { useSelector } from "react-redux";
 import useFetchPosts from "../../hooks/useFetchPosts";
-import { UpdateContext } from "../../context/loading";
-import { useContext, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 export default Home = ({ navigation }) => {
   const { userDetails } = useSelector((state) => state.user);
-  const { shouldFetch, setShouldFetch } = useContext(UpdateContext);
-  const userId = userDetails.userId || null;
+  const { allPosts } = useSelector((state) => state.post);
+  const userId = userDetails?.userId;
 
-  const { posts, isLoading, fetchPosts, loadMorePosts } = useFetchPosts(
-    userId,
-    "main"
+  const { isLoading, fetchAllPosts, loadMorePosts, refreshPosts } =
+    useFetchPosts("main");
+
+  const renderPost = useCallback(
+    ({ item }) => {
+      return <MainPost item={item} userId={userId} navigation={navigation} />;
+    },
+    [navigation]
   );
 
-  const renderPost = ({ item }) => {
-    return (
-      <MainPost
-        item={item}
-        userId={userDetails.userId}
-        navigation={navigation}
-      />
-    );
-  };
-
   useEffect(() => {
-    if (shouldFetch) {
-      fetchPosts(1);
-      setShouldFetch(false);
+    if (allPosts.length === 0) {
+      fetchAllPosts(1);
+    } else {
+      refreshPosts();
     }
-  }, [shouldFetch]);
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -44,10 +39,10 @@ export default Home = ({ navigation }) => {
       </View>
       <View style={styles.content}>
         <FlatList
-          data={[]}
+          data={allPosts}
           refreshing={isLoading}
           renderItem={renderPost}
-          onRefresh={fetchPosts}
+          onRefresh={refreshPosts}
           onEndReached={loadMorePosts}
           overScrollMode="never"
           contentContainerStyle={{

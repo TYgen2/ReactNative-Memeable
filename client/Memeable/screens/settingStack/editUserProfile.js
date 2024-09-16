@@ -40,7 +40,7 @@ export default EditUserProfile = ({ route, navigation }) => {
     updateStringInfo,
   } = useUpdateStrings({
     displayName: data.displayName,
-    username: data.displayName,
+    username: data.username,
     userBio: data.userBio,
   });
 
@@ -102,17 +102,29 @@ export default EditUserProfile = ({ route, navigation }) => {
           style={[styles.textInput, { height: 60, justifyContent: "center" }]}
         >
           <Text style={{ color: "grey" }}>User name</Text>
-          <TextInput value={username} onChangeText={setUsername} />
+          <TextInput
+            value={username}
+            onChangeText={setUsername}
+            autoCapitalize="none"
+          />
         </View>
         <View
           style={[styles.textInput, { height: 60, justifyContent: "center" }]}
         >
           <Text style={{ color: "grey" }}>Display name</Text>
-          <TextInput value={displayName} onChangeText={setdisplayName} />
+          <TextInput
+            value={displayName}
+            onChangeText={setdisplayName}
+            autoCapitalize="none"
+          />
         </View>
         <View style={[styles.textInput, { height: 120, paddingTop: 4 }]}>
           <Text style={{ color: "grey" }}>Personal bio</Text>
-          <TextInput value={userBio} onChangeText={setUserBio} />
+          <TextInput
+            value={userBio}
+            onChangeText={setUserBio}
+            autoCapitalize="none"
+          />
         </View>
       </View>
       <View style={styles.songContainer}></View>

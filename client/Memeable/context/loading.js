@@ -9,8 +9,8 @@ export const LoadingContextProvider = ({ children }) => {
   return (
     <UpdateContext.Provider
       value={{
-        isLoading,
-        setIsLoading,
+        // isLoading,
+        // setIsLoading,
         shouldFetch,
         setShouldFetch,
       }}

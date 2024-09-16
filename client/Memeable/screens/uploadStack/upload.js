@@ -8,18 +8,17 @@ import {
   View,
 } from "react-native";
 import { screenWidth } from "../../utils/constants";
-import { Formik } from "formik";
+import { Formik, useFormikContext } from "formik";
 import { uploadReviewSchema } from "../../utils/validationSchema";
-import { handlePostUpload } from "../../handleAPIs/userActions";
 import Icon from "react-native-vector-icons/Ionicons";
-import { getTokens } from "../../utils/tokenActions";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UpdateContext } from "../../context/loading";
+import useUpload from "../../hooks/useUpload";
 
 export default Upload = ({ route, navigation }) => {
   const { imageUri } = route.params;
-  const [isUploading, setIsUploading] = useState(false);
   const { shouldFetch, setShouldFetch } = useContext(UpdateContext);
+  const { isUploading, setIsUploading, uploadPost } = useUpload(imageUri);
 
   return (
     <View style={[styles.container, { backgroundColor: "white" }]}>
@@ -55,20 +54,7 @@ export default Upload = ({ route, navigation }) => {
         }}
         validationSchema={uploadReviewSchema}
         onSubmit={async (values) => {
-          setIsUploading(true);
-          const tokens = await getTokens();
-          await handlePostUpload(
-            imageUri,
-            values.title,
-            values.description,
-            values.hashtag,
-            tokens.jwtToken,
-            tokens.refreshToken
-          ).then(() => {
-            setIsUploading(false);
-            setShouldFetch(true);
-            navigation.pop();
-          });
+          uploadPost(values).then(() => navigation.pop());
         }}
       >
         {(props) => (

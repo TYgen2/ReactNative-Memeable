@@ -10,6 +10,7 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
+import postReducer from "./postReducer";
 
 const persisConfig = {
   key: "root",
@@ -19,6 +20,7 @@ const persisConfig = {
 
 const reducer = combineReducers({
   user: userReducer,
+  post: postReducer,
 });
 
 const persistedReducer = persistReducer(persisConfig, reducer);

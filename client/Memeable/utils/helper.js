@@ -5,7 +5,7 @@ import {
   screenWidth,
 } from "../utils/constants";
 
-// select image from album
+// select image for posting
 export const selectImageForUpload = async (setImageUri, navigation) => {
   const result = await ImagePicker.requestMediaLibraryPermissionsAsync();
   if (result.granted === true) {

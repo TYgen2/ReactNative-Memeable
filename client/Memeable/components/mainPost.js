@@ -8,16 +8,13 @@ import {
   Pressable,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import { DEFAULT_ICONS } from "../utils/constants";
 import { getTokens } from "../utils/tokenActions";
 import { handleLike } from "../handleAPIs/userActions";
-import { displayLikes } from "../utils/helper";
+import { displayLikes, getIconSource } from "../utils/helper";
 
 export default MainPosts = ({ item, userId, navigation }) => {
-  const iconBgColor = item.userId.icon.bgColor || "transparent";
-  const userIcon = item.userId.icon.customIcon
-    ? { uri: item.userId.icon.customIcon }
-    : DEFAULT_ICONS.find((icon) => icon.id === item.userId.icon.id).source;
+  const iconBgColor = item.userId?.icon.bgColor || "transparent";
+  const userIcon = getIconSource(item.userId?.icon);
 
   const [likes, setLikes] = useState(item.likes);
 

@@ -3,6 +3,7 @@ import axios from "axios";
 import { LOCAL_HOST } from "@env";
 import { storeTokens } from "../utils/tokenActions";
 
+// fetch local user info and store in Redux
 export const fetchUserInfo = createAsyncThunk(
   "user/fetchUserInfo",
   async ({ jwtToken, refreshToken }, { rejectWithValue }) => {
@@ -27,6 +28,35 @@ export const fetchUserInfo = createAsyncThunk(
   }
 );
 
+export const fetchPosts = createAsyncThunk(
+  "user/fetchPosts",
+  async (
+    { page, limit, mode, since, reset, jwtToken, refreshToken },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axios.get(`${LOCAL_HOST}/api/fetchPosts`, {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          "x-refresh-token": refreshToken,
+        },
+        params: { page, limit, mode, since },
+      });
+
+      console.log("Posts fetched using REDUX!!");
+      if (response.data.token && response.data.refreshToken) {
+        await storeTokens(response.data.token, response.data.refreshToken);
+        console.log("Tokens updated");
+      }
+
+      return { ...response.data, reset };
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// handling follow action
 export const handleFollow = createAsyncThunk(
   "user/handleFollow",
   async ({ targetId, action, jwtToken, refreshToken }, { rejectWithValue }) => {
@@ -163,6 +193,54 @@ export const handleUpdateIcon = createAsyncThunk(
       return {
         msg: response.data.msg,
         updatedIcon: response.data.updatedIcon.icon,
+      };
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// handling upload post action
+export const handleUploadPost = createAsyncThunk(
+  "user/handleUploadPost",
+  async (
+    { imageUri, title, description, hashtag, jwtToken, refreshToken },
+    { rejectWithValue }
+  ) => {
+    const formData = new FormData();
+    const fileType = imageUri.endsWith(".png") ? "image/png" : "image/jpeg";
+    formData.append("file", {
+      uri: imageUri,
+      type: fileType,
+      name: "image",
+    });
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("hashtag", hashtag);
+
+    try {
+      const response = await axios.post(
+        `${LOCAL_HOST}/api/handleUploadPost`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+            "x-refresh-token": refreshToken,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("Updated userPosts using REDUX!!");
+      if (response.data.token && response.data.refreshToken) {
+        await storeTokens(response.data.token, response.data.refreshToken);
+        console.log("Tokens updated");
+      }
+
+      return {
+        msg: response.data.msg,
+        postData: response.data.postData,
       };
     } catch (error) {
       console.log(error);
