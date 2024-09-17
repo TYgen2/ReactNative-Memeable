@@ -18,7 +18,7 @@ router.post("/api/uploadDefaultIcon", authenticateToken, async (req, res) => {
   try {
     // update icon field in database
     const updatedIcon = await User.findByIdAndUpdate(
-      req.body.userId,
+      req.userId,
       { icon: req.body.icon },
       { new: true }
     );
@@ -30,12 +30,6 @@ router.post("/api/uploadDefaultIcon", authenticateToken, async (req, res) => {
 
     const response = { msg: "Default icon saved to database!!" };
 
-    // when new pair of tokens are generated from authenticateToken middleware
-    if (req.newToken && req.newRefreshToken) {
-      console.log("HAVE NEW TOKENN!!!");
-      response.token = req.newToken;
-      response.refreshToken = req.newRefreshToken;
-    }
     return res.status(201).send(response);
   } catch (error) {
     console.log(error);
@@ -70,7 +64,7 @@ router.post(
 
       // update icon field in database
       const updatedIcon = await User.findByIdAndUpdate(
-        req.body.userId,
+        req.userId,
         { $set: { "icon.customIcon": `${CDN}` + `${imageKey}` } },
         { new: true }
       );
@@ -84,12 +78,6 @@ router.post(
         msg: "Custom icon saved to database and uploaded to S3!!",
       };
 
-      // when new pair of tokens are generated from authenticateToken middleware
-      if (req.newToken && req.newRefreshToken) {
-        console.log("HAVE NEW TOKENN!!!");
-        response.token = req.newToken;
-        response.refreshToken = req.newRefreshToken;
-      }
       return res.status(201).send(response);
     } catch (error) {
       console.log(error);

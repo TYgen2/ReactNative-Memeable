@@ -57,14 +57,8 @@ export default Login = ({ navigation }) => {
       return;
     }
 
-    // User exist, proceed to login
-    const tokens = await getTokens();
-    dispatch(
-      fetchUserInfo({
-        jwtToken: tokens.jwtToken,
-        refreshToken: tokens.refreshToken,
-      })
-    );
+    // User exist, proceed to fetch user info before login
+    dispatch(fetchUserInfo());
   };
 
   const [request, response, promptAsync] =

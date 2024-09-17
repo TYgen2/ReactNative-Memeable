@@ -1,82 +1,20 @@
 import axios from "axios";
 import axiosRetry from "axios-retry";
 import { LOCAL_HOST } from "@env";
-import { storeTokens } from "../utils/tokenActions";
+import apiClient from "../utils/axiosHelper";
 
 axiosRetry(axios, { retries: 3 });
 
-// send image data to backend for posting
-export const handlePostUpload = async (
-  imageUri,
-  title,
-  description,
-  hashtag,
-  jwtToken,
-  refreshToken
-) => {
-  if (imageUri) {
-    const formData = new FormData();
-    const fileType = imageUri.endsWith(".png") ? "image/png" : "image/jpeg";
-    formData.append("file", {
-      uri: imageUri,
-      type: fileType,
-      name: "image",
-    });
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("hashtag", hashtag);
-
-    try {
-      const res = await axios.post(`${LOCAL_HOST}/api/uploadPost`, formData, {
-        headers: {
-          Authorization: `Bearer ${jwtToken}`,
-          "x-refresh-token": refreshToken,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      // when user's jwtToken is expired, but refreshToken is still valid,
-      // backend will return a new pair of token, and needs update global
-      if (res.data.token && res.data.refreshToken) {
-        await storeTokens(res.data.token, res.data.refreshToken);
-        console.log("Tokens updated");
-      }
-      console.log(res.data.msg);
-    } catch (error) {
-      console.error(error.response.data);
-    }
-  }
-};
-
 // send icon data to backend for update profile icon
-export const handleIconUpload = async (
-  userId,
-  icon,
-  jwtToken,
-  refreshToken
-) => {
+export const handleIconUpload = async (icon) => {
   // using default icons
   if (icon.customIcon == null) {
+    console.log("Now upload icon with default icons");
     try {
-      const res = await axios.post(
-        `${LOCAL_HOST}/api/uploadDefaultIcon`,
-        {
-          userId,
-          icon,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
-            "x-refresh-token": refreshToken,
-          },
-        }
-      );
-      // when user's jwtToken is expired, but refreshToken is still valid,
-      // backend will return a new pair of token, and needs update global
-      if (res.data.token && res.data.refreshToken) {
-        storeTokens(res.data.token, res.data.refreshToken);
-        console.log("Tokens updated during uploading icon");
-      }
+      const res = await apiClient.post("/uploadDefaultIcon", {
+        icon,
+      });
+
       console.log(res.data.msg);
     } catch (error) {
       console.error(error.response.data);
@@ -91,26 +29,16 @@ export const handleIconUpload = async (
       type: fileType,
       name: "image",
     });
-    formData.append("userId", userId);
     formData.append("icon", imageUri);
 
     try {
-      const res = await axios.post(
-        `${LOCAL_HOST}/api/uploadCustomIcon`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
-            "x-refresh-token": refreshToken,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      console.log("Now upload icon with custom icons");
+      const res = await apiClient.post("/uploadCustomIcon", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-      if (res.data.token && res.data.refreshToken) {
-        storeTokens(res.data.token, res.data.refreshToken);
-        console.log("Tokens updated during uploading icon");
-      }
       console.log(res.data.msg);
     } catch (error) {
       if (error.response) {
@@ -147,13 +75,9 @@ export const handleLike = async (userId, postId, jwtToken, refreshToken) => {
   }
 };
 
-export const handleSearch = async (query, jwtToken, refreshToken) => {
+export const handleSearch = async (query) => {
   try {
-    const res = await axios.get(`${LOCAL_HOST}/api/searchUser`, {
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
-        "x-refresh-token": refreshToken,
-      },
+    const res = await apiClient.get("/searchUser", {
       params: { query },
     });
     const searchRes = res.data;

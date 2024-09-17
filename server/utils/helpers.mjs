@@ -18,14 +18,14 @@ export const comparePassword = (plain, hashed) =>
 
 export const generateJWT = (payload) => {
   return jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: "1h",
+    expiresIn: "15m",
   });
 };
 
 export const generateRefreshToken = () => {
   const refreshToken = crypto.randomBytes(40).toString("hex");
   return jwt.sign({ refreshToken }, process.env.REFRESH_SECRET, {
-    expiresIn: "30d",
+    expiresIn: "7d",
   });
 };
 

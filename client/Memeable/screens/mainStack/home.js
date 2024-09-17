@@ -21,12 +21,16 @@ export default Home = ({ navigation }) => {
   );
 
   useEffect(() => {
+    // When user first login, fetch posts and store in Redux
     if (allPosts.length === 0) {
       fetchAllPosts(1);
     } else {
+      // User already logged in before. When they open the app,
+      // refresth the page to check whether there are new posts
       refreshPosts();
     }
-  }, []);
+    // when user follows another user, updating the feeds immediately
+  }, [userDetails]);
 
   return (
     <View style={styles.container}>

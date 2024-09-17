@@ -15,11 +15,10 @@ import {
 } from "../../utils/constants";
 import EffectiveGIF from "../../components/effectiveGIF";
 import { hideGIF, showGIF } from "../../utils/animation";
-import { handleLoginFetch, selectImageForProfile } from "../../utils/helper";
-import { reduxSetUserInfo } from "../../store/userReducer";
+import { selectImageForProfile } from "../../utils/helper";
+
 import { useDispatch, useSelector } from "react-redux";
 import { handleIconUpload } from "../../handleAPIs/userActions";
-import { getTokens } from "../../utils/tokenActions";
 import { fetchUserInfo } from "../../store/userActions";
 
 export default EditProfile = ({ route }) => {
@@ -184,25 +183,14 @@ export default EditProfile = ({ route }) => {
           style={styles.button}
           activeOpacity={0.8}
           onPress={async () => {
-            const tokens = await getTokens();
             const iconJSON = {
               id: icon.id,
               bgColor,
               customIcon,
             };
-            await handleIconUpload(
-              userId,
-              iconJSON,
-              tokens.jwtToken,
-              tokens.refreshToken
-            );
+            await handleIconUpload(iconJSON);
 
-            dispatch(
-              fetchUserInfo({
-                jwtToken: tokens.jwtToken,
-                refreshToken: tokens.refreshToken,
-              })
-            );
+            dispatch(fetchUserInfo());
           }}
         >
           <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>

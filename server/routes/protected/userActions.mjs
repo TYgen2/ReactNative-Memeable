@@ -74,13 +74,6 @@ router.post(
 
       const response = { msg: "Image uploaded to S3 successfully!!", postData };
 
-      // when new pair of tokens are generated from authenticateToken middleware
-      if (req.newToken && req.newRefreshToken) {
-        console.log("HAVE NEW TOKENN!!!");
-        response.token = req.newToken;
-        response.refreshToken = req.newRefreshToken;
-      }
-
       return res.status(201).send(response);
     } catch (error) {
       console.log(error);
@@ -104,6 +97,7 @@ router.post("/api/handleLike", authenticateToken, async (req, res) => {
       await like.save();
     }
     await Post.findByIdAndUpdate(postId, { $inc: { likes: target ? -1 : 1 } });
+
     res
       .status(200)
       .send({ msg: target ? "Unliked the post!" : "Liked the post!" });

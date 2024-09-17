@@ -228,7 +228,9 @@ router.post("/api/auth/token-validation", async (req, res) => {
   // check whether there is a matched refreshToken in db
   const user = await User.findOne({ refreshToken });
   if (!user) {
-    return res.status(400).send({ msg: "Invalid refresh token" });
+    return res
+      .status(404)
+      .send({ msg: "Invalid refresh token", success: false });
   }
 
   try {
@@ -236,9 +238,10 @@ router.post("/api/auth/token-validation", async (req, res) => {
     jwt.verify(jwtToken, process.env.JWT_SECRET);
 
     // if not expired yet, just return
-    res
-      .status(200)
-      .send({ msg: "JWT token is still valid. Process to other actions..." });
+    res.status(200).send({
+      msg: "JWT token is still valid. Process to other actions...",
+      success: true,
+    });
   } catch (jwtError) {
     // when JWT is expired
     console.log(
@@ -256,11 +259,16 @@ router.post("/api/auth/token-validation", async (req, res) => {
       await user.save();
 
       console.log("TOKENS generated successfully!!");
-      res.status(200).send({ token: token, refreshToken: signedRefreshToken });
+
+      res.setHeader("x-new-token", token);
+      res.setHeader("x-new-refresh-token", signedRefreshToken);
+
+      res.status(200).send({ success: true });
     } catch (refreshError) {
       // when both tokens are expired
-      res.status(400).send({
+      res.status(401).send({
         msg: "Both tokens are expired!! Please login agagin.",
+        success: false,
       });
     }
   }

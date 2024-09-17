@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { getTokens } from "../utils/tokenActions";
 import { handleSearch } from "../handleAPIs/userActions";
 
 export default useSearch = (initialQuery = "") => {
@@ -9,8 +8,7 @@ export default useSearch = (initialQuery = "") => {
 
   const search = useCallback(async () => {
     setIsSearching(true);
-    const tokens = await getTokens();
-    const res = await handleSearch(query, tokens.jwtToken, tokens.refreshToken);
+    const res = await handleSearch(query);
     setResults(res.searchRes);
     setIsSearching(false);
   }, [query]);

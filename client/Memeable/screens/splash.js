@@ -8,27 +8,22 @@ import Animated, {
 } from "react-native-reanimated";
 import { UpdateContext } from "../context/loading";
 import { validateTokens } from "../handleAPIs/auth";
-import { getTokens } from "../utils/tokenActions";
+import { useDispatch } from "react-redux";
+import { reduxLogout } from "../store/userReducer";
+import { clearPosts } from "../store/postReducer";
 
 export default Splash = () => {
   const { setIsLoading } = useContext(UpdateContext);
+  const dispatch = useDispatch();
 
   const checkStatus = async () => {
-    const tokens = await getTokens();
-    const res = await validateTokens(tokens.jwtToken, tokens.refreshToken);
+    const res = await validateTokens();
 
-    // JWT expired, receiving a new pair of tokens,
-    // store them in global state (local already stored
-    // in the validateTokens API)
-    if (res.success === true && res.refreshToken) {
-      console.log(res.message);
-    } else if (res.success) {
-      // JWT still valid
-      console.log(res.message);
-    } else {
-      // not login in yet / both JWT and refreshToken are expired
-      console.log(res.message);
+    if (res.success === false) {
+      dispatch(reduxLogout());
+      dispatch(clearPosts());
     }
+
     // state that controls which stack should be displayed
     setIsLoading(false);
   };

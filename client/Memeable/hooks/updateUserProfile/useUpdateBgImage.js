@@ -1,5 +1,4 @@
 import { useRef, useState } from "react";
-import { getTokens } from "../../utils/tokenActions";
 import { useDispatch } from "react-redux";
 import { handleUpdateBgImage } from "../../store/userActions";
 
@@ -8,16 +7,13 @@ export default useUpdateBgImage = (bgImageData) => {
   const initialBgImageRef = useRef(bgImageData);
   const dispatch = useDispatch();
 
-  const updateBgImageInfo = async () => {
+  const updateBgImageInfo = () => {
     if (newBgImage !== initialBgImageRef.current) {
       console.log("Proceed to update bgImage info!!");
       try {
-        const tokens = await getTokens();
         dispatch(
           handleUpdateBgImage({
             bgImage: newBgImage,
-            jwtToken: tokens.jwtToken,
-            refreshToken: tokens.refreshToken,
           })
         );
       } catch (error) {

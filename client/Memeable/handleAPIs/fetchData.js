@@ -1,14 +1,9 @@
-import axios from "axios";
-import { LOCAL_HOST } from "@env";
+import apiClient from "../utils/axiosHelper";
 
 // fetch User profile info
-export const fetchProfile = async (targetId, jwtToken, refreshToken) => {
+export const fetchProfile = async (targetId) => {
   try {
-    const res = await axios.get(`${LOCAL_HOST}/api/fetchUserProfile`, {
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
-        "x-refresh-token": refreshToken,
-      },
+    const res = await apiClient.get("/fetchUserProfile", {
       params: { targetId },
     });
     return { userData: res.data };

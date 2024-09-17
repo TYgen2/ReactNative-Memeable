@@ -1,5 +1,4 @@
 import { useRef, useState } from "react";
-import { getTokens } from "../../utils/tokenActions";
 import { useDispatch } from "react-redux";
 import { handleUpdateStrings } from "../../store/userActions";
 
@@ -10,7 +9,7 @@ export default useUpdateStrings = (stringData) => {
   const initialStringsRef = useRef(stringData);
   const dispatch = useDispatch();
 
-  const updateStringInfo = async () => {
+  const updateStringInfo = () => {
     if (
       displayName !== initialStringsRef.current.displayName ||
       username !== initialStringsRef.current.username ||
@@ -18,14 +17,11 @@ export default useUpdateStrings = (stringData) => {
     ) {
       console.log("Proceed to update strings info!!");
       try {
-        const tokens = await getTokens();
         dispatch(
           handleUpdateStrings({
             displayName,
             username,
             userBio,
-            jwtToken: tokens.jwtToken,
-            refreshToken: tokens.refreshToken,
           })
         );
       } catch (error) {

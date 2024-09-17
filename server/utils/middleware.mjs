@@ -14,14 +14,12 @@ export const authenticateToken = async (req, res, next) => {
   const refreshToken = req.headers["x-refresh-token"];
 
   if (!jwtToken || !refreshToken) {
-    return res.status(401).send({ msg: "Missing token" });
+    return res.status(404).send({ msg: "Missing tokens" });
   }
 
   const user = await User.findOne({ refreshToken });
   if (!user) {
-    return res
-      .status(400)
-      .send({ msg: "Invalid refresh token / User not exist" });
+    return res.status(404).send({ msg: "Invalid refresh token" });
   }
 
   req.userId = user.id;
@@ -48,12 +46,11 @@ export const authenticateToken = async (req, res, next) => {
 
       console.log("TOKENS generated successfully from middleware!!");
 
-      // for later use
-      req.newToken = token;
-      req.newRefreshToken = signedRefreshToken;
+      res.setHeader("x-new-token", token);
+      res.setHeader("x-new-refresh-token", signedRefreshToken);
       next();
     } catch (refreshError) {
-      return res.status(400).send({
+      return res.status(401).send({
         msg: "Both tokens are expired!! Checked from middleware",
       });
     }

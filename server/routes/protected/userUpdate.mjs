@@ -46,9 +46,11 @@ router.post(
         return res.status(404).send({ msg: "User not found, update failed" });
       }
 
-      return res
-        .status(200)
-        .send({ msg: "User profile updated successfully!" });
+      return res.status(200).send({
+        msg: "User profile updated successfully!",
+        token: res.token,
+        refreshToken: res.refreshToken,
+      });
     } catch (error) {
       if (error.code === 11000) {
         return res
@@ -99,13 +101,6 @@ router.post(
         updatedBgImage,
         msg: "bgImage updated and uploaded to S3 successfully!!",
       };
-
-      // when new pair of tokens are generated from authenticateToken middleware
-      if (req.newToken && req.newRefreshToken) {
-        console.log("HAVE NEW TOKENN!!!");
-        response.token = req.newToken;
-        response.refreshToken = req.newRefreshToken;
-      }
 
       return res.status(201).send(response);
     } catch (error) {
@@ -163,12 +158,6 @@ router.post(
         msg: "Icon updated to database and uploaded to S3!!",
       };
 
-      // when new pair of tokens are generated from authenticateToken middleware
-      if (req.newToken && req.newRefreshToken) {
-        console.log("HAVE NEW TOKENN!!!");
-        response.token = req.newToken;
-        response.refreshToken = req.newRefreshToken;
-      }
       return res.status(201).send(response);
     } catch (error) {
       console.log(error);

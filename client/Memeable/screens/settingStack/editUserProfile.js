@@ -1,4 +1,5 @@
 import {
+  Alert,
   Image,
   ImageBackground,
   StyleSheet,
@@ -85,12 +86,21 @@ export default EditUserProfile = ({ route, navigation }) => {
           style={styles.saveButton}
           onPress={async () => {
             try {
-              await Promise.all([
+              const results = await Promise.allSettled([
                 updateStringInfo(),
                 updateBgImageInfo(),
                 updateIconInfo(),
               ]);
-              navigation.pop();
+
+              const allSuccessful = results.every(
+                (result) => result.status === "fulfilled"
+              );
+
+              if (allSuccessful) {
+                navigation.pop();
+              } else {
+                console.log("Some of them gged");
+              }
             } catch (error) {
               console.log(error);
             }

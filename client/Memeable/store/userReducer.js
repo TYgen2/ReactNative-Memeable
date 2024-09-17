@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { Alert } from "react-native";
 import {
   fetchUserInfo,
   handleFollow,
@@ -67,11 +68,11 @@ export const userSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
         if (action.payload.errorType === "validation") {
-          console.log("Input data invalid:", action.payload.invalidData[0].msg);
+          Alert.alert("Input data invalid:", action.payload.invalidData[0].msg);
         } else if (action.payload.errorType === "duplicate") {
-          console.log("Updated failed:", action.payload.msg);
+          Alert.alert("Updated failed:", action.payload.msg);
         } else {
-          console.log(action.payload.msg);
+          Alert.alert(action.payload.msg);
         }
       })
       .addCase(handleUpdateBgImage.pending, (state) => {

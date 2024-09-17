@@ -1,6 +1,4 @@
-import { useContext, useEffect, useState } from "react";
-import { getTokens } from "../utils/tokenActions";
-import { UpdateContext } from "../context/loading";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProfile } from "../handleAPIs/fetchData";
 import { handleFollow } from "../store/userActions";
@@ -8,7 +6,6 @@ import { handleFollow } from "../store/userActions";
 export default useFetchProfileInfo = (userId, targetId) => {
   const [userData, setUserData] = useState(null);
   const [isInfoLoading, setIsInfoLoading] = useState(true);
-  const { shouldFetch, setShouldFetch } = useContext(UpdateContext);
   const { userDetails } = useSelector((state) => state.user);
   const isMe = userDetails?.userId === targetId;
   const dispatch = useDispatch();
@@ -29,12 +26,7 @@ export default useFetchProfileInfo = (userId, targetId) => {
       setIsInfoLoading(true);
 
       try {
-        const tokens = await getTokens();
-        const res = await fetchProfile(
-          targetId,
-          tokens.jwtToken,
-          tokens.refreshToken
-        );
+        const res = await fetchProfile(targetId);
         setUserData(res.userData);
       } catch (error) {
         console.error(
@@ -71,15 +63,12 @@ export default useFetchProfileInfo = (userId, targetId) => {
   };
 
   // button actions for follow / unfollow in UserProfile
-  const handlePressed = async () => {
-    const tokens = await getTokens();
+  const handlePressed = () => {
     // handle follow API, also update global state
     dispatch(
       handleFollow({
         targetId,
         action: userData.isFollowing ? "unfollow" : "follow",
-        jwtToken: tokens.jwtToken,
-        refreshToken: tokens.refreshToken,
       })
     ).then(() => {
       handleFollowersCount(userData.isFollowing ? "unfollow" : "follow");

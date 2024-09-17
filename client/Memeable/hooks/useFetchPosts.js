@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getTokens } from "../utils/tokenActions";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPosts } from "../store/userActions";
 
@@ -20,7 +19,6 @@ export default useFetchAllPosts = (mode) => {
     async (page, reset = false) => {
       if (isLoading) return;
       setIsLoading(true);
-      const tokens = await getTokens();
       try {
         const response = await dispatch(
           fetchPosts({
@@ -29,10 +27,10 @@ export default useFetchAllPosts = (mode) => {
             mode,
             since: reset ? allPosts[0]?.createDate : undefined,
             reset,
-            jwtToken: tokens.jwtToken,
-            refreshToken: tokens.refreshToken,
           })
         ).unwrap();
+
+        console.log(response.hasMore);
 
         if (reset) {
           setCurrentPage(1);

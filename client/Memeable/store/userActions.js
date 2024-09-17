@@ -1,26 +1,14 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { LOCAL_HOST } from "@env";
-import { storeTokens } from "../utils/tokenActions";
+import apiClient from "../utils/axiosHelper";
 
 // fetch local user info and store in Redux
 export const fetchUserInfo = createAsyncThunk(
   "user/fetchUserInfo",
-  async ({ jwtToken, refreshToken }, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${LOCAL_HOST}/api/fetchUserInfo`, {
-        headers: {
-          Authorization: `Bearer ${jwtToken}`,
-          "x-refresh-token": refreshToken,
-        },
-      });
+      const response = await apiClient.get("/fetchUserInfo");
 
       console.log("Global state updated using REDUX!!");
-      if (response.data.token && response.data.refreshToken) {
-        await storeTokens(response.data.token, response.data.refreshToken);
-        console.log("Tokens updated");
-      }
-
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -28,27 +16,16 @@ export const fetchUserInfo = createAsyncThunk(
   }
 );
 
+// fetch posts, including first load, load more and refresh
 export const fetchPosts = createAsyncThunk(
   "user/fetchPosts",
-  async (
-    { page, limit, mode, since, reset, jwtToken, refreshToken },
-    { rejectWithValue }
-  ) => {
+  async ({ page, limit, mode, since, reset }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${LOCAL_HOST}/api/fetchPosts`, {
-        headers: {
-          Authorization: `Bearer ${jwtToken}`,
-          "x-refresh-token": refreshToken,
-        },
+      const response = await apiClient.get("/fetchPosts", {
         params: { page, limit, mode, since },
       });
 
       console.log("Posts fetched using REDUX!!");
-      if (response.data.token && response.data.refreshToken) {
-        await storeTokens(response.data.token, response.data.refreshToken);
-        console.log("Tokens updated");
-      }
-
       return { ...response.data, reset };
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -59,25 +36,14 @@ export const fetchPosts = createAsyncThunk(
 // handling follow action
 export const handleFollow = createAsyncThunk(
   "user/handleFollow",
-  async ({ targetId, action, jwtToken, refreshToken }, { rejectWithValue }) => {
+  async ({ targetId, action }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${LOCAL_HOST}/api/handleFollow`,
-        { targetId, action },
-        {
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
-            "x-refresh-token": refreshToken,
-          },
-        }
-      );
+      const response = await apiClient.post("/handleFollow", {
+        targetId,
+        action,
+      });
 
       console.log("Follow updated using REDUX!!");
-      if (response.data.token && response.data.refreshToken) {
-        await storeTokens(response.data.token, response.data.refreshToken);
-        console.log("Tokens updated");
-      }
-
       return { msg: response.data.msg };
     } catch (error) {
       return rejectWithValue(error.response.data.msg);
@@ -88,28 +54,15 @@ export const handleFollow = createAsyncThunk(
 // update displayName, username and userBio in user profile
 export const handleUpdateStrings = createAsyncThunk(
   "user/handleUpdateStrings",
-  async (
-    { displayName, username, userBio, jwtToken, refreshToken },
-    { rejectWithValue }
-  ) => {
+  async ({ displayName, username, userBio }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${LOCAL_HOST}/api/handleUpdateStrings`,
-        { displayName, username, userBio },
-        {
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
-            "x-refresh-token": refreshToken,
-          },
-        }
-      );
+      const response = await apiClient.post("/handleUpdateStrings", {
+        displayName,
+        username,
+        userBio,
+      });
 
       console.log("Updated Strings using REDUX!!");
-      if (response.data.token && response.data.refreshToken) {
-        await storeTokens(response.data.token, response.data.refreshToken);
-        console.log("Tokens updated");
-      }
-
       return { msg: response.data.msg };
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -120,7 +73,7 @@ export const handleUpdateStrings = createAsyncThunk(
 // update bgImage in user profile
 export const handleUpdateBgImage = createAsyncThunk(
   "user/handleUpdateBgImage",
-  async ({ bgImage, jwtToken, refreshToken }, { rejectWithValue }) => {
+  async ({ bgImage }, { rejectWithValue }) => {
     const formData = new FormData();
     const fileType = bgImage.endsWith(".png") ? "image/png" : "image/jpeg";
     formData.append("file", {
@@ -130,24 +83,13 @@ export const handleUpdateBgImage = createAsyncThunk(
     });
 
     try {
-      const response = await axios.post(
-        `${LOCAL_HOST}/api/handleUpdateBgImage`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
-            "x-refresh-token": refreshToken,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await apiClient.post("/handleUpdateBgImage", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       console.log("Updated bgImage using REDUX!!");
-      if (response.data.token && response.data.refreshToken) {
-        await storeTokens(response.data.token, response.data.refreshToken);
-        console.log("Tokens updated");
-      }
-
       return {
         msg: response.data.msg,
         updatedBgImage: response.data.updatedBgImage.bgImage,
@@ -162,7 +104,7 @@ export const handleUpdateBgImage = createAsyncThunk(
 // update icon in user profile
 export const handleUpdateIcon = createAsyncThunk(
   "user/handleUpdateIcon",
-  async ({ icon, jwtToken, refreshToken }, { rejectWithValue }) => {
+  async ({ icon }, { rejectWithValue }) => {
     const formData = new FormData();
     const fileType = icon.endsWith(".png") ? "image/png" : "image/jpeg";
     formData.append("file", {
@@ -172,24 +114,13 @@ export const handleUpdateIcon = createAsyncThunk(
     });
 
     try {
-      const response = await axios.post(
-        `${LOCAL_HOST}/api/handleUpdateIcon`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
-            "x-refresh-token": refreshToken,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await apiClient.post("/handleUpdateIcon", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       console.log("Updated icon using REDUX!!");
-      if (response.data.token && response.data.refreshToken) {
-        await storeTokens(response.data.token, response.data.refreshToken);
-        console.log("Tokens updated");
-      }
-
       return {
         msg: response.data.msg,
         updatedIcon: response.data.updatedIcon.icon,
@@ -204,10 +135,7 @@ export const handleUpdateIcon = createAsyncThunk(
 // handling upload post action
 export const handleUploadPost = createAsyncThunk(
   "user/handleUploadPost",
-  async (
-    { imageUri, title, description, hashtag, jwtToken, refreshToken },
-    { rejectWithValue }
-  ) => {
+  async ({ imageUri, title, description, hashtag }, { rejectWithValue }) => {
     const formData = new FormData();
     const fileType = imageUri.endsWith(".png") ? "image/png" : "image/jpeg";
     formData.append("file", {
@@ -220,24 +148,13 @@ export const handleUploadPost = createAsyncThunk(
     formData.append("hashtag", hashtag);
 
     try {
-      const response = await axios.post(
-        `${LOCAL_HOST}/api/handleUploadPost`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${jwtToken}`,
-            "x-refresh-token": refreshToken,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await apiClient.post("/handleUploadPost", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       console.log("Updated userPosts using REDUX!!");
-      if (response.data.token && response.data.refreshToken) {
-        await storeTokens(response.data.token, response.data.refreshToken);
-        console.log("Tokens updated");
-      }
-
       return {
         msg: response.data.msg,
         postData: response.data.postData,
