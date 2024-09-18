@@ -15,6 +15,7 @@ import postReducer from "./postReducer";
 const persisConfig = {
   key: "root",
   storage,
+  blacklist: ["post"],
   version: 1,
 };
 

@@ -42,16 +42,16 @@ export default CustomTab = ({ state, descriptors, navigation }) => {
 
 const styles = StyleSheet.create({
   tabBar: {
-    width: screenWidth * 0.9,
+    height: 60,
+    width: screenWidth - 10,
     justifyContent: "space-evenly",
     alignSelf: "center",
     flexDirection: "row",
     position: "absolute",
-    bottom: 20,
-    backgroundColor: "rgba(43,43,43, 0.95)",
-    paddingTop: 20,
-    paddingBottom: 10,
-    borderRadius: 50,
+    bottom: 5,
+    backgroundColor: "#2b2b2b",
+    paddingVertical: 10,
+    borderRadius: 10,
     elevation: 4,
     zIndex: 4,
     shadowColor: "#5D3FD3",

@@ -7,13 +7,12 @@ import {
   Text,
   TouchableOpacity,
   View,
-  RefreshControl,
 } from "react-native";
 import { useSelector } from "react-redux";
 import UserPost from "../../components/userPost";
-import useFetchPosts from "../../hooks/useFetchPosts";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import useFetchProfileInfo from "../../hooks/useFetchProfileInfo";
+import useFetchPostsForUser from "../../hooks/useFetchPostsForUser";
 import BackButton from "../../components/backButton";
 import { getBgImageSource, getIconSource } from "../../utils/helper";
 import { useFocusEffect } from "@react-navigation/native";
@@ -26,14 +25,18 @@ export default UserProfile = ({ route, navigation }) => {
   const { userData, setUserData, isMe, isInfoLoading, handlePressed } =
     useFetchProfileInfo(userDetails?.userId, targetId);
 
-  const { posts, isLoading, fetchPosts, loadMorePosts } = useFetchPosts(
-    targetId,
-    "user"
-  );
+  const { userPosts, isPostsLoading, fetchPosts, loadMorePosts } =
+    useFetchPostsForUser(targetId);
 
-  const renderPost = ({ item }) => {
+  const renderPost = useCallback(({ item }) => {
     return <UserPost item={item} />;
-  };
+  }, []);
+
+  useEffect(() => {
+    if (userPosts.length === 0) {
+      fetchPosts(1);
+    }
+  }, []);
 
   // handle instant UI reflect
   useFocusEffect(
@@ -64,35 +67,62 @@ export default UserProfile = ({ route, navigation }) => {
 
     return (
       <FlatList
-        data={posts}
-        renderItem={[]}
+        data={userPosts}
+        renderItem={renderPost}
         numColumns={3}
         contentContainerStyle={styles.container}
         overScrollMode="never"
-        // onEndReached={loadMorePosts}
-        // refreshControl={
-        //   <RefreshControl
-        //     refreshing={isLoading}
-        //     onRefresh={fetchPosts}
-        //     enabled={false}
-        //   />
-        // }
+        onEndReached={loadMorePosts}
+        refreshing={isPostsLoading}
         ListEmptyComponent={
           <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            <Text
-              style={{
-                fontWeight: "bold",
-                fontSize: 24,
-                color: "grey",
-                paddingBottom: 100,
-              }}
-            >
-              This user has no posts
-            </Text>
+            {isPostsLoading ? (
+              <ActivityIndicator
+                size={30}
+                style={{
+                  flex: 1,
+                  backgroundColor: "white",
+                  paddingBottom: 100,
+                }}
+                color="grey"
+              />
+            ) : (
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  fontSize: 24,
+                  color: "grey",
+                  paddingBottom: 100,
+                }}
+              >
+                This user has no posts
+              </Text>
+            )}
           </View>
         }
+        // ListFooterComponent={
+        //   isPostsLoading && (
+        //     <View
+        //       style={{
+        //         flex: 1,
+        //         justifyContent: "center",
+        //         alignItems: "center",
+        //       }}
+        //     >
+        //       <ActivityIndicator
+        //         size={50}
+        //         style={{ flex: 1, backgroundColor: "white" }}
+        //         color="grey"
+        //       />
+        //     </View>
+        //   )
+        // }
         ListHeaderComponent={
           <>
             {isStack && <BackButton navigation={navigation} />}
@@ -192,6 +222,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: "white",
+    paddingBottom: 70,
   },
   backgroundImage: {
     height: 250,

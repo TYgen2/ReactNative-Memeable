@@ -11,3 +11,16 @@ export const fetchProfile = async (targetId) => {
     return { message: error.response.data.msg };
   }
 };
+
+// fetch user posts
+export const fetchUserPosts = async (page, limit, targetId) => {
+  try {
+    const response = await apiClient.get("/fetchUserPosts", {
+      params: { page, limit, targetId },
+    });
+
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(error.response.data);
+  }
+};

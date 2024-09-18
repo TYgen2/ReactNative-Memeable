@@ -3,6 +3,7 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { Follow } from "../mongoose/schemas/follow.mjs";
+import mongoose from "mongoose";
 
 dotenv.config();
 
@@ -61,5 +62,6 @@ export const getFollowingIds = async (userId) => {
     .lean();
   const followingIds = following.map((follow) => follow.userId.toString());
   followingIds.push(userId);
+
   return followingIds;
 };

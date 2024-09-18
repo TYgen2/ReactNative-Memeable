@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchPosts } from "../store/userActions";
+import { fetchAllPosts } from "../store/userActions";
 
-export default useFetchAllPosts = (mode) => {
+export default useFetchPosts = () => {
   const { allPosts } = useSelector((state) => state.post);
   const allPostsRef = useRef(allPosts);
   const [currentPage, setCurrentPage] = useState(1);
@@ -15,46 +15,45 @@ export default useFetchAllPosts = (mode) => {
     allPostsRef.current = allPosts;
   }, [allPosts]);
 
-  const fetchAllPosts = useCallback(
+  const fetchPosts = useCallback(
     async (page, reset = false) => {
       if (isLoading) return;
       setIsLoading(true);
       try {
         const response = await dispatch(
-          fetchPosts({
+          fetchAllPosts({
             page,
-            limit: 3,
-            mode,
+            limit: 5,
             since: reset ? allPosts[0]?.createDate : undefined,
             reset,
           })
         ).unwrap();
 
-        console.log(response.hasMore);
-
         if (reset) {
           setCurrentPage(1);
         } else {
           setCurrentPage(page);
-          setHasMore(response.hasMore);
         }
+        setHasMore(response.hasMore);
       } catch (error) {
         console.error(error);
       } finally {
         setIsLoading(false);
       }
     },
-    [dispatch, mode, isLoading, hasMore]
+    [dispatch, isLoading, hasMore]
   );
 
   const loadMorePosts = async () => {
     if (isLoading || !hasMore || allPosts.length === 0) return;
-    await fetchAllPosts(currentPage + 1);
+    console.log("fetching more...");
+    await fetchPosts(currentPage + 1);
   };
 
   const refreshPosts = async () => {
-    await fetchAllPosts(1, true);
+    console.log("refreshing...");
+    await fetchPosts(1, true);
   };
 
-  return { isLoading, fetchAllPosts, loadMorePosts, refreshPosts };
+  return { isLoading, fetchPosts, loadMorePosts, refreshPosts };
 };

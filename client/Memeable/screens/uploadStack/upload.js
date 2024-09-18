@@ -20,6 +20,10 @@ export default Upload = ({ route, navigation }) => {
   const { shouldFetch, setShouldFetch } = useContext(UpdateContext);
   const { isUploading, setIsUploading, uploadPost } = useUpload(imageUri);
 
+  useEffect(() => {
+    console.log("upload page re render");
+  }, []);
+
   return (
     <View style={[styles.container, { backgroundColor: "white" }]}>
       {isUploading && (

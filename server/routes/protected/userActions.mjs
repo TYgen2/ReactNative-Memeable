@@ -86,21 +86,23 @@ router.post(
 
 // user like / unlike posts
 router.post("/api/handleLike", authenticateToken, async (req, res) => {
-  const { userId, postId } = req.body;
+  const { postId } = req.body;
 
   try {
-    const target = await Like.findOne({ userId, postId });
+    const target = await Like.findOne({ userId: req.userId, postId });
     if (target) {
       await target.deleteOne();
     } else {
-      const like = new Like({ userId, postId });
+      const like = new Like({ userId: req.userId, postId });
       await like.save();
     }
     await Post.findByIdAndUpdate(postId, { $inc: { likes: target ? -1 : 1 } });
 
-    res
-      .status(200)
-      .send({ msg: target ? "Unliked the post!" : "Liked the post!" });
+    res.status(200).send({
+      msg: target ? "Unliked the post!" : "Liked the post!",
+      likeAction: target ? "unlike" : "like",
+      postId,
+    });
   } catch (error) {
     res.status(400).send({ msg: "Error when handling the like function" });
   }

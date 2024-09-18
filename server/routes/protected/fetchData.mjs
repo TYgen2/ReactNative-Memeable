@@ -6,6 +6,7 @@ import { Like } from "../../mongoose/schemas/like.mjs";
 import { User } from "../../mongoose/schemas/user.mjs";
 import { authenticateToken } from "../../utils/middleware.mjs";
 import { Follow } from "../../mongoose/schemas/follow.mjs";
+import mongoose from "mongoose";
 dotenv.config();
 
 const router = Router();
@@ -103,51 +104,211 @@ router.get("/api/fetchUserProfile", authenticateToken, async (req, res) => {
   }
 });
 
-// fetch posts (user's or following's)
-router.get("/api/fetchPosts", authenticateToken, async (req, res) => {
-  const { page, limit, mode, since } = req.query;
+// fetch all posts in home page
+router.get("/api/fetchAllPosts", authenticateToken, async (req, res) => {
+  const { page, limit, since } = req.query;
 
   try {
-    const user = await User.findById(req.userId).select("following").lean();
+    const user = await User.findById(req.userId).lean();
     if (!user) {
-      res.status(404).send({ msg: "No user found, ERROR!!!" });
+      return res.status(404).send({ msg: "No user found, ERROR!!!" });
     }
 
     const followingIds = await getFollowingIds(req.userId);
-    const likedPosts = await Like.find({ userId: req.userId })
-      .select("postId")
-      .lean();
-    const likedPostIds = likedPosts.map((like) => like.postId.toString());
 
-    let search;
-    if (mode === "main") {
-      search = Post.find({ userId: { $in: followingIds } });
-    } else {
-      search = Post.find({ userId: req.userId });
-    }
+    // filter all the posts where the post has
+    // a userId contained in the followingIds array
+    let matchStage = {
+      userId: {
+        $in: followingIds.map((id) => new mongoose.Types.ObjectId(id)),
+      },
+    };
 
     if (since) {
-      search = search.where("createDate").gt(new Date(since));
-    } else {
-      search = search.skip((page - 1) * limit).limit(Number(limit) + 1);
+      matchStage.createDate = { $gt: new Date(since) };
     }
 
-    const posts = await search
-      .sort({ createDate: -1 })
-      .populate({ path: "userId", select: "icon displayName" })
-      .exec();
+    const posts = await Post.aggregate([
+      { $match: matchStage },
+      { $sort: { createDate: -1 } },
+      { $skip: (page - 1) * limit },
+      { $limit: Number(limit) + 1 },
+      {
+        // from the Like collection,
+        $lookup: {
+          from: "likes",
+          // define a postId variable, where value = _id field.
+          // Dollar sign means the _id field is in the current doc.
+          let: { postId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                // allows the use of aggregation expressions
+                $expr: {
+                  $and: [
+                    // double dollar sign used for access variables
+                    // defined in the let clause (i.e. postId = "$_id")
+
+                    // compare $postId in Like and $$postId in Post
+                    { $eq: ["$postId", "$$postId"] },
+                    {
+                      $eq: [
+                        "$userId",
+                        new mongoose.Types.ObjectId(`${req.userId}`),
+                      ],
+                    },
+                  ],
+                },
+              },
+            },
+            { $project: { _id: 1 } },
+          ],
+          as: "likeDocs",
+        },
+      },
+      {
+        $addFields: {
+          hasLiked: { $gt: [{ $size: "$likeDocs" }, 0] },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          // field in Post
+          localField: "userId",
+          // field in User
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unwind: "$user" },
+      {
+        $project: {
+          _id: 1,
+          userId: {
+            _id: "$user._id",
+            displayName: "$user.displayName",
+            icon: "$user.icon",
+          },
+          imageUri: 1,
+          width: 1,
+          height: 1,
+          title: 1,
+          description: 1,
+          hashtag: 1,
+          createDate: 1,
+          likes: 1, // Keep the original likes field
+          hasLiked: 1,
+          timeAgo: { $literal: "" }, // Placeholder for timeAgo, to be calculated in application code
+        },
+      },
+    ]);
 
     const hasMore = posts.length > limit;
     const postData = posts.slice(0, limit).map((post) => {
-      const postObject = post.toObject();
-      delete postObject.__v;
-      postObject.timeAgo = getTimeDifference(postObject.createDate);
-      postObject.hasLiked = likedPostIds.includes(postObject._id.toString());
-      return postObject;
+      post.timeAgo = getTimeDifference(post.createDate);
+      return post;
     });
 
     return res.status(200).send({ postData, hasMore });
   } catch (error) {
+    console.error("Error:", error);
+    return res.status(400).send({ msg: "Error when fetching posts" });
+  }
+});
+
+// fetch user posts in user profile page
+router.get("/api/fetchUserPosts", authenticateToken, async (req, res) => {
+  const { page, limit, targetId } = req.query;
+
+  try {
+    const user = await User.findById(targetId).lean();
+    if (!user) {
+      return res.status(404).send({ msg: "No user found, ERROR!!!" });
+    }
+
+    const posts = await Post.aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(targetId) } },
+      { $sort: { createDate: -1 } },
+      { $skip: (page - 1) * limit },
+      { $limit: Number(limit) + 1 },
+      {
+        // from the Like collection,
+        $lookup: {
+          from: "likes",
+          // define a postId variable, where value = _id field.
+          // Dollar sign means the _id field is in the current doc.
+          let: { postId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                // allows the use of aggregation expressions
+                $expr: {
+                  $and: [
+                    // double dollar sign used for access variables
+                    // defined in the let clause (i.e. postId = "$_id")
+
+                    // compare $postId in Like and $$postId in Post
+                    { $eq: ["$postId", "$$postId"] },
+                    {
+                      $eq: ["$userId", new mongoose.Types.ObjectId(targetId)],
+                    },
+                  ],
+                },
+              },
+            },
+            { $project: { _id: 1 } },
+          ],
+          as: "likeDocs",
+        },
+      },
+      {
+        $addFields: {
+          hasLiked: { $gt: [{ $size: "$likeDocs" }, 0] },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          // field in Post
+          localField: "userId",
+          // field in User
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unwind: "$user" },
+      {
+        $project: {
+          _id: 1,
+          userId: {
+            _id: "$user._id",
+            displayName: "$user.displayName",
+            icon: "$user.icon",
+          },
+          imageUri: 1,
+          width: 1,
+          height: 1,
+          title: 1,
+          description: 1,
+          hashtag: 1,
+          createDate: 1,
+          likes: 1, // Keep the original likes field
+          hasLiked: 1,
+          timeAgo: { $literal: "" }, // Placeholder for timeAgo, to be calculated in application code
+        },
+      },
+    ]);
+
+    const hasMore = posts.length > limit;
+    const postData = posts.slice(0, limit).map((post) => {
+      post.timeAgo = getTimeDifference(post.createDate);
+      return post;
+    });
+
+    return res.status(200).send({ postData, hasMore });
+  } catch (error) {
+    console.error("Error:", error);
     return res.status(400).send({ msg: "Error when fetching posts" });
   }
 });

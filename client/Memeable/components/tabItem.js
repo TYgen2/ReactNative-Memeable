@@ -19,9 +19,9 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
   const iconSource = getIconSource(userDetails?.userIcon);
 
   const icon = {
-    HomeStack: (props) => <MCIcon name="home" size={30} {...props} />,
-    SearchStack: (props) => <IonIcon name="search" size={30} {...props} />,
-    Notify: (props) => <IonIcon name="notifications" size={30} {...props} />,
+    HomeStack: (props) => <MCIcon name="home" size={25} {...props} />,
+    SearchStack: (props) => <IonIcon name="search" size={25} {...props} />,
+    Notify: (props) => <IonIcon name="notifications" size={25} {...props} />,
   };
 
   useEffect(() => {
@@ -49,13 +49,7 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
   });
 
   return (
-    <TouchableOpacity
-      style={{
-        marginRight: routeName == "Search" ? 30 : 0,
-        marginLeft: routeName == "Notify" ? 30 : 0,
-      }}
-      onPress={onPress}
-    >
+    <TouchableOpacity style={styles.tabContainer} onPress={onPress}>
       {/* Home, Search, Notify tabs */}
       {routeName != "UserProfile" ? (
         <Animated.View
@@ -68,6 +62,7 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
             style={[
               {
                 color: "white",
+                fontSize: 12,
               },
               animatedTextStyle,
             ]}
@@ -79,7 +74,8 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
         // User profile tab
         <View
           style={{
-            marginBottom: 4,
+            flex: 1,
+            justifyContent: "center",
           }}
         >
           <View
@@ -91,9 +87,9 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
             <View style={styles.iconBorder2}>
               <Image
                 style={{
-                  height: 40,
-                  width: 40,
-                  borderRadius: 40,
+                  height: 25,
+                  width: 25,
+                  borderRadius: 25,
                   backgroundColor: iconBgColor,
                 }}
                 source={iconSource}
@@ -107,19 +103,25 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
 };
 
 const styles = StyleSheet.create({
+  tabContainer: {
+    width: 45,
+    height: 45,
+    marginRight: routeName == "SearchStack" ? 40 : 0,
+    marginLeft: routeName == "Notify" ? 40 : 0,
+  },
   iconBorder1: {
-    height: 50,
-    width: 50,
+    height: 35,
+    width: 35,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 50,
+    borderRadius: 35,
   },
   iconBorder2: {
-    height: 45,
-    width: 45,
+    height: 30,
+    width: 30,
     backgroundColor: "white",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 45,
+    borderRadius: 30,
   },
 });

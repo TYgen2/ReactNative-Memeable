@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Animated } from "react-native";
+import { Animated, View } from "react-native";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import IonIcon from "react-native-vector-icons/Ionicons";
 import { popInAnimations, popOutAnimations } from "../utils/animation";
@@ -8,7 +8,7 @@ import { selectImageForUpload } from "../utils/helper";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 
 export default PostButton = () => {
-  const [icon_bottom] = useState(new Animated.Value(70));
+  const [icon_bottom] = useState(new Animated.Value(40));
   const [icon_opacity] = useState(new Animated.Value(0));
   const [icon_folder] = useState(new Animated.Value(170));
   const [icon_camera] = useState(new Animated.Value(170));
@@ -69,15 +69,28 @@ export default PostButton = () => {
           <IonIcon name="folder-open-outline" size={30} color="white" />
         </TouchableOpacity>
       </Animated.View>
-      <TouchableOpacity
-        style={[styles.button, { bottom: 120 }]}
-        activeOpacity={0.7}
-        onPress={() => {
-          pop === false ? popIn() : popOut();
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          alignSelf: "center",
+          width: 40,
+          height: 40,
+          borderRadius: 40,
+          bottom: 55,
+          backgroundColor: "white",
         }}
       >
-        <IonIcon name="add-outline" size={40} color="white" />
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          activeOpacity={0.7}
+          onPress={() => {
+            pop === false ? popIn() : popOut();
+          }}
+        >
+          <IonIcon name="add-outline" size={28} color="white" />
+        </TouchableOpacity>
+      </View>
     </OutsidePressHandler>
   );
 };
@@ -87,10 +100,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
-    width: 60,
-    height: 60,
-    borderRadius: 60,
-    backgroundColor: "black",
+    width: 35,
+    height: 35,
+    borderRadius: 35,
+    backgroundColor: "#2b2b2b",
   },
   subButton: {
     position: "absolute",

@@ -8,13 +8,14 @@ import {
   Pressable,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import { getTokens } from "../utils/tokenActions";
-import { handleLike } from "../handleAPIs/userActions";
 import { displayLikes, getIconSource } from "../utils/helper";
+import { handleLike } from "../store/userActions";
+import { useDispatch } from "react-redux";
 
-export default MainPosts = ({ item, userId, navigation }) => {
+export default MainPosts = ({ item, navigation }) => {
   const iconBgColor = item.userId?.icon.bgColor || "transparent";
   const userIcon = getIconSource(item.userId?.icon);
+  const dispatch = useDispatch();
 
   const [likes, setLikes] = useState(item.likes);
 
@@ -92,7 +93,7 @@ export default MainPosts = ({ item, userId, navigation }) => {
       <View style={styles.rightsideBar}>
         {/* save icon */}
         <TouchableOpacity onPress={toggleSave}>
-          <Icon name={saved ? "bookmark" : "bookmark-outline"} size={36} />
+          <Icon name={saved ? "bookmark" : "bookmark-outline"} size={32} />
         </TouchableOpacity>
         {/* like, comment */}
         <View style={styles.actionsContainer}>
@@ -106,33 +107,24 @@ export default MainPosts = ({ item, userId, navigation }) => {
             <Text>{displayLikes(likes)}</Text>
             <TouchableOpacity
               onPress={async () => {
+                // handle like API and update global state
+                dispatch(handleLike({ postId: item._id }));
+
+                // update local like status
                 toggleLike();
-                const tokens = await getTokens();
-                await handleLike(
-                  userId,
-                  item._id,
-                  tokens.jwtToken,
-                  tokens.refreshToken
-                ).then(() => {
-                  if (liked) {
-                    setLikes((prev) => prev - 1);
-                    console.log("Successfully unliked!");
-                  } else {
-                    setLikes((prev) => prev + 1);
-                    console.log("Successfully liked!");
-                  }
-                });
+                // update local like count
+                setLikes((prev) => (liked ? prev - 1 : prev + 1));
               }}
             >
               <Icon
                 name={liked ? "heart" : "heart-outline"}
-                size={36}
+                size={32}
                 color={liked ? "#FF4433" : "grey"}
               />
             </TouchableOpacity>
           </View>
           <TouchableOpacity>
-            <Icon name="chatbox-ellipses-outline" size={36} color="grey" />
+            <Icon name="chatbox-ellipses-outline" size={32} color="grey" />
           </TouchableOpacity>
         </View>
       </View>

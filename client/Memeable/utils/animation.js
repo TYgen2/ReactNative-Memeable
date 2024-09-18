@@ -2,7 +2,7 @@ import { Animated } from "react-native";
 
 export const popInAnimations = (icon_bottom, icon_opacity, icon_1, icon_2) => {
   Animated.timing(icon_bottom, {
-    toValue: 120,
+    toValue: 70,
     duration: 500,
     useNativeDriver: false,
   }).start();
@@ -25,7 +25,7 @@ export const popInAnimations = (icon_bottom, icon_opacity, icon_1, icon_2) => {
 
 export const popOutAnimations = (icon_bottom, icon_opacity, icon_1, icon_2) => {
   Animated.timing(icon_bottom, {
-    toValue: 70,
+    toValue: 40,
     duration: 500,
     useNativeDriver: false,
   }).start();

@@ -1,6 +1,5 @@
 import axios from "axios";
 import axiosRetry from "axios-retry";
-import { LOCAL_HOST } from "@env";
 import apiClient from "../utils/axiosHelper";
 
 axiosRetry(axios, { retries: 3 });
@@ -52,26 +51,6 @@ export const handleIconUpload = async (icon) => {
         console.error("Error:", error.message);
       }
     }
-  }
-};
-
-// handle like / unlike
-export const handleLike = async (userId, postId, jwtToken, refreshToken) => {
-  try {
-    const res = await axios.post(
-      `${LOCAL_HOST}/api/handleLike`,
-      { userId, postId },
-      {
-        headers: {
-          Authorization: `Bearer ${jwtToken}`,
-          "x-refresh-token": refreshToken,
-        },
-      }
-    );
-
-    return { msg: res.data.msg };
-  } catch (error) {
-    return { message: error.response.data.msg };
   }
 };
 

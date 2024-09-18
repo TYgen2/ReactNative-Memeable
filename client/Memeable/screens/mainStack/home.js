@@ -6,31 +6,30 @@ import useFetchPosts from "../../hooks/useFetchPosts";
 import { useCallback, useEffect } from "react";
 
 export default Home = ({ navigation }) => {
-  const { userDetails } = useSelector((state) => state.user);
   const { allPosts } = useSelector((state) => state.post);
-  const userId = userDetails?.userId;
+  const { userDetails } = useSelector((state) => state.user);
 
-  const { isLoading, fetchAllPosts, loadMorePosts, refreshPosts } =
-    useFetchPosts("main");
+  const { isLoading, fetchPosts, loadMorePosts, refreshPosts } =
+    useFetchPosts();
 
   const renderPost = useCallback(
     ({ item }) => {
-      return <MainPost item={item} userId={userId} navigation={navigation} />;
+      return <MainPost item={item} navigation={navigation} />;
     },
     [navigation]
   );
 
+  // when home page first mount, fetch posts for page 1
   useEffect(() => {
-    // When user first login, fetch posts and store in Redux
     if (allPosts.length === 0) {
-      fetchAllPosts(1);
-    } else {
-      // User already logged in before. When they open the app,
-      // refresth the page to check whether there are new posts
-      refreshPosts();
+      fetchPosts(1);
     }
-    // when user follows another user, updating the feeds immediately
-  }, [userDetails]);
+
+    // when user followed other users, clear the allPosts
+    // and then trigger the fetchAllPosts above to get
+    // the fresh feeds. When user unfollowed other users,
+    // remove that user's posts in allPosts without refresh
+  }, [userDetails.followingCount]);
 
   return (
     <View style={styles.container}>
@@ -94,7 +93,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   appName: {
-    flex: 1,
+    height: 50,
     width: "100%",
     justifyContent: "flex-start",
     flexDirection: "row",
@@ -109,9 +108,10 @@ const styles = StyleSheet.create({
     paddingLeft: 4,
   },
   content: {
-    flex: 11,
+    flex: 15,
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
+    paddingBottom: 70,
   },
 });

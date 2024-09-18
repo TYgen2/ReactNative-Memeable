@@ -5,7 +5,7 @@ import { barOffset } from "../utils/constants";
 export default BackButton = ({ navigation }) => {
   return (
     <Pressable style={styles.backButton} onPress={() => navigation.pop()}>
-      <Icon name="keyboard-backspace" size={30} />
+      <Icon name="keyboard-backspace" size={30} color="white" />
     </Pressable>
   );
 };
