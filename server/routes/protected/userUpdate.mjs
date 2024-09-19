@@ -155,6 +155,7 @@ router.post(
 
       const response = {
         updatedIcon,
+        user: req.userId,
         msg: "Icon updated to database and uploaded to S3!!",
       };
 

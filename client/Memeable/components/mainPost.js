@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useCallback, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -8,39 +8,54 @@ import {
   Pressable,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import { displayLikes, getIconSource } from "../utils/helper";
+import {
+  displayLikes,
+  getIconSource,
+  getSquareImageHeight,
+  navigateToUserProfile,
+} from "../utils/helper";
+import FastImage from "react-native-fast-image";
 import { handleLike } from "../store/userActions";
 import { useDispatch } from "react-redux";
 
-export default MainPosts = ({ item, navigation }) => {
+const squareHeight = getSquareImageHeight();
+
+export default MainPost = memo(({ item, navigation }) => {
   const iconBgColor = item.userId?.icon.bgColor || "transparent";
   const userIcon = getIconSource(item.userId?.icon);
   const dispatch = useDispatch();
 
-  const [likes, setLikes] = useState(item.likes);
+  const [postState, setPostState] = useState({
+    likes: item.likes,
+    liked: item.hasLiked,
+    saved: false,
+  });
 
-  // like icon
-  const [liked, setLiked] = useState(item.hasLiked);
-  const toggleLike = () => {
-    setLiked(!liked);
-  };
-  // save icon
-  const [saved, setSaved] = useState(false);
-  const toggleSave = () => {
-    setSaved(!saved);
-  };
+  // update local like status and like count
+  const toggleLike = useCallback(() => {
+    setPostState((prevState) => ({
+      ...prevState,
+      liked: !prevState.liked,
+      likes: prevState.liked ? prevState.likes - 1 : prevState.likes + 1,
+    }));
+
+    // handle like API and update global state
+    dispatch(handleLike({ postId: item._id }));
+  }, [dispatch, item._id]);
+
+  const toggleSave = useCallback(() => {
+    setPostState((prevState) => ({
+      ...prevState,
+      saved: !prevState.saved,
+    }));
+  }, []);
 
   return (
     <View style={styles.postContainer}>
       <View style={styles.imageContainer}>
         <View style={styles.uploaderContainer}>
           <Pressable
-            onPress={() =>
-              navigation.navigate("UserProfile", {
-                isStack: true,
-                targetId: item.userId,
-              })
-            }
+            onPress={() => navigateToUserProfile(navigation, item.userId._id)}
           >
             <Image
               source={userIcon}
@@ -49,12 +64,7 @@ export default MainPosts = ({ item, navigation }) => {
           </Pressable>
           <View style={{ flex: 1 }}>
             <Pressable
-              onPress={() =>
-                navigation.navigate("UserProfile", {
-                  isStack: true,
-                  targetId: item.userId,
-                })
-              }
+              onPress={() => navigateToUserProfile(navigation, item.userId._id)}
             >
               <Text style={styles.uploaderName}>{item.userId.displayName}</Text>
             </Pressable>
@@ -62,24 +72,27 @@ export default MainPosts = ({ item, navigation }) => {
           </View>
           <Text style={styles.timeAgo}>{item.timeAgo}</Text>
         </View>
-        <Image
+        <FastImage
           source={{ uri: item.imageUri }}
+          resizeMode={FastImage.resizeMode.cover}
           style={[
             styles.image,
-            { height: item.height > item.width ? 500 : 200 },
+            {
+              height:
+                item.height > item.width
+                  ? 500
+                  : item.height < item.width
+                  ? 200
+                  : squareHeight,
+            },
           ]}
         />
         {item.description == "" ? (
           <></>
         ) : (
-          <View style={{ flexDirection: "row", width: "95%", marginTop: 4 }}>
+          <View style={styles.descriptionView}>
             <Pressable
-              onPress={() =>
-                navigation.navigate("UserProfile", {
-                  isStack: true,
-                  targetId: item.userId,
-                })
-              }
+              onPress={() => navigateToUserProfile(navigation, item.userId._id)}
             >
               <Text style={styles.uploaderName2}>
                 {item.userId.displayName}
@@ -93,33 +106,21 @@ export default MainPosts = ({ item, navigation }) => {
       <View style={styles.rightsideBar}>
         {/* save icon */}
         <TouchableOpacity onPress={toggleSave}>
-          <Icon name={saved ? "bookmark" : "bookmark-outline"} size={32} />
+          <Icon
+            name={postState.saved ? "bookmark" : "bookmark-outline"}
+            size={32}
+          />
         </TouchableOpacity>
         {/* like, comment */}
         <View style={styles.actionsContainer}>
           {/* like button */}
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text>{displayLikes(likes)}</Text>
-            <TouchableOpacity
-              onPress={async () => {
-                // handle like API and update global state
-                dispatch(handleLike({ postId: item._id }));
-
-                // update local like status
-                toggleLike();
-                // update local like count
-                setLikes((prev) => (liked ? prev - 1 : prev + 1));
-              }}
-            >
+          <View style={styles.center}>
+            <Text>{displayLikes(postState.likes)}</Text>
+            <TouchableOpacity onPress={toggleLike}>
               <Icon
-                name={liked ? "heart" : "heart-outline"}
+                name={postState.liked ? "heart" : "heart-outline"}
                 size={32}
-                color={liked ? "#FF4433" : "grey"}
+                color={postState.liked ? "#FF4433" : "grey"}
               />
             </TouchableOpacity>
           </View>
@@ -130,7 +131,7 @@ export default MainPosts = ({ item, navigation }) => {
       </View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   postContainer: {
@@ -148,7 +149,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   image: {
-    resizeMode: "cover",
+    // resizeMode: "cover",
     width: "95%",
     borderRadius: 10,
   },
@@ -163,6 +164,11 @@ const styles = StyleSheet.create({
   uploaderName: { fontSize: 18, paddingLeft: 4, fontWeight: "bold" },
   title: { fontSize: 16, paddingLeft: 4 },
   description: { fontSize: 16 },
+  descriptionView: {
+    flexDirection: "row",
+    width: "95%",
+    marginTop: 4,
+  },
   uploaderName2: { fontWeight: "bold", fontSize: 16 },
   hashtag: {
     fontSize: 16,
@@ -178,5 +184,9 @@ const styles = StyleSheet.create({
   },
   actionsContainer: {
     gap: 10,
+  },
+  center: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

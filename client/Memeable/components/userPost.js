@@ -1,17 +1,20 @@
-import { Image, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { screenWidth } from "../utils/constants";
+import FastImage from "react-native-fast-image";
 
 export default UserPost = ({ item }) => {
   return (
     <TouchableOpacity
-      style={{ margin: 1 }}
+      style={styles.imageContainer}
       activeOpacity={0.8}
       onPress={() => console.log(item)}
     >
-      <Image
-        source={{ uri: item.imageUri }}
-        style={{ width: screenWidth / 3, height: screenWidth / 3 }}
-      />
+      <FastImage source={{ uri: item.imageUri }} style={styles.image} />
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  imageContainer: { margin: 1 },
+  image: { width: screenWidth / 3, height: screenWidth / 3 },
+});

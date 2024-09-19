@@ -32,13 +32,7 @@ export default UserProfile = ({ route, navigation }) => {
     return <UserPost item={item} />;
   }, []);
 
-  useEffect(() => {
-    if (userPosts.length === 0) {
-      fetchPosts(1);
-    }
-  }, []);
-
-  // handle instant UI reflect
+  // handle instant UI reflect (follower, following)
   useFocusEffect(
     useCallback(() => {
       if (isMe && prevUserDetailsRef.current !== userDetails) {
@@ -48,6 +42,11 @@ export default UserProfile = ({ route, navigation }) => {
       }
     }, [userDetails])
   );
+
+  useEffect(() => {
+    // first mount, or when user upload a new posts
+    fetchPosts(1, true);
+  }, [userDetails.postsCount]);
 
   // handle first mount by local loading state
   if (isInfoLoading || status === "loading") {
@@ -106,23 +105,6 @@ export default UserProfile = ({ route, navigation }) => {
             )}
           </View>
         }
-        // ListFooterComponent={
-        //   isPostsLoading && (
-        //     <View
-        //       style={{
-        //         flex: 1,
-        //         justifyContent: "center",
-        //         alignItems: "center",
-        //       }}
-        //     >
-        //       <ActivityIndicator
-        //         size={50}
-        //         style={{ flex: 1, backgroundColor: "white" }}
-        //         color="grey"
-        //       />
-        //     </View>
-        //   )
-        // }
         ListHeaderComponent={
           <>
             {isStack && <BackButton navigation={navigation} />}

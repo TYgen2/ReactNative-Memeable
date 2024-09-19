@@ -3,6 +3,7 @@ import {
   fetchAllPosts,
   handleFollow,
   handleLike,
+  handleUpdateIcon,
   handleUploadPost,
 } from "./userActions";
 import { Alert } from "react-native";
@@ -28,7 +29,7 @@ export const postSlice = createSlice({
       })
       .addCase(handleUploadPost.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.allPosts.unshift(action.payload.postData);
+        state.allPosts = [];
       })
       .addCase(handleUploadPost.rejected, (state, action) => {
         state.status = "failed";
@@ -101,6 +102,23 @@ export const postSlice = createSlice({
         }
       })
       .addCase(handleLike.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(handleUpdateIcon.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        const userId = action.payload.user;
+        const modifiedIcon = action.payload.updatedIcon.customIcon;
+
+        state.allPosts = state.allPosts.map((post) => {
+          if (post.userId._id === userId) {
+            post.userId.icon.customIcon = modifiedIcon;
+            return post;
+          }
+          return post;
+        });
+      })
+      .addCase(handleUpdateIcon.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

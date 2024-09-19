@@ -10,13 +10,17 @@ import SearchedUser from "../../components/searchedUser";
 import { barOffset } from "../../utils/constants";
 import Icon from "react-native-vector-icons/Ionicons";
 import useSearch from "../../hooks/useSearch";
+import { useCallback } from "react";
 
 export default Search = ({ navigation }) => {
   const { query, setQuery, results, setResults, isSearching } = useSearch();
 
-  const renderItem = ({ item }) => {
-    return <SearchedUser item={item} navigation={navigation} />;
-  };
+  const renderItem = useCallback(
+    ({ item }) => {
+      return <SearchedUser item={item} navigation={navigation} />;
+    },
+    [navigation]
+  );
 
   return (
     <View style={styles.container}>

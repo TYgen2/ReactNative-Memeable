@@ -49,7 +49,16 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
   });
 
   return (
-    <TouchableOpacity style={styles.tabContainer} onPress={onPress}>
+    <TouchableOpacity
+      style={[
+        styles.tabContainer,
+        {
+          marginRight: routeName == "SearchStack" ? 40 : 0,
+          marginLeft: routeName == "Notify" ? 40 : 0,
+        },
+      ]}
+      onPress={onPress}
+    >
       {/* Home, Search, Notify tabs */}
       {routeName != "UserProfile" ? (
         <Animated.View
@@ -72,12 +81,7 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
         </Animated.View>
       ) : (
         // User profile tab
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-          }}
-        >
+        <View style={styles.profileView}>
           <View
             style={[
               styles.iconBorder1,
@@ -86,12 +90,7 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
           >
             <View style={styles.iconBorder2}>
               <Image
-                style={{
-                  height: 25,
-                  width: 25,
-                  borderRadius: 25,
-                  backgroundColor: iconBgColor,
-                }}
+                style={[styles.userIcon, { backgroundColor: iconBgColor }]}
                 source={iconSource}
               />
             </View>
@@ -106,8 +105,6 @@ const styles = StyleSheet.create({
   tabContainer: {
     width: 45,
     height: 45,
-    marginRight: routeName == "SearchStack" ? 40 : 0,
-    marginLeft: routeName == "Notify" ? 40 : 0,
   },
   iconBorder1: {
     height: 35,
@@ -123,5 +120,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 30,
+  },
+  profileView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  userIcon: {
+    height: 25,
+    width: 25,
+    borderRadius: 25,
   },
 });

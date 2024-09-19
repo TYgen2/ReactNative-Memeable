@@ -29,14 +29,17 @@ export default Home = ({ navigation }) => {
     // and then trigger the fetchAllPosts above to get
     // the fresh feeds. When user unfollowed other users,
     // remove that user's posts in allPosts without refresh
-  }, [userDetails.followingCount]);
+
+    // when user post a new post, refresh the whole allPosts
+    // to get the fresh feeds with updated timeAgo
+  }, [userDetails.followingCount, userDetails.postsCount]);
 
   return (
     <View style={styles.container}>
       <View style={styles.appName}>
         <Image
           source={require("../../assets/popcat.png")}
-          style={{ width: 25, height: 25 }}
+          style={styles.titleIcon}
         />
         <Text style={styles.title}>Memeable</Text>
       </View>
@@ -47,34 +50,18 @@ export default Home = ({ navigation }) => {
           renderItem={renderPost}
           onRefresh={refreshPosts}
           onEndReached={loadMorePosts}
+          onEndReachedThreshold={0.8}
           overScrollMode="never"
-          contentContainerStyle={{
-            flexGrow: 1,
-            width: screenWidth,
-          }}
+          contentContainerStyle={styles.flatlistContainer}
           ListEmptyComponent={
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-                paddingBottom: 100,
-              }}
-            >
+            <View style={styles.emptyComponent}>
               {isLoading ? (
                 <Image
                   source={require("../../assets/kurukuru.gif")}
-                  style={{
-                    width: 150,
-                    height: 150,
-                  }}
+                  style={styles.loadingIcon}
                 />
               ) : (
-                <Text
-                  style={{ fontWeight: "bold", fontSize: 30, color: "grey" }}
-                >
-                  Zzz...
-                </Text>
+                <Text style={styles.emptyPost}>Zzz...</Text>
               )}
             </View>
           }
@@ -92,6 +79,17 @@ const styles = StyleSheet.create({
     marginTop: barOffset,
     backgroundColor: "white",
   },
+  flatlistContainer: {
+    flexGrow: 1,
+    width: screenWidth,
+    paddingBottom: 70,
+  },
+  emptyComponent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingBottom: 100,
+  },
   appName: {
     height: 50,
     width: "100%",
@@ -107,11 +105,16 @@ const styles = StyleSheet.create({
     fontSize: 24,
     paddingLeft: 4,
   },
+  titleIcon: { width: 25, height: 25 },
+  loadingIcon: {
+    width: 150,
+    height: 150,
+  },
   content: {
     flex: 15,
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
-    paddingBottom: 70,
   },
+  emptyPost: { fontWeight: "bold", fontSize: 30, color: "grey" },
 });

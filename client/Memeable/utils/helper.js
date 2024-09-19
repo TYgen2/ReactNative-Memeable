@@ -108,3 +108,14 @@ export const getBgImageSource = (bgImage) => {
   // bgImage is null by default
   return DEFAULT_BGIMAGE;
 };
+
+export const getSquareImageHeight = () => {
+  return screenWidth * (14 / 15) * 0.95;
+};
+
+export const navigateToUserProfile = (navigation, targetId) => {
+  navigation.navigate("UserProfile", {
+    isStack: true,
+    targetId,
+  });
+};

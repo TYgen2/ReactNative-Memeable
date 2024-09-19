@@ -143,6 +143,7 @@ export const handleUpdateIcon = createAsyncThunk(
       return {
         msg: response.data.msg,
         updatedIcon: response.data.updatedIcon.icon,
+        user: response.data.user,
       };
     } catch (error) {
       console.log(error);

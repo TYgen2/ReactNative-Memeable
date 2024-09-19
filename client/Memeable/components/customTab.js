@@ -2,8 +2,9 @@ import { StyleSheet, View } from "react-native";
 import { screenWidth } from "../utils/constants";
 import TabItem from "./tabItem";
 import PostButton from "./postButton";
+import { memo, useCallback } from "react";
 
-export default CustomTab = ({ state, descriptors, navigation }) => {
+export default CustomTab = memo(({ state, descriptors, navigation }) => {
   return (
     <View>
       <PostButton />
@@ -13,7 +14,7 @@ export default CustomTab = ({ state, descriptors, navigation }) => {
           const label = options.title;
           const isFocused = state.index === index;
 
-          const onPress = () => {
+          const onPress = useCallback(() => {
             const event = navigation.emit({
               type: "tabPress",
               target: route.key,
@@ -23,7 +24,7 @@ export default CustomTab = ({ state, descriptors, navigation }) => {
             if (!isFocused && !event.defaultPrevented) {
               navigation.navigate(route.name, route.params);
             }
-          };
+          }, [isFocused, navigation, route.name, route.params]);
 
           return (
             <TabItem
@@ -38,7 +39,7 @@ export default CustomTab = ({ state, descriptors, navigation }) => {
       </View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   tabBar: {

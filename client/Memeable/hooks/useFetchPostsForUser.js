@@ -16,14 +16,19 @@ export default useFetchPostsForUser = (targetId) => {
   }, [userPosts]);
 
   const fetchPosts = useCallback(
-    async (page) => {
+    async (page, reset = false) => {
       if (isPostsLoading) return;
       setIsPostsLoading(true);
       try {
         const response = await fetchUserPosts(page, 9, targetId);
 
-        // append next page's posts to the bottom
-        setUserPosts([...userPosts, ...response.postData]);
+        if (reset) {
+          setUserPosts(response.postData);
+        } else {
+          // append next page's posts to the bottom
+          setUserPosts([...userPosts, ...response.postData]);
+        }
+
         setCurrentPage(page);
         setHasMore(response.hasMore);
       } catch (error) {
