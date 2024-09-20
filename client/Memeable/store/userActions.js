@@ -19,10 +19,10 @@ export const fetchUserInfo = createAsyncThunk(
 // fetch all posts, including first load, load more and refresh
 export const fetchAllPosts = createAsyncThunk(
   "user/fetchAllPosts",
-  async ({ page, limit, since, reset }, { rejectWithValue }) => {
+  async ({ page, limit, reset }, { rejectWithValue }) => {
     try {
       const response = await apiClient.get("/fetchAllPosts", {
-        params: { page, limit, since },
+        params: { page, limit },
       });
 
       console.log("Posts fetched using REDUX!!");
@@ -45,25 +45,6 @@ export const handleFollow = createAsyncThunk(
 
       console.log("Follow updated using REDUX!!");
       return { msg: response.data.msg };
-    } catch (error) {
-      return rejectWithValue(error.response.data.msg);
-    }
-  }
-);
-
-// handling like actions
-export const handleLike = createAsyncThunk(
-  "user/handleLike",
-  async ({ postId }, { rejectWithValue }) => {
-    try {
-      const response = await apiClient.post("/handleLike", { postId });
-
-      console.log("Like updated using REDUX!!");
-      return {
-        msg: response.data.msg,
-        likeAction: response.data.likeAction,
-        postId,
-      };
     } catch (error) {
       return rejectWithValue(error.response.data.msg);
     }

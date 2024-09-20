@@ -1,12 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchAllPosts,
-  handleFollow,
-  handleLike,
   handleUpdateIcon,
   handleUploadPost,
 } from "./userActions";
-import { Alert } from "react-native";
 
 const initialState = {
   allPosts: [],
@@ -40,68 +37,18 @@ export const postSlice = createSlice({
       })
       .addCase(fetchAllPosts.fulfilled, (state, action) => {
         state.status = "succeeded";
-        const newPosts = action.payload.postData;
-        const limit = action.meta.arg.limit;
+        const { postData, reset } = action.payload;
 
         // refresh mode
-        if (action.payload.reset) {
-          // if the number of fetched new posts are equal to the fetch limit,
-          // replace the allPosts to clear cache
-          if (newPosts.length === limit) {
-            state.allPosts = newPosts;
-          } else {
-            // append the fetched new posts to the front of current allPosts
-            state.allPosts = [...newPosts, ...state.allPosts];
-          }
+        if (reset) {
+          state.allPosts = postData;
         } else {
-          // load more fetch, append more fetch posts to the end of current allPosts
-          state.allPosts = [...state.allPosts, ...action.payload.postData];
+          // initial fetch & load more fetch, append more fetched
+          // posts to the end of current allPosts
+          state.allPosts = [...state.allPosts, ...postData];
         }
       })
       .addCase(fetchAllPosts.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
-      })
-      .addCase(handleFollow.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        const { targetId } = action.meta.arg;
-        const followAction = action.meta.arg.action;
-
-        // remove the unfollowed user's post in allPosts
-        if (followAction === "unfollow") {
-          state.allPosts = state.allPosts.filter(
-            (post) => post.userId._id !== targetId
-          );
-        } else if (followAction === "follow") {
-          state.allPosts = [];
-        }
-      })
-      .addCase(handleFollow.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
-      })
-      .addCase(handleLike.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        const { msg, likeAction, postId } = action.payload;
-        const post = state.allPosts.find((post) => post._id === postId);
-
-        // update like status
-        if (post) {
-          post.hasLiked = !post.hasLiked;
-        } else {
-          Alert.alert(msg);
-        }
-
-        // update like count
-        if (likeAction === "like") {
-          post.likes += 1;
-        } else if (likeAction === "unlike") {
-          post.likes -= 1;
-        } else {
-          Alert.alert(msg);
-        }
-      })
-      .addCase(handleLike.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       })

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllPosts } from "../store/userActions";
+import { debounce } from "lodash";
 
 export default useFetchPosts = () => {
   const { allPosts } = useSelector((state) => state.post);
@@ -17,23 +18,24 @@ export default useFetchPosts = () => {
 
   const fetchPosts = useCallback(
     async (page, reset = false) => {
-      if (isLoading) return;
+      // if (isLoading) return;
       setIsLoading(true);
       try {
         const response = await dispatch(
           fetchAllPosts({
             page,
             limit: 5,
-            since: reset ? allPosts[0]?.createDate : undefined,
             reset,
           })
         ).unwrap();
 
+        // refresh mode should not update hasMore
         if (reset) {
           setCurrentPage(1);
         } else {
           setCurrentPage(page);
         }
+
         setHasMore(response.hasMore);
       } catch (error) {
         console.error(error);
@@ -44,11 +46,11 @@ export default useFetchPosts = () => {
     [dispatch, isLoading, hasMore]
   );
 
-  const loadMorePosts = async () => {
+  const loadMorePosts = debounce(async () => {
     if (isLoading || !hasMore || allPosts.length === 0) return;
     console.log("fetching more...");
     await fetchPosts(currentPage + 1);
-  };
+  }, 300);
 
   const refreshPosts = async () => {
     console.log("refreshing...");

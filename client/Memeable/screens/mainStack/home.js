@@ -25,14 +25,8 @@ export default Home = ({ navigation }) => {
       fetchPosts(1);
     }
 
-    // when user followed other users, clear the allPosts
-    // and then trigger the fetchAllPosts above to get
-    // the fresh feeds. When user unfollowed other users,
-    // remove that user's posts in allPosts without refresh
-
-    // when user post a new post, refresh the whole allPosts
-    // to get the fresh feeds with updated timeAgo
-  }, [userDetails.followingCount, userDetails.postsCount]);
+    // when user upload post, refresh immediately
+  }, [userDetails.postsCount]);
 
   return (
     <View style={styles.container}>
@@ -49,8 +43,12 @@ export default Home = ({ navigation }) => {
           refreshing={isLoading}
           renderItem={renderPost}
           onRefresh={refreshPosts}
-          onEndReached={loadMorePosts}
-          onEndReachedThreshold={0.8}
+          // prevent called when initial fetching
+          onEndReached={({ distanceFromEnd }) => {
+            if (distanceFromEnd <= 0) return;
+            loadMorePosts();
+          }}
+          onEndReachedThreshold={0.9}
           overScrollMode="never"
           contentContainerStyle={styles.flatlistContainer}
           ListEmptyComponent={

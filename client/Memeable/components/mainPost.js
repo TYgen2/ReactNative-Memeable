@@ -2,7 +2,6 @@ import { memo, useCallback, useState } from "react";
 import {
   StyleSheet,
   View,
-  Image,
   TouchableOpacity,
   Text,
   Pressable,
@@ -15,15 +14,13 @@ import {
   navigateToUserProfile,
 } from "../utils/helper";
 import FastImage from "react-native-fast-image";
-import { handleLike } from "../store/userActions";
-import { useDispatch } from "react-redux";
+import { handleLike } from "../handleAPIs/userActions";
 
 const squareHeight = getSquareImageHeight();
 
 export default MainPost = memo(({ item, navigation }) => {
   const iconBgColor = item.userId?.icon.bgColor || "transparent";
   const userIcon = getIconSource(item.userId?.icon);
-  const dispatch = useDispatch();
 
   const [postState, setPostState] = useState({
     likes: item.likes,
@@ -32,16 +29,15 @@ export default MainPost = memo(({ item, navigation }) => {
   });
 
   // update local like status and like count
-  const toggleLike = useCallback(() => {
+  const toggleLike = useCallback(async () => {
     setPostState((prevState) => ({
       ...prevState,
       liked: !prevState.liked,
       likes: prevState.liked ? prevState.likes - 1 : prevState.likes + 1,
     }));
 
-    // handle like API and update global state
-    dispatch(handleLike({ postId: item._id }));
-  }, [dispatch, item._id]);
+    await handleLike(item._id);
+  }, [item._id]);
 
   const toggleSave = useCallback(() => {
     setPostState((prevState) => ({
@@ -57,7 +53,7 @@ export default MainPost = memo(({ item, navigation }) => {
           <Pressable
             onPress={() => navigateToUserProfile(navigation, item.userId._id)}
           >
-            <Image
+            <FastImage
               source={userIcon}
               style={[styles.uploaderIcon, { backgroundColor: iconBgColor }]}
             />
@@ -124,7 +120,11 @@ export default MainPost = memo(({ item, navigation }) => {
               />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              // navigation.navigate("CommentModal");
+            }}
+          >
             <Icon name="chatbox-ellipses-outline" size={32} color="grey" />
           </TouchableOpacity>
         </View>
@@ -149,7 +149,6 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   image: {
-    // resizeMode: "cover",
     width: "95%",
     borderRadius: 10,
   },

@@ -19,7 +19,7 @@ export const selectImageForUpload = async (setImageUri, navigation) => {
     if (!res.canceled) {
       const { uri } = res.assets[0];
       setImageUri(uri);
-      navigation.navigate("UploadStack", {
+      navigation.navigate("FunctionStack", {
         screen: "Upload",
         params: { imageUri: uri },
       });

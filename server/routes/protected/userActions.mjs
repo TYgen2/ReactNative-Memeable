@@ -100,8 +100,6 @@ router.post("/api/handleLike", authenticateToken, async (req, res) => {
 
     res.status(200).send({
       msg: target ? "Unliked the post!" : "Liked the post!",
-      likeAction: target ? "unlike" : "like",
-      postId,
     });
   } catch (error) {
     res.status(400).send({ msg: "Error when handling the like function" });

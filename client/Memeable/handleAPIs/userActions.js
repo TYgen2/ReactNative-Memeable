@@ -65,3 +65,14 @@ export const handleSearch = async (query) => {
     return { message: error.response.data.msg };
   }
 };
+
+export const handleLike = async (postId) => {
+  try {
+    const res = await apiClient.post("/handleLike", { postId });
+
+    console.log("Like updated locally!");
+    return { msg: res.data.msg };
+  } catch (error) {
+    return { msg: error.response.data.msg };
+  }
+};

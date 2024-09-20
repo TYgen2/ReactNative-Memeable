@@ -8,6 +8,7 @@ import {
   generateRefreshToken,
   hashPassword,
   randomUserName,
+  validateTokens,
 } from "../utils/helpers.mjs";
 import "../strategies/jwt.mjs";
 import jwt from "jsonwebtoken";
@@ -225,52 +226,27 @@ router.post("/api/auth/token-validation", async (req, res) => {
   const jwtToken = req.headers.authorization?.split(" ")[1];
   const refreshToken = req.headers["x-refresh-token"];
 
-  // check whether there is a matched refreshToken in db
-  const user = await User.findOne({ refreshToken });
-  if (!user) {
-    return res
-      .status(404)
-      .send({ msg: "Invalid refresh token", success: false });
+  if (!jwtToken || !refreshToken) {
+    return res.status(404).send({ msg: "Missing tokens", success: false });
   }
 
   try {
-    // firstly verify the JWT is expired or not
-    jwt.verify(jwtToken, process.env.JWT_SECRET);
+    const { user, newTokens } = await validateTokens(jwtToken, refreshToken);
 
-    // if not expired yet, just return
+    if (newTokens) {
+      res.setHeader("x-new-token", newTokens.token);
+      res.setHeader("x-new-refresh-token", newTokens.signedRefreshToken);
+    }
+
     res.status(200).send({
       msg: "JWT token is still valid. Process to other actions...",
       success: true,
     });
-  } catch (jwtError) {
-    // when JWT is expired
-    console.log(
-      "JWT token is expired!! Now proceed to validate refreshToken..."
-    );
-    try {
-      // verify the refreshToken is expired or not
-      jwt.verify(refreshToken, process.env.REFRESH_SECRET);
-
-      // if not expired, continue to generate new tokens
-      const token = generateJWT({ id: user.id });
-      const signedRefreshToken = generateRefreshToken();
-
-      user.refreshToken = signedRefreshToken;
-      await user.save();
-
-      console.log("TOKENS generated successfully!!");
-
-      res.setHeader("x-new-token", token);
-      res.setHeader("x-new-refresh-token", signedRefreshToken);
-
-      res.status(200).send({ success: true });
-    } catch (refreshError) {
-      // when both tokens are expired
-      res.status(401).send({
-        msg: "Both tokens are expired!! Please login agagin.",
-        success: false,
-      });
-    }
+  } catch (error) {
+    res.status(401).send({
+      msg: error.message,
+      success: false,
+    });
   }
 });
 

@@ -106,7 +106,7 @@ router.get("/api/fetchUserProfile", authenticateToken, async (req, res) => {
 
 // fetch all posts in home page
 router.get("/api/fetchAllPosts", authenticateToken, async (req, res) => {
-  const { page, limit, since } = req.query;
+  const { page, limit } = req.query;
 
   try {
     const user = await User.findById(req.userId).lean();
@@ -123,10 +123,6 @@ router.get("/api/fetchAllPosts", authenticateToken, async (req, res) => {
         $in: followingIds.map((id) => new mongoose.Types.ObjectId(id)),
       },
     };
-
-    if (since) {
-      matchStage.createDate = { $gt: new Date(since) };
-    }
 
     const posts = await Post.aggregate([
       { $match: matchStage },

@@ -3,7 +3,7 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { Follow } from "../mongoose/schemas/follow.mjs";
-import mongoose from "mongoose";
+import { User } from "../mongoose/schemas/user.mjs";
 
 dotenv.config();
 
@@ -64,4 +64,34 @@ export const getFollowingIds = async (userId) => {
   followingIds.push(userId);
 
   return followingIds;
+};
+
+export const validateTokens = async (jwtToken, refreshToken) => {
+  const user = await User.findOne({ refreshToken });
+  if (!user) {
+    console.log("Invalid refresh token");
+    return res.status(404).send({ msg: "Invalid refresh token" });
+  }
+
+  try {
+    jwt.verify(jwtToken, process.env.JWT_SECRET);
+
+    console.log("JWT still valid, passed the token check from middleware!!");
+    return { user, newTokens: null };
+  } catch (jwtError) {
+    try {
+      jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+      const token = generateJWT({ id: user.id });
+      const signedRefreshToken = generateRefreshToken();
+
+      user.refreshToken = signedRefreshToken;
+      await user.save();
+
+      console.log("TOKENS generated successfully from middleware!!");
+      return { user, newTokens: { token, signedRefreshToken } };
+    } catch (refreshError) {
+      console.log("Both tokens are expired!! Checked from middleware");
+      throw new Error("Both tokens expired");
+    }
+  }
 };

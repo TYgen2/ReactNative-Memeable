@@ -22,6 +22,7 @@ import CustomTab from "./components/customTab";
 import { EventProvider } from "react-native-outside-press";
 import { reduxLogin } from "./store/userReducer";
 import { enableScreens } from "react-native-screens";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const persistor = persistStore(store);
 enableScreens();
@@ -35,7 +36,7 @@ const ExploreStack = createNativeStackNavigator();
 const SettingStack = createNativeStackNavigator();
 
 const MainStack = createNativeStackNavigator();
-const UploadStack = createNativeStackNavigator();
+const FunctionStack = createNativeStackNavigator();
 
 // For login and register
 const AuthStackScreen = () => {
@@ -118,11 +119,11 @@ const MainStackScreen = () => {
 };
 
 // For upload procedures
-const UploadStackScreen = () => {
+const FunctionScreen = () => {
   return (
-    <UploadStack.Navigator screenOptions={{ headerShown: false }}>
-      <UploadStack.Screen name="Upload" component={upload} />
-    </UploadStack.Navigator>
+    <FunctionStack.Navigator screenOptions={{ headerShown: false }}>
+      <FunctionStack.Screen name="Upload" component={upload} />
+    </FunctionStack.Navigator>
   );
 };
 
@@ -131,7 +132,7 @@ const MainStackNavigator = () => {
   return (
     <MainStack.Navigator screenOptions={{ headerShown: false }}>
       <MainStack.Screen name="MainStack" component={MainStackScreen} />
-      <MainStack.Screen name="UploadStack" component={UploadStackScreen} />
+      <MainStack.Screen name="FunctionStack" component={FunctionScreen} />
       <MainStack.Screen name="SettingStack" component={SettingScreen} />
     </MainStack.Navigator>
   );
@@ -178,7 +179,9 @@ export default function Root() {
       <Provider store={store}>
         <PersistGate persistor={persistor}>
           <LoadingContextProvider>
-            <App />
+            <GestureHandlerRootView>
+              <App />
+            </GestureHandlerRootView>
           </LoadingContextProvider>
         </PersistGate>
       </Provider>
