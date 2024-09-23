@@ -1,25 +1,23 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { clearTokens } from "../../utils/tokenActions";
 import { reduxLogout } from "../../store/userReducer";
 import { clearPosts } from "../../store/postReducer";
 import { useContext } from "react";
 import { UpdateContext } from "../../context/loading";
+import { userLogout } from "../../handleAPIs/auth";
 
 export default Notify = () => {
   const dispatch = useDispatch();
-  const { shouldFetch, setShouldFetch } = useContext(UpdateContext);
+
+  const handleLogout = async () => {
+    await userLogout();
+    dispatch(reduxLogout());
+    dispatch(clearPosts());
+  };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.testingBox}
-        onPress={async () => {
-          await clearTokens();
-          dispatch(reduxLogout());
-          dispatch(clearPosts());
-        }}
-      >
+      <TouchableOpacity style={styles.testingBox} onPress={handleLogout}>
         <Text>LOGOUT</Text>
       </TouchableOpacity>
     </View>

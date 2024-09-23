@@ -11,6 +11,7 @@ import { validateTokens } from "../handleAPIs/auth";
 import { useDispatch } from "react-redux";
 import { reduxLogout } from "../store/userReducer";
 import { clearPosts } from "../store/postReducer";
+import { clearTokens } from "../utils/tokenActions";
 
 export default Splash = () => {
   const { setIsLoading } = useContext(UpdateContext);
@@ -18,8 +19,10 @@ export default Splash = () => {
 
   const checkStatus = async () => {
     const res = await validateTokens();
+    console.log(res.message);
 
     if (res.success === false) {
+      await clearTokens();
       dispatch(reduxLogout());
       dispatch(clearPosts());
     }

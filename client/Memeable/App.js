@@ -23,6 +23,7 @@ import { EventProvider } from "react-native-outside-press";
 import { reduxLogin } from "./store/userReducer";
 import { enableScreens } from "react-native-screens";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 const persistor = persistStore(store);
 enableScreens();
@@ -180,7 +181,9 @@ export default function Root() {
         <PersistGate persistor={persistor}>
           <LoadingContextProvider>
             <GestureHandlerRootView>
-              <App />
+              <BottomSheetModalProvider>
+                <App />
+              </BottomSheetModalProvider>
             </GestureHandlerRootView>
           </LoadingContextProvider>
         </PersistGate>

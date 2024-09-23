@@ -4,6 +4,7 @@ import MainPost from "../../components/mainPost";
 import { useSelector } from "react-redux";
 import useFetchPosts from "../../hooks/useFetchPosts";
 import { useCallback, useEffect } from "react";
+import { apiQueue } from "../../utils/helper";
 
 export default Home = ({ navigation }) => {
   const { allPosts } = useSelector((state) => state.post);
@@ -22,7 +23,7 @@ export default Home = ({ navigation }) => {
   // when home page first mount, fetch posts for page 1
   useEffect(() => {
     if (allPosts.length === 0) {
-      fetchPosts(1);
+      apiQueue.add(() => fetchPosts(1));
     }
 
     // when user upload post, refresh immediately

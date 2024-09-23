@@ -1,6 +1,6 @@
 import axios from "axios";
 import { LOCAL_HOST } from "@env";
-import { getTokens, storeTokens } from "./tokenActions";
+import { clearTokens, getTokens, storeTokens } from "./tokenActions";
 
 const apiClient = axios.create({
   baseURL: `${LOCAL_HOST}/api`,
@@ -14,6 +14,8 @@ apiClient.interceptors.request.use(
     // send the request with tokens included in headers automatically
     if (jwtToken) {
       config.headers.Authorization = `Bearer ${jwtToken}`;
+    }
+    if (refreshToken) {
       config.headers["x-refresh-token"] = refreshToken;
     }
     return config;
@@ -30,10 +32,18 @@ apiClient.interceptors.response.use(
   async (response) => {
     const newToken = response.headers["x-new-token"];
     const newRefreshToken = response.headers["x-new-refresh-token"];
+    console.log("NEW TOKEN:", newToken);
+    console.log("NEW REFRESH TOKEN:", newRefreshToken);
 
     if (newToken && newRefreshToken) {
-      console.log("New tokens received!! Storing in keychain...");
-      await storeTokens(newToken, newRefreshToken);
+      const { jwtToken, refreshToken } = await getTokens();
+      console.log("CURRENT JWT TOKEN:", jwtToken);
+      console.log("CURRENT REFRESH TOKEN:", refreshToken);
+
+      if (newToken !== jwtToken || newRefreshToken !== refreshToken) {
+        console.log("New tokens received!! Storing in keychain...");
+        await storeTokens(newToken, newRefreshToken);
+      }
     }
 
     // If tokens are still valid, return the response normally
@@ -41,13 +51,14 @@ apiClient.interceptors.response.use(
   },
   async (error) => {
     // Both tokens are expired, return to auth page
-    if (error.response.status === 401) {
+    if (error.response && error.response.status === 401) {
       console.log("Both tokens expired!! Returning to the login page...");
+      await clearTokens();
     }
+
     if (error.response.status === 404) {
       console.log("User not found, refreshToken GGed");
     }
-
     return Promise.reject(error);
   }
 );

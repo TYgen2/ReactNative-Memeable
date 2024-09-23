@@ -76,3 +76,15 @@ export const handleLike = async (postId) => {
     return { msg: error.response.data.msg };
   }
 };
+
+export const handleComment = async (postId, content) => {
+  try {
+    const res = await apiClient.post("/handleComment", { postId, content });
+    const { msg, comment } = res.data;
+
+    console.log("Commented successfully!");
+    return { msg, comment };
+  } catch {
+    return { msg: error.response.data.msg };
+  }
+};

@@ -13,38 +13,37 @@ import { Formik } from "formik";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { googleLoginConfig, screenWidth } from "../../utils/constants";
 import { loginReviewSchema } from "../../utils/validationSchema";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { facebookLogin, googleLogin, userLogin } from "../../handleAPIs/auth";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import { useEffect } from "react";
-import { reduxSetUserInfo } from "../../store/userReducer";
 import { LoginManager, AccessToken } from "react-native-fbsdk-next";
-import { handleLoginFetch } from "../../utils/helper";
-import { getTokens } from "../../utils/tokenActions";
 import { fetchUserInfo } from "../../store/userActions";
+import { apiQueue } from "../../utils/helper";
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default Login = ({ navigation }) => {
   const dispatch = useDispatch();
-  const { userInfo } = useSelector((state) => state.user);
 
   const handleLogin = async (method, payload) => {
-    let res;
+    let loginFunction;
     switch (method) {
       case "Local":
-        res = await userLogin(payload);
+        loginFunction = () => userLogin(payload);
         break;
       case "Google":
-        res = await googleLogin(payload);
+        loginFunction = () => googleLogin(payload);
         break;
       case "Facebook":
-        res = await facebookLogin(payload);
+        loginFunction = () => facebookLogin(payload);
         break;
       default:
         return;
     }
+
+    const res = await apiQueue.add(loginFunction);
 
     if (!res.success) {
       Alert.alert(`${method} login failed: `, res.message);
@@ -52,13 +51,14 @@ export default Login = ({ navigation }) => {
     }
     console.log(`Logged in with ${method} method!`);
 
-    if (res.isNew) {
-      navigation.replace("Edit Profile", { userId: res.userId });
-      return;
-    }
-
-    // User exist, proceed to fetch user info before login
-    dispatch(fetchUserInfo());
+    await apiQueue.add(() => {
+      if (res.isNew) {
+        navigation.replace("Edit Profile", { userId: res.userId });
+      } else {
+        // User exist, proceed to fetch user info before login
+        dispatch(fetchUserInfo());
+      }
+    });
   };
 
   const [request, response, promptAsync] =

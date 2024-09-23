@@ -10,6 +10,7 @@ import { checkSchema, validationResult } from "express-validator";
 import { createPostValidationSchema } from "../../validationSchemas.mjs";
 import { Like } from "../../mongoose/schemas/like.mjs";
 import { Follow } from "../../mongoose/schemas/follow.mjs";
+import { Comment } from "../../mongoose/schemas/comment.mjs";
 dotenv.config();
 
 const router = Router();
@@ -122,6 +123,57 @@ router.post("/api/handleFollow", authenticateToken, async (req, res) => {
     }
   } catch (error) {
     res.status(400).send({ msg: "Error when handling follow/unfollow" });
+  }
+});
+
+// comment on a post
+router.post("/api/handleComment", authenticateToken, async (req, res) => {
+  const { postId, content } = req.body;
+
+  try {
+    const newComment = new Comment({
+      userId: req.userId,
+      postId,
+      content,
+    });
+
+    await newComment.save();
+
+    const commentData = newComment.toObject();
+    commentData.timeAgo = getTimeDifference(commentData.createDate);
+
+    res.status(201).send({
+      msg: "Comment created successfully",
+      comment: commentData,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ msg: "Error creating comment" });
+  }
+});
+
+// comment on a comment
+router.post("/api/handleSubComment", authenticateToken, async (req, res) => {
+  const { parentCommentId, content } = req.body;
+
+  try {
+    const newSubComment = new Comment({
+      userId: req.userId,
+      parentCommentId,
+      content,
+    });
+
+    await newSubComment.save();
+
+    const subCommentData = newSubComment.toObject();
+    subCommentData.timeAgo = getTimeDifference(subCommentData.createDate);
+
+    res.status(201).send({
+      msg: "Sub-comment created successfully",
+      subComment: subCommentData,
+    });
+  } catch (error) {
+    res.status(400).send({ msg: "Error creating sub-comment" });
   }
 });
 

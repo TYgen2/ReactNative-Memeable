@@ -24,3 +24,15 @@ export const fetchUserPosts = async (page, limit, targetId) => {
     return rejectWithValue(error.response.data);
   }
 };
+
+export const fetchComments = async (page, limit, postId) => {
+  try {
+    const response = await apiClient.get("/fetchComments", {
+      params: { postId, page, limit },
+    });
+
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(error.response.data);
+  }
+};

@@ -21,8 +21,11 @@ export const authenticateToken = async (req, res, next) => {
     req.userId = user.id;
 
     if (newTokens) {
+      console.log(`New tokens generated for user ${user.displayName}`);
       res.setHeader("x-new-token", newTokens.token);
       res.setHeader("x-new-refresh-token", newTokens.signedRefreshToken);
+    } else {
+      console.log(`Using existing tokens for user ${user.displayName}`);
     }
 
     next();

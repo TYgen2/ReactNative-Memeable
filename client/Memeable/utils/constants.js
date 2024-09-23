@@ -1,5 +1,6 @@
-import { Dimensions, StatusBar } from "react-native";
+import { Dimensions, StatusBar, StyleSheet, View } from "react-native";
 import { GOOGLE_ANDROID_CLIENT_ID, GOOGLE_WEB_CLIENT_ID } from "@env";
+import { ActivityIndicator } from "react-native";
 
 const dimensions = Dimensions.get("screen");
 export const screenWidth = dimensions.width;
@@ -58,3 +59,19 @@ export const ICON_BGCOLOR = [
 ];
 
 export const DEFAULT_BGIMAGE = require("../assets/default_bgImage.jpg");
+
+export const LOADING_INDICATOR = () => {
+  return (
+    <View style={styles.center}>
+      <ActivityIndicator size={24} color={"grey"} />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});

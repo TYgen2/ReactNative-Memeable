@@ -11,10 +11,10 @@ import {
   validateTokens,
 } from "../utils/helpers.mjs";
 import "../strategies/jwt.mjs";
-import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
 import dotenv from "dotenv";
 import axios from "axios";
+import { authenticateToken } from "../utils/middleware.mjs";
 
 dotenv.config();
 
@@ -247,6 +247,16 @@ router.post("/api/auth/token-validation", async (req, res) => {
       msg: error.message,
       success: false,
     });
+  }
+});
+
+// logout
+router.post("/api/auth/logout", authenticateToken, async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.userId, { refreshToken: null });
+    res.status(200).send({ msg: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).send({ msg: "Error during logout" });
   }
 });
 

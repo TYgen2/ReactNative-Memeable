@@ -1,10 +1,11 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
   View,
   TouchableOpacity,
   Text,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import {
@@ -15,12 +16,23 @@ import {
 } from "../utils/helper";
 import FastImage from "react-native-fast-image";
 import { handleLike } from "../handleAPIs/userActions";
+import BottomSheet, {
+  BottomSheetModal,
+  BottomSheetBackdrop,
+  BottomSheetFlatList,
+} from "@gorhom/bottom-sheet";
+import CommentInput from "./commentInput";
+import useFetchComments from "../hooks/useFetchComments";
+import CommentItem from "./commentItem";
+import { useSelector } from "react-redux";
+import { LOADING_INDICATOR } from "../utils/constants";
 
 const squareHeight = getSquareImageHeight();
 
 export default MainPost = memo(({ item, navigation }) => {
   const iconBgColor = item.userId?.icon.bgColor || "transparent";
   const userIcon = getIconSource(item.userId?.icon);
+  const { userDetails } = useSelector((state) => state.user);
 
   const [postState, setPostState] = useState({
     likes: item.likes,
@@ -45,6 +57,75 @@ export default MainPost = memo(({ item, navigation }) => {
       saved: !prevState.saved,
     }));
   }, []);
+
+  const bottomSheetModalRef = useRef(null);
+
+  const openCommentModal = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+
+  const renderBackdrop = useCallback(
+    (props) => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+      />
+    ),
+    []
+  );
+
+  const {
+    comments,
+    setComments,
+    isCommentLoading,
+    fetchCommentsForPost,
+    loadMoreComments,
+    isLoadingMore,
+  } = useFetchComments(item._id);
+
+  const renderCommentItem = useCallback(
+    ({ item }) => {
+      return <CommentItem item={item} navigation={navigation} />;
+    },
+    [navigation]
+  );
+
+  const renderEmpty = () => {
+    if (!isCommentLoading) return null;
+    return <LOADING_INDICATOR />;
+  };
+
+  const renderFooter = () => {
+    if (!isLoadingMore) return null;
+    return <LOADING_INDICATOR />;
+  };
+
+  const onChange = useCallback(
+    (index) => {
+      if (index === 0 && comments.length === 0) {
+        console.log("fetching comments..");
+        fetchCommentsForPost(1);
+      }
+    },
+    [fetchCommentsForPost, comments.length]
+  );
+
+  const handleNewComment = useCallback(
+    (newComment) => {
+      const enhancedComment = {
+        ...newComment,
+        user: {
+          displayName: userDetails.displayName,
+          icon: userDetails.userIcon,
+        },
+        userId: userDetails.userId,
+      };
+
+      setComments((prevComments) => [enhancedComment, ...prevComments]);
+    },
+    [setComments]
+  );
 
   return (
     <View style={styles.postContainer}>
@@ -120,15 +201,42 @@ export default MainPost = memo(({ item, navigation }) => {
               />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            onPress={() => {
-              // navigation.navigate("CommentModal");
-            }}
-          >
+          <TouchableOpacity onPress={openCommentModal}>
             <Icon name="chatbox-ellipses-outline" size={32} color="grey" />
           </TouchableOpacity>
         </View>
       </View>
+
+      <BottomSheetModal
+        ref={bottomSheetModalRef}
+        index={0}
+        snapPoints={["80%"]}
+        backdropComponent={renderBackdrop}
+        style={styles.bottomSheet}
+        keyboardBehavior="extend"
+        keyboardBlurBehavior="restore"
+        onChange={onChange}
+      >
+        <View style={styles.commentModalContent}>
+          <BottomSheetFlatList
+            data={comments}
+            renderItem={renderCommentItem}
+            refreshing={isCommentLoading}
+            onEndReached={loadMoreComments}
+            onEndReachedThreshold={0.6}
+            contentContainerStyle={styles.commentList}
+            ListEmptyComponent={renderEmpty}
+            ListFooterComponent={renderFooter}
+          />
+          <View style={styles.inputContainer}>
+            <CommentInput
+              postId={item._id}
+              userIcon={userIcon}
+              onCommentPosted={handleNewComment}
+            />
+          </View>
+        </View>
+      </BottomSheetModal>
     </View>
   );
 });
@@ -186,6 +294,18 @@ const styles = StyleSheet.create({
   },
   center: {
     justifyContent: "center",
+    alignItems: "center",
+  },
+  commentModalContent: {
+    flex: 1,
+    justifyContent: "space-between",
+  },
+  commentList: { flexGrow: 1 },
+  inputContainer: {
+    width: "100%",
+  },
+  footerLoader: {
+    paddingVertical: 30,
     alignItems: "center",
   },
 });

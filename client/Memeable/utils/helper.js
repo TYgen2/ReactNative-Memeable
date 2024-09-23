@@ -4,6 +4,7 @@ import {
   DEFAULT_ICONS,
   screenWidth,
 } from "../utils/constants";
+import PQueue from "p-queue/dist";
 
 // select image for posting
 export const selectImageForUpload = async (setImageUri, navigation) => {
@@ -119,3 +120,5 @@ export const navigateToUserProfile = (navigation, targetId) => {
     targetId,
   });
 };
+
+export const apiQueue = new PQueue({ concurrency: 1, interval: 5000 });

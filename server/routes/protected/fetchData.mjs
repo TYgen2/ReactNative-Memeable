@@ -7,6 +7,7 @@ import { User } from "../../mongoose/schemas/user.mjs";
 import { authenticateToken } from "../../utils/middleware.mjs";
 import { Follow } from "../../mongoose/schemas/follow.mjs";
 import mongoose from "mongoose";
+import { Comment } from "../../mongoose/schemas/comment.mjs";
 dotenv.config();
 
 const router = Router();
@@ -306,6 +307,109 @@ router.get("/api/fetchUserPosts", authenticateToken, async (req, res) => {
   } catch (error) {
     console.error("Error:", error);
     return res.status(400).send({ msg: "Error when fetching posts" });
+  }
+});
+
+// fetch comments in post page
+router.get("/api/fetchComments", authenticateToken, async (req, res) => {
+  const { postId, page, limit } = req.query;
+
+  try {
+    const comments = await Comment.aggregate([
+      {
+        $match: {
+          postId: new mongoose.Types.ObjectId(postId),
+          parentCommentId: null,
+        },
+      },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "parentCommentId",
+          as: "subComments",
+        },
+      },
+      {
+        $addFields: {
+          hasSubComment: { $gt: [{ $size: "$subComments" }, 0] },
+        },
+      },
+      { $project: { subComments: 0 } },
+      { $sort: { createDate: -1 } },
+      { $skip: (page - 1) * limit },
+      { $limit: Number(limit) + 1 },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unwind: "$user" },
+      {
+        $project: {
+          _id: 1,
+          userId: 1,
+          content: 1,
+          createDate: 1,
+          likes: 1,
+          hasSubComment: 1,
+          timeAgo: { $literal: "" },
+          "user.displayName": 1,
+          "user.icon": 1,
+        },
+      },
+    ]);
+
+    const hasMore = comments.length > limit;
+    const commentData = comments.slice(0, limit).map((comment) => {
+      comment.timeAgo = getTimeDifference(comment.createDate);
+      return comment;
+    });
+
+    res.status(200).send({ commentData, hasMore });
+  } catch (error) {
+    res.status(400).send({ msg: "Error fetching comments" });
+  }
+});
+
+// fetch sub comments in post page
+router.get("/api/fetchSubComments", authenticateToken, async (req, res) => {
+  const { parentCommentId, page, limit } = req.query;
+
+  try {
+    const subComments = await Comment.aggregate([
+      {
+        $match: {
+          parentCommentId: new mongoose.Types.ObjectId(parentCommentId),
+        },
+      },
+      { $sort: { createDate: -1 } },
+      { $skip: (page - 1) * limit },
+      { $limit: Number(limit) + 1 },
+      {
+        $project: {
+          _id: 1,
+          userId: 1,
+          content: 1,
+          createDate: 1,
+          likes: 1,
+          timeAgo: { $literal: "" },
+        },
+      },
+    ]);
+
+    const hasMore = subComments.length > limit;
+    const subCommentData = subComments.slice(0, limit).map((comment) => {
+      comment.timeAgo = getTimeDifference(comment.createdAt);
+      return comment;
+    });
+
+    res.status(200).send({ subCommentData, hasMore });
+  } catch (error) {
+    res.status(400).send({ msg: "Error fetching sub-comments" });
   }
 });
 

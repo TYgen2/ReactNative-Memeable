@@ -1,6 +1,6 @@
 import axios from "axios";
 import { LOCAL_HOST } from "@env";
-import { storeTokens } from "../utils/tokenActions";
+import { clearTokens, storeTokens } from "../utils/tokenActions";
 import apiClient from "../utils/axiosHelper";
 
 // local register
@@ -70,5 +70,17 @@ export const validateTokens = async () => {
     return { success: res.data.success, message: res.data.msg };
   } catch (error) {
     return { success: false, message: error.response.data.msg };
+  }
+};
+
+// logout
+export const userLogout = async () => {
+  try {
+    await apiClient.post("/auth/logout");
+    await clearTokens();
+
+    console.log("User logged out successfully!");
+  } catch (error) {
+    console.error(error);
   }
 };
