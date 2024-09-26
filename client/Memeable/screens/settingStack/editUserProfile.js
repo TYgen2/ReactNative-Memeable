@@ -1,5 +1,4 @@
 import {
-  Alert,
   Image,
   ImageBackground,
   StyleSheet,
@@ -15,38 +14,42 @@ import {
   selectImageForProfile,
 } from "../../utils/helper";
 import Icon from "react-native-vector-icons/Ionicons";
-import useUpdateStrings from "../../hooks/updateUserProfile/useUpdateStrings";
-import useUpdateBgImage from "../../hooks/updateUserProfile/useUpdateBgImage";
-import useUpdateIcon from "../../hooks/updateUserProfile/useUpdateIcon";
+import { useEditUserProfileViewModel } from "../../hooks/editUserProfile/useEditUserProfileViewModel";
+import { ActivityIndicator } from "react-native";
 
 export default EditUserProfile = ({ route, navigation }) => {
   const { data } = route.params;
-
-  // handling udpate bgImage
-  const { newBgImage, setNewBgImage, updateBgImageInfo } = useUpdateBgImage(
-    data.bgImage
-  );
-
-  // handling udpate icon
-  const { newIcon, setNewIcon, updateIconInfo } = useUpdateIcon(data.userIcon);
-
-  // handling udpate of displayName, username and userBio
   const {
+    newBgImage,
+    setNewBgImage,
+    newIcon,
+    setNewIcon,
     displayName,
-    setdisplayName,
+    setDisplayName,
     username,
     setUsername,
     userBio,
     setUserBio,
-    updateStringInfo,
-  } = useUpdateStrings({
-    displayName: data.displayName,
-    username: data.username,
-    userBio: data.userBio,
-  });
+    handleUpdateProfile,
+    isUpdating,
+  } = useEditUserProfileViewModel(data);
+
+  const handleSave = async () => {
+    const success = await handleUpdateProfile();
+    if (success) {
+      navigation.pop();
+    } else {
+      console.log("Some updates failed");
+    }
+  };
 
   return (
     <View style={styles.container}>
+      {isUpdating && (
+        <View style={styles.overlay}>
+          <ActivityIndicator size="large" color="white" />
+        </View>
+      )}
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => selectImageForBgImage(setNewBgImage)}
@@ -82,30 +85,7 @@ export default EditUserProfile = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
       <View style={styles.editInput}>
-        <TouchableOpacity
-          style={styles.saveButton}
-          onPress={async () => {
-            try {
-              const results = await Promise.allSettled([
-                updateStringInfo(),
-                updateBgImageInfo(),
-                updateIconInfo(),
-              ]);
-
-              const allSuccessful = results.every(
-                (result) => result.status === "fulfilled"
-              );
-
-              if (allSuccessful) {
-                navigation.pop();
-              } else {
-                console.log("Some of them gged");
-              }
-            } catch (error) {
-              console.log(error);
-            }
-          }}
-        >
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
           <Text style={{ color: "white", fontWeight: "bold" }}>SAVE</Text>
         </TouchableOpacity>
         <View
@@ -124,7 +104,7 @@ export default EditUserProfile = ({ route, navigation }) => {
           <Text style={{ color: "grey" }}>Display name</Text>
           <TextInput
             value={displayName}
-            onChangeText={setdisplayName}
+            onChangeText={setDisplayName}
             autoCapitalize="none"
           />
         </View>
@@ -197,5 +177,17 @@ const styles = StyleSheet.create({
   },
   songContainer: {
     flex: 2,
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 2,
+    elevation: 2,
   },
 });

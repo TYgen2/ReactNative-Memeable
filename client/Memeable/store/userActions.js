@@ -63,7 +63,7 @@ export const handleUpdateStrings = createAsyncThunk(
       });
 
       console.log("Updated Strings using REDUX!!");
-      return { msg: response.data.msg };
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -90,10 +90,7 @@ export const handleUpdateBgImage = createAsyncThunk(
       });
 
       console.log("Updated bgImage using REDUX!!");
-      return {
-        msg: response.data.msg,
-        updatedBgImage: response.data.updatedBgImage.bgImage,
-      };
+      return response.data;
     } catch (error) {
       console.log(error);
       return rejectWithValue(error.response.data);
@@ -121,11 +118,7 @@ export const handleUpdateIcon = createAsyncThunk(
       });
 
       console.log("Updated icon using REDUX!!");
-      return {
-        msg: response.data.msg,
-        updatedIcon: response.data.updatedIcon.icon,
-        user: response.data.user,
-      };
+      return response.data;
     } catch (error) {
       console.log(error);
       return rejectWithValue(error.response.data);

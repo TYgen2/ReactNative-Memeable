@@ -2,7 +2,6 @@ import { Router } from "express";
 import dotenv from "dotenv";
 import { Post } from "../../mongoose/schemas/post.mjs";
 import { getFollowingIds, getTimeDifference } from "../../utils/helpers.mjs";
-import { Like } from "../../mongoose/schemas/like.mjs";
 import { User } from "../../mongoose/schemas/user.mjs";
 import { authenticateToken } from "../../utils/middleware.mjs";
 import { Follow } from "../../mongoose/schemas/follow.mjs";
@@ -22,40 +21,26 @@ router.get("/api/fetchUserInfo", authenticateToken, async (req, res) => {
 
     const userId = req.userId;
 
-    const [followersCount, followingCount, postsCount, likedPosts, posts] =
-      await Promise.all([
-        Follow.countDocuments({ userId }),
-        Follow.countDocuments({
-          followerId: userId,
-        }),
-        Post.countDocuments({ userId }),
-        Like.find({ userId }).select("postId").lean(),
-        Post.find({ userId }).sort({ createDate: -1 }).limit(9).exec(),
-      ]);
-
-    const likedPostIds = likedPosts.map((like) => like.postId.toString());
-
-    const postData = posts.map((post) => {
-      const postObject = post.toObject();
-      postObject.timeAgo = getTimeDifference(postObject.createDate);
-      postObject.hasLiked = likedPostIds.includes(postObject._id.toString());
-      return postObject;
-    });
+    const [followersCount, followingCount, postsCount] = await Promise.all([
+      Follow.countDocuments({ userId }),
+      Follow.countDocuments({
+        followerId: userId,
+      }),
+      Post.countDocuments({ userId }),
+      Post.find({ userId }).sort({ createDate: -1 }).limit(9).exec(),
+    ]);
 
     return res.status(200).send({
-      userDetails: {
-        email: user.email,
-        userId: user._id,
-        displayName: user.displayName,
-        username: user.username,
-        userIcon: user.icon,
-        userBio: user.bio,
-        bgImage: user.bgImage,
-        followersCount,
-        followingCount,
-        postsCount,
-      },
-      userPosts: postData,
+      userId,
+      displayName: user.displayName,
+      username: user.username,
+      userIcon: user.icon,
+      userBio: user.bio,
+      bgImage: user.bgImage,
+      followersCount,
+      followingCount,
+      postsCount,
+      isFollowing: false,
     });
   } catch (error) {
     return res
@@ -88,6 +73,7 @@ router.get("/api/fetchUserProfile", authenticateToken, async (req, res) => {
       ]);
 
     return res.status(200).send({
+      userId: targetId,
       displayName: user.displayName,
       username: user.username,
       userIcon: user.icon,

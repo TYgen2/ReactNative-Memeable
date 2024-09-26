@@ -46,10 +46,13 @@ router.post(
         return res.status(404).send({ msg: "User not found, update failed" });
       }
 
-      return res.status(200).send({
+      return res.status(201).send({
+        updatedStrings: {
+          displayName: updatedUser.displayName,
+          username: updatedUser.username,
+          userBio: updatedUser.bio,
+        },
         msg: "User profile updated successfully!",
-        token: res.token,
-        refreshToken: res.refreshToken,
       });
     } catch (error) {
       if (error.code === 11000) {
@@ -98,7 +101,7 @@ router.post(
       }
 
       const response = {
-        updatedBgImage,
+        updatedBgImage: updatedBgImage.bgImage,
         msg: "bgImage updated and uploaded to S3 successfully!!",
       };
 
@@ -154,8 +157,7 @@ router.post(
       }
 
       const response = {
-        updatedIcon,
-        user: req.userId,
+        updatedIcon: updatedIcon.icon,
         msg: "Icon updated to database and uploaded to S3!!",
       };
 

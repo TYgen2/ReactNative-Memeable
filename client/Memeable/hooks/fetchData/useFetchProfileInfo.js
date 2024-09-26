@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProfile } from "../handleAPIs/fetchData";
-import { handleFollow } from "../store/userActions";
+import { fetchProfile } from "../../handleAPIs/fetchData";
+import { handleFollow } from "../../store/userActions";
+import { UserProfileModel } from "../../models/UserProfileModel";
+import { apiQueue } from "../../utils/helper";
 
 export default useFetchProfileInfo = (userId, targetId) => {
   const [userData, setUserData] = useState(null);
@@ -16,7 +18,7 @@ export default useFetchProfileInfo = (userId, targetId) => {
 
     // use global state userDetails for display
     if (isMe) {
-      setUserData(userDetails);
+      setUserData(new UserProfileModel(userDetails));
       setIsInfoLoading(false);
       return;
     }
@@ -26,12 +28,13 @@ export default useFetchProfileInfo = (userId, targetId) => {
       setIsInfoLoading(true);
 
       try {
-        const res = await fetchProfile(targetId);
-        setUserData(res.userData);
+        const res = await apiQueue.add(() => fetchProfile(targetId));
+        setUserData(new UserProfileModel(res.userData));
       } catch (error) {
         console.error(
           error.response?.data?.msg || "Error when fetching additional info"
         );
+        setUserData(null);
       } finally {
         setIsInfoLoading(false);
       }

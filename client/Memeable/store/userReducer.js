@@ -34,7 +34,7 @@ export const userSlice = createSlice({
       })
       .addCase(fetchUserInfo.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.userDetails = action.payload.userDetails;
+        state.userDetails = action.payload;
       })
       .addCase(fetchUserInfo.rejected, (state, action) => {
         state.status = "failed";
@@ -59,10 +59,10 @@ export const userSlice = createSlice({
       })
       .addCase(handleUpdateStrings.fulfilled, (state, action) => {
         state.status = "succeeded";
-        const updatedData = action.meta.arg;
-        state.userDetails.username = updatedData.username;
-        state.userDetails.displayName = updatedData.displayName;
-        state.userDetails.userBio = updatedData.userBio;
+        const updatedInfo = action.payload.updatedStrings;
+        state.userDetails.username = updatedInfo.username;
+        state.userDetails.displayName = updatedInfo.displayName;
+        state.userDetails.userBio = updatedInfo.userBio;
       })
       .addCase(handleUpdateStrings.rejected, (state, action) => {
         state.status = "failed";
@@ -91,10 +91,7 @@ export const userSlice = createSlice({
       })
       .addCase(handleUpdateIcon.fulfilled, (state, action) => {
         state.status = "succeeded";
-        const updatedIcon = action.payload.updatedIcon;
-        state.userDetails.userIcon.customIcon = updatedIcon.customIcon;
-        state.userDetails.userIcon.bgColor = updatedIcon.bgColor;
-        state.userDetails.userIcon.id = updatedIcon.id;
+        state.userDetails.userIcon = action.payload.updatedIcon;
       })
       .addCase(handleUpdateIcon.rejected, (state, action) => {
         state.status = "failed";

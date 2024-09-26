@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { fetchComments } from "../handleAPIs/fetchData";
+import { fetchComments } from "../../handleAPIs/fetchData";
 import { debounce } from "lodash";
 
 export default useFetchComments = (postId) => {

@@ -1,65 +1,47 @@
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useRef } from "react";
 import {
   StyleSheet,
   View,
   TouchableOpacity,
   Text,
   Pressable,
-  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import {
   displayLikes,
   getIconSource,
-  getSquareImageHeight,
   navigateToUserProfile,
 } from "../utils/helper";
 import FastImage from "react-native-fast-image";
-import { handleLike } from "../handleAPIs/userActions";
-import BottomSheet, {
+import {
   BottomSheetModal,
   BottomSheetBackdrop,
   BottomSheetFlatList,
 } from "@gorhom/bottom-sheet";
 import CommentInput from "./commentInput";
-import useFetchComments from "../hooks/useFetchComments";
 import CommentItem from "./commentItem";
 import { useSelector } from "react-redux";
 import { LOADING_INDICATOR } from "../utils/constants";
-
-const squareHeight = getSquareImageHeight();
+import { usePostViewModel } from "../hooks/usePostViewModel";
 
 export default MainPost = memo(({ item, navigation }) => {
-  const iconBgColor = item.userId?.icon.bgColor || "transparent";
-  const userIcon = getIconSource(item.userId?.icon);
   const { userDetails } = useSelector((state) => state.user);
+  const myIcon = getIconSource(userDetails?.userIcon);
 
-  const [postState, setPostState] = useState({
-    likes: item.likes,
-    liked: item.hasLiked,
-    saved: false,
-  });
-
-  // update local like status and like count
-  const toggleLike = useCallback(async () => {
-    setPostState((prevState) => ({
-      ...prevState,
-      liked: !prevState.liked,
-      likes: prevState.liked ? prevState.likes - 1 : prevState.likes + 1,
-    }));
-
-    await handleLike(item._id);
-  }, [item._id]);
-
-  const toggleSave = useCallback(() => {
-    setPostState((prevState) => ({
-      ...prevState,
-      saved: !prevState.saved,
-    }));
-  }, []);
+  const {
+    post,
+    postState,
+    toggleLike,
+    toggleSave,
+    comments,
+    isCommentLoading,
+    loadMoreComments,
+    isLoadingMore,
+    onChange,
+    handleNewComment,
+  } = usePostViewModel(item);
 
   const bottomSheetModalRef = useRef(null);
-
   const openCommentModal = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
@@ -74,15 +56,6 @@ export default MainPost = memo(({ item, navigation }) => {
     ),
     []
   );
-
-  const {
-    comments,
-    setComments,
-    isCommentLoading,
-    fetchCommentsForPost,
-    loadMoreComments,
-    isLoadingMore,
-  } = useFetchComments(item._id);
 
   const renderCommentItem = useCallback(
     ({ item }) => {
@@ -101,84 +74,54 @@ export default MainPost = memo(({ item, navigation }) => {
     return <LOADING_INDICATOR />;
   };
 
-  const onChange = useCallback(
-    (index) => {
-      if (index === 0 && comments.length === 0) {
-        console.log("fetching comments..");
-        fetchCommentsForPost(1);
-      }
-    },
-    [fetchCommentsForPost, comments.length]
-  );
-
-  const handleNewComment = useCallback(
-    (newComment) => {
-      const enhancedComment = {
-        ...newComment,
-        user: {
-          displayName: userDetails.displayName,
-          icon: userDetails.userIcon,
-        },
-        userId: userDetails.userId,
-      };
-
-      setComments((prevComments) => [enhancedComment, ...prevComments]);
-    },
-    [setComments]
-  );
-
   return (
     <View style={styles.postContainer}>
       <View style={styles.imageContainer}>
         <View style={styles.uploaderContainer}>
           <Pressable
-            onPress={() => navigateToUserProfile(navigation, item.userId._id)}
+            onPress={() => navigateToUserProfile(navigation, post.userId)}
           >
             <FastImage
-              source={userIcon}
-              style={[styles.uploaderIcon, { backgroundColor: iconBgColor }]}
+              source={post.userIcon}
+              style={[
+                styles.uploaderIcon,
+                { backgroundColor: post.userIconBgColor },
+              ]}
             />
           </Pressable>
           <View style={{ flex: 1 }}>
             <Pressable
-              onPress={() => navigateToUserProfile(navigation, item.userId._id)}
+              onPress={() => navigateToUserProfile(navigation, post.userId)}
             >
-              <Text style={styles.uploaderName}>{item.userId.displayName}</Text>
+              <Text style={styles.uploaderName}>{post.userDisplayName}</Text>
             </Pressable>
-            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.title}>{post.title}</Text>
           </View>
-          <Text style={styles.timeAgo}>{item.timeAgo}</Text>
+          <Text style={styles.timeAgo}>{post.timeAgo}</Text>
         </View>
         <FastImage
-          source={{ uri: item.imageUri }}
+          source={{ uri: post.imageUri }}
           resizeMode={FastImage.resizeMode.cover}
           style={[
             styles.image,
             {
-              height:
-                item.height > item.width
-                  ? 500
-                  : item.height < item.width
-                  ? 200
-                  : squareHeight,
+              height: post.imageHeight,
             },
           ]}
         />
-        {item.description == "" ? (
+        {post.description == "" ? (
           <></>
         ) : (
           <View style={styles.descriptionView}>
             <Pressable
-              onPress={() => navigateToUserProfile(navigation, item.userId._id)}
+              onPress={() => navigateToUserProfile(navigation, post.userId)}
             >
-              <Text style={styles.uploaderName2}>
-                {item.userId.displayName}
-              </Text>
+              <Text style={styles.uploaderName2}>{post.userDisplayName}</Text>
             </Pressable>
-            <Text style={styles.description}>{" ‧ " + item.description}</Text>
+            <Text style={styles.description}>{" ‧ " + post.description}</Text>
           </View>
         )}
-        <Text style={styles.hashtag}>{item.hashtag}</Text>
+        <Text style={styles.hashtag}>{post.hashtag}</Text>
       </View>
       <View style={styles.rightsideBar}>
         {/* save icon */}
@@ -231,7 +174,7 @@ export default MainPost = memo(({ item, navigation }) => {
           <View style={styles.inputContainer}>
             <CommentInput
               postId={item._id}
-              userIcon={userIcon}
+              userIcon={myIcon}
               onCommentPosted={handleNewComment}
             />
           </View>

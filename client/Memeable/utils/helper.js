@@ -114,6 +114,13 @@ export const getSquareImageHeight = () => {
   return screenWidth * (14 / 15) * 0.95;
 };
 
+export const calculatePostHeight = (imageHeight, imageWidth) => {
+  const squareHeight = getSquareImageHeight();
+  if (imageHeight > imageWidth) return 500;
+  if (imageHeight < imageWidth) return 200;
+  return squareHeight;
+};
+
 export const navigateToUserProfile = (navigation, targetId) => {
   navigation.navigate("UserProfile", {
     isStack: true,
@@ -121,4 +128,4 @@ export const navigateToUserProfile = (navigation, targetId) => {
   });
 };
 
-export const apiQueue = new PQueue({ concurrency: 1, interval: 5000 });
+export const apiQueue = new PQueue({ concurrency: 1, interval: 1000 });

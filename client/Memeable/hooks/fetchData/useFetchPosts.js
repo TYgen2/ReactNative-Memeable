@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllPosts } from "../store/userActions";
+import { fetchAllPosts } from "../../store/userActions";
 import { debounce } from "lodash";
+import { apiQueue } from "../../utils/helper";
 
 export default useFetchPosts = () => {
   const { allPosts } = useSelector((state) => state.post);
+  const { userDetails } = useSelector((state) => state.user);
+
   const allPostsRef = useRef(allPosts);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,6 +59,15 @@ export default useFetchPosts = () => {
     console.log("refreshing...");
     await fetchPosts(1, true);
   };
+
+  // when home page first mount, fetch posts for page 1
+  useEffect(() => {
+    if (allPosts.length === 0) {
+      apiQueue.add(() => fetchPosts(1));
+    }
+
+    // when user upload post, refresh immediately
+  }, [userDetails.postsCount]);
 
   return { isLoading, fetchPosts, loadMorePosts, refreshPosts };
 };

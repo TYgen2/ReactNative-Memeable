@@ -1,15 +1,16 @@
 import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { handleUpdateStrings } from "../../store/userActions";
+import { apiQueue } from "../../utils/helper";
 
 export default useUpdateStrings = (stringData) => {
-  const [displayName, setdisplayName] = useState(stringData.displayName);
+  const [displayName, setDisplayName] = useState(stringData.displayName);
   const [username, setUsername] = useState(stringData.username);
   const [userBio, setUserBio] = useState(stringData.userBio);
   const initialStringsRef = useRef(stringData);
   const dispatch = useDispatch();
 
-  const updateStringInfo = () => {
+  const updateStringInfo = async () => {
     if (
       displayName !== initialStringsRef.current.displayName ||
       username !== initialStringsRef.current.username ||
@@ -17,22 +18,26 @@ export default useUpdateStrings = (stringData) => {
     ) {
       console.log("Proceed to update strings info!!");
       try {
-        dispatch(
-          handleUpdateStrings({
-            displayName,
-            username,
-            userBio,
-          })
+        return await apiQueue.add(() =>
+          dispatch(
+            handleUpdateStrings({
+              displayName,
+              username,
+              userBio,
+            })
+          )
         );
       } catch (error) {
         console.error("Error when updating user profile", error.message);
+        throw error;
       }
     }
+    return Promise.resolve();
   };
 
   return {
     displayName,
-    setdisplayName,
+    setDisplayName,
     username,
     setUsername,
     userBio,

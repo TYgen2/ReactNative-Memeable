@@ -1,0 +1,187 @@
+import {
+  ImageBackground,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import BackButton from "../backButton";
+import { getBgImageSource, getIconSource } from "../../utils/helper";
+import FastImage from "react-native-fast-image";
+
+export default UserProfileHeader = ({
+  userData,
+  isStack,
+  isMe,
+  navigation,
+  handlePressed,
+}) => {
+  return (
+    <>
+      {isStack && <BackButton navigation={navigation} />}
+      <ImageBackground
+        source={getBgImageSource(userData.bgImageSource)}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      />
+      <View style={styles.userInfo}>
+        <View style={styles.iconBorder}>
+          <FastImage
+            style={[
+              styles.icon,
+              { backgroundColor: userData.userIcon.bgColor },
+            ]}
+            source={getIconSource(userData.userIcon)}
+          />
+        </View>
+        <Text style={styles.displayName}>{userData.displayName}</Text>
+        <Text style={styles.username}>@{userData.username}</Text>
+        <Text style={styles.userBio}>{userData.userBio}</Text>
+        <View style={styles.moreInfo}>
+          <View
+            style={[
+              styles.infoBox,
+              {
+                borderRightWidth: 0.5,
+                borderRightColor: "rgba(0,0,0,0.1)",
+              },
+            ]}
+          >
+            <Text style={styles.infoText}>Followers</Text>
+            <Text style={styles.infoNumber}>{userData.followersCount}</Text>
+          </View>
+          <View style={styles.infoBox}>
+            <Text style={styles.infoText}>Following</Text>
+            <Text style={styles.infoNumber}>{userData.followingCount}</Text>
+          </View>
+          <View
+            style={[
+              styles.infoBox,
+              {
+                borderLeftWidth: 0.5,
+                borderLeftColor: "rgba(0,0,0,0.1)",
+              },
+            ]}
+          >
+            <Text style={styles.infoText}>Posts</Text>
+            <Text style={styles.infoNumber}>{userData.postsCount}</Text>
+          </View>
+        </View>
+        <View style={styles.actionContainer}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            activeOpacity={0.8}
+            onPress={async () => {
+              if (isMe) {
+                navigation.navigate("SettingStack", {
+                  screen: "EditUserProfile",
+                  params: { data: userData },
+                });
+              } else {
+                handlePressed();
+              }
+            }}
+          >
+            <Text style={styles.actionText}>
+              {isMe
+                ? "Edit profile"
+                : userData.isFollowing
+                ? "Unfollow"
+                : "Follow"}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionButton} activeOpacity={0.8}>
+            <Text style={styles.actionText}>
+              {isMe ? "Setting" : "Message"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </>
+  );
+};
+const styles = StyleSheet.create({
+  backgroundImage: {
+    height: 250,
+    width: "100%",
+  },
+  userInfo: {
+    height: 300,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconBorder: {
+    height: 120,
+    width: 120,
+    borderRadius: 120,
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  icon: {
+    height: 110,
+    width: 110,
+    borderRadius: 110,
+  },
+  displayName: {
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 24,
+  },
+  username: {
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 12,
+    fontStyle: "italic",
+    color: "grey",
+    marginBottom: 10,
+  },
+  userBio: {
+    color: "grey",
+  },
+  moreInfo: {
+    marginHorizontal: 40,
+    marginVertical: 6,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  infoBox: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  infoText: {
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  infoNumber: {
+    fontWeight: "bold",
+    fontSize: 20,
+  },
+  actionContainer: {
+    width: "60%",
+    flexDirection: "row",
+    marginBottom: 80,
+    gap: 10,
+  },
+  actionButton: {
+    flex: 1,
+    backgroundColor: "#2B2B2B",
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 10,
+    elevation: 5,
+    zIndex: 5,
+    shadowColor: "blue",
+  },
+  actionText: {
+    fontWeight: "bold",
+    fontSize: 16,
+    color: "white",
+  },
+});

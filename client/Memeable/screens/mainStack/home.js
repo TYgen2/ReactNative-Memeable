@@ -2,16 +2,12 @@ import { FlatList, Image, StyleSheet, Text, View } from "react-native";
 import { barOffset, screenWidth } from "../../utils/constants";
 import MainPost from "../../components/mainPost";
 import { useSelector } from "react-redux";
-import useFetchPosts from "../../hooks/useFetchPosts";
-import { useCallback, useEffect } from "react";
-import { apiQueue } from "../../utils/helper";
+import useFetchPosts from "../../hooks/fetchData/useFetchPosts";
+import { useCallback } from "react";
 
 export default Home = ({ navigation }) => {
   const { allPosts } = useSelector((state) => state.post);
-  const { userDetails } = useSelector((state) => state.user);
-
-  const { isLoading, fetchPosts, loadMorePosts, refreshPosts } =
-    useFetchPosts();
+  const { isLoading, loadMorePosts, refreshPosts } = useFetchPosts();
 
   const renderPost = useCallback(
     ({ item }) => {
@@ -19,15 +15,6 @@ export default Home = ({ navigation }) => {
     },
     [navigation]
   );
-
-  // when home page first mount, fetch posts for page 1
-  useEffect(() => {
-    if (allPosts.length === 0) {
-      apiQueue.add(() => fetchPosts(1));
-    }
-
-    // when user upload post, refresh immediately
-  }, [userDetails.postsCount]);
 
   return (
     <View style={styles.container}>

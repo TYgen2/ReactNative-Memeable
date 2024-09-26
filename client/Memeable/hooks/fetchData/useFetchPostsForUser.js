@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { fetchUserPosts } from "../handleAPIs/fetchData";
+import { fetchUserPosts } from "../../handleAPIs/fetchData";
+import { apiQueue } from "../../utils/helper";
 
 export default useFetchPostsForUser = (targetId) => {
   const [userPosts, setUserPosts] = useState([]);
@@ -20,7 +21,9 @@ export default useFetchPostsForUser = (targetId) => {
       if (isPostsLoading) return;
       setIsPostsLoading(true);
       try {
-        const response = await fetchUserPosts(page, 9, targetId);
+        const response = await apiQueue.add(() =>
+          fetchUserPosts(page, 9, targetId)
+        );
 
         if (reset) {
           setUserPosts(response.postData);
@@ -40,11 +43,11 @@ export default useFetchPostsForUser = (targetId) => {
     [dispatch, isPostsLoading, hasMore]
   );
 
-  const loadMorePosts = async () => {
+  const loadMorePosts = useCallback(async () => {
     if (isPostsLoading || !hasMore || userPosts.length === 0) return;
     console.log("fetching more...");
     await fetchPosts(currentPage + 1);
-  };
+  }, [isPostsLoading, hasMore, userPosts.length, currentPage]);
 
   return { userPosts, fetchPosts, isPostsLoading, loadMorePosts };
 };

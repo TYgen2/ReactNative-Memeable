@@ -1,10 +1,20 @@
 import axios from "axios";
+import { setGlobalConfig, requestLogger, responseLogger } from "axios-logger";
 import { LOCAL_HOST } from "@env";
 import { clearTokens, getTokens, storeTokens } from "./tokenActions";
 
 const apiClient = axios.create({
   baseURL: `${LOCAL_HOST}/api`,
 });
+
+setGlobalConfig({
+  dateFormat: "HH:mm:ss",
+  status: true,
+  headers: true,
+});
+
+// apiClient.interceptors.request.use(requestLogger);
+// apiClient.interceptors.response.use(responseLogger);
 
 // Request interceptor
 apiClient.interceptors.request.use(
