@@ -15,4 +15,13 @@ router.use(userRegisterRouter);
 router.use(fetchDataRouter);
 router.use(searchRouter);
 
+// test
+router.get("/api/testing", async (req, res) => {
+  try {
+    res.status(200).send({ msg: "REACHED" });
+  } catch (error) {
+    res.status(500).send({ msg: "Error WTF" });
+  }
+});
+
 export default router;

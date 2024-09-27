@@ -4,6 +4,8 @@ import cookieParser from "cookie-parser";
 import passport from "passport";
 import mongoose from "mongoose";
 import morgan from "morgan";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 

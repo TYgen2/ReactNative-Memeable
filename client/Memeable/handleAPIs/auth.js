@@ -7,11 +7,13 @@ import apiClient from "../utils/axiosHelper";
 export const userRegister = async (json) => {
   try {
     const res = await axios.post(`${LOCAL_HOST}/api/auth/register`, json);
-    const { token, refreshToken, isNew, userId } = res.data;
+    const { isNew, userId } = res.data;
+    const token = res.headers["x-new-token"];
+    const refreshToken = res.headers["x-new-refresh-token"];
     await storeTokens(token, refreshToken);
 
     console.log("User registered and logged in successfully!");
-    return { success: true, refreshToken, isNew, userId };
+    return { success: true, isNew, userId };
   } catch (error) {
     return { success: false, message: error.response.data.msg };
   }
@@ -21,11 +23,13 @@ export const userRegister = async (json) => {
 export const userLogin = async (json) => {
   try {
     const res = await axios.post(`${LOCAL_HOST}/api/auth/login`, json);
-    const { token, refreshToken, isNew, userId } = res.data;
+    const { isNew, userId } = res.data;
+    const token = res.headers["x-new-token"];
+    const refreshToken = res.headers["x-new-refresh-token"];
     await storeTokens(token, refreshToken);
 
     console.log("User logged in successfully!");
-    return { success: true, refreshToken, isNew, userId };
+    return { success: true, isNew, userId };
   } catch (error) {
     return { success: false, message: error.response.data.msg };
   }
@@ -37,11 +41,13 @@ export const googleLogin = async (idToken) => {
     const res = await axios.post(`${LOCAL_HOST}/api/auth/google`, {
       idToken,
     });
-    const { token, refreshToken, isNew, userId } = res.data;
+    const { isNew, userId } = res.data;
+    const token = res.headers["x-new-token"];
+    const refreshToken = res.headers["x-new-refresh-token"];
     await storeTokens(token, refreshToken);
 
     console.log("User logged in successfully!");
-    return { success: true, refreshToken, isNew, userId };
+    return { success: true, isNew, userId };
   } catch (error) {
     return { success: false, message: error.response.data.msg };
   }
@@ -53,11 +59,13 @@ export const facebookLogin = async (accessToken) => {
     const res = await axios.post(`${LOCAL_HOST}/api/auth/facebook`, {
       accessToken,
     });
-    const { token, refreshToken, isNew, userId } = res.data;
+    const { isNew, userId } = res.data;
+    const token = res.headers["x-new-token"];
+    const refreshToken = res.headers["x-new-refresh-token"];
     await storeTokens(token, refreshToken);
 
     console.log("User logged in successfully!");
-    return { success: true, refreshToken, isNew, userId };
+    return { success: true, isNew, userId };
   } catch (error) {
     return { success: false, message: error.response.data.msg };
   }

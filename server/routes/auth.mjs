@@ -57,9 +57,10 @@ router.post(
       const savedUser = await newUser.save();
       const token = generateJWT({ id: savedUser.id });
 
+      res.setHeader("x-new-token", token);
+      res.setHeader("x-new-refresh-token", signedRefreshToken);
+
       return res.status(201).send({
-        token: token,
-        refreshToken: signedRefreshToken,
         isNew: true,
         userId: savedUser.id,
       });
@@ -96,9 +97,10 @@ router.post("/api/auth/login", async (req, res) => {
     user.refreshToken = signedRefreshToken;
     await user.save();
 
+    res.setHeader("x-new-token", token);
+    res.setHeader("x-new-refresh-token", signedRefreshToken);
+
     return res.status(201).send({
-      token: token,
-      refreshToken: signedRefreshToken,
       isNew: false,
       userId: user.id,
     });
@@ -153,9 +155,10 @@ router.post("/api/auth/google", async (req, res) => {
     // return the generated JWT to client
     const token = generateJWT({ id: user.id });
 
+    res.setHeader("x-new-token", token);
+    res.setHeader("x-new-refresh-token", signedRefreshToken);
+
     return res.status(201).send({
-      token: token,
-      refreshToken: signedRefreshToken,
       isNew,
       userId: user.id,
     });
@@ -209,9 +212,10 @@ router.post("/api/auth/facebook", async (req, res) => {
 
     const token = generateJWT({ id: user.id });
 
+    res.setHeader("x-new-token", token);
+    res.setHeader("x-new-refresh-token", signedRefreshToken);
+
     return res.status(201).send({
-      token: token,
-      refreshToken: signedRefreshToken,
       isNew,
       userId: user.id,
     });

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { setGlobalConfig, requestLogger, responseLogger } from "axios-logger";
-import { LOCAL_HOST } from "@env";
 import { clearTokens, getTokens, storeTokens } from "./tokenActions";
+import { LOCAL_HOST } from "@env";
 
 const apiClient = axios.create({
   baseURL: `${LOCAL_HOST}/api`,

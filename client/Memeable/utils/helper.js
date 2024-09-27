@@ -5,6 +5,7 @@ import {
   screenWidth,
 } from "../utils/constants";
 import PQueue from "p-queue/dist";
+import * as DocumentPicker from "expo-document-picker";
 
 // select image for posting
 export const selectImageForUpload = async (setImageUri, navigation) => {
@@ -78,6 +79,21 @@ export const selectImageForBgImage = async (setBgImage) => {
     }
   } else {
     console.log("Access denied / One time only");
+  }
+};
+
+// select song for profile song
+export const selectSongForProfile = async (setNewSong) => {
+  try {
+    const res = await DocumentPicker.getDocumentAsync({
+      type: "audio/*",
+    });
+    if (!res.canceled) {
+      const { uri } = res.assets[0];
+      setNewSong(uri);
+    }
+  } catch (err) {
+    console.error("Error picking audio file:", err);
   }
 };
 

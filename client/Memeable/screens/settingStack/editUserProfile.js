@@ -12,10 +12,14 @@ import {
   getIconSource,
   selectImageForBgImage,
   selectImageForProfile,
+  selectSongForProfile,
 } from "../../utils/helper";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useEditUserProfileViewModel } from "../../hooks/editUserProfile/useEditUserProfileViewModel";
 import { ActivityIndicator } from "react-native";
+import useUpdateSong from "../../hooks/updateUserProfile/useUpdateSong";
+import { Audio } from "expo-av";
+import { useEffect } from "react";
 
 export default EditUserProfile = ({ route, navigation }) => {
   const { data } = route.params;
@@ -33,6 +37,18 @@ export default EditUserProfile = ({ route, navigation }) => {
     handleUpdateProfile,
     isUpdating,
   } = useEditUserProfileViewModel(data);
+
+  const { newSong, setNewSong } = useUpdateSong(null);
+
+  const playAudio = async (uri) => {
+    const { sound } = await Audio.Sound.createAsync(
+      { uri },
+      {
+        isLooping: true,
+      }
+    );
+    await sound.playAsync();
+  };
 
   const handleSave = async () => {
     const success = await handleUpdateProfile();
@@ -117,7 +133,20 @@ export default EditUserProfile = ({ route, navigation }) => {
           />
         </View>
       </View>
-      <View style={styles.songContainer}></View>
+      <View style={styles.songContainer}>
+        <TouchableOpacity
+          style={{ width: 100, height: 100, backgroundColor: "pink" }}
+          onPress={() => selectSongForProfile(setNewSong)}
+        />
+
+        <TouchableOpacity
+          style={{ width: 100, height: 100, backgroundColor: "cyan" }}
+          onPress={async () => {
+            console.log(newSong);
+            playAudio(newSong);
+          }}
+        />
+      </View>
     </View>
   );
 };
