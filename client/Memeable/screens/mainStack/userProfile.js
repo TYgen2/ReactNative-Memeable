@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 import UserPost from "../../components/userPost";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
 import useFetchProfileInfo from "../../hooks/fetchData/useFetchProfileInfo";
 import useFetchPostsForUser from "../../hooks/fetchData/useFetchPostsForUser";
 import { useFocusEffect } from "@react-navigation/native";
@@ -23,7 +23,7 @@ export default UserProfile = ({ route, navigation }) => {
   const { userData, setUserData, isMe, isInfoLoading, handlePressed } =
     useFetchProfileInfo(userDetails?.userId, targetId);
 
-  const { userPosts, isPostsLoading, fetchPosts, loadMorePosts } =
+  const { userPosts, isPostsLoading, loadMorePosts } =
     useFetchPostsForUser(targetId);
 
   const renderPost = useCallback(({ item }) => {
@@ -33,6 +33,8 @@ export default UserProfile = ({ route, navigation }) => {
   // handle instant UI reflect (follower, following)
   useFocusEffect(
     useCallback(() => {
+      console.log(userDetails);
+
       if (isMe && prevUserDetailsRef.current !== userDetails) {
         console.log("UserProfile re-rendered!!");
         setUserData(new UserProfileModel(userDetails));
@@ -40,12 +42,6 @@ export default UserProfile = ({ route, navigation }) => {
       }
     }, [userDetails])
   );
-
-  useEffect(() => {
-    // first mount, or when user upload a new posts
-    console.log("UserProfile rendered");
-    fetchPosts(1, true);
-  }, [userDetails.postsCount]);
 
   // handle first mount by local loading state
   if (isInfoLoading || status === "loading") {

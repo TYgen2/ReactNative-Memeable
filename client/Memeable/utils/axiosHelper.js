@@ -42,13 +42,9 @@ apiClient.interceptors.response.use(
   async (response) => {
     const newToken = response.headers["x-new-token"];
     const newRefreshToken = response.headers["x-new-refresh-token"];
-    console.log("NEW TOKEN:", newToken);
-    console.log("NEW REFRESH TOKEN:", newRefreshToken);
 
     if (newToken && newRefreshToken) {
       const { jwtToken, refreshToken } = await getTokens();
-      console.log("CURRENT JWT TOKEN:", jwtToken);
-      console.log("CURRENT REFRESH TOKEN:", refreshToken);
 
       if (newToken !== jwtToken || newRefreshToken !== refreshToken) {
         console.log("New tokens received!! Storing in keychain...");

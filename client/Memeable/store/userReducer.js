@@ -5,6 +5,7 @@ import {
   handleFollow,
   handleUpdateBgImage,
   handleUpdateIcon,
+  handleUpdateSong,
   handleUpdateStrings,
   handleUploadPost,
 } from "./userActions";
@@ -94,6 +95,17 @@ export const userSlice = createSlice({
         state.userDetails.userIcon = action.payload.updatedIcon;
       })
       .addCase(handleUpdateIcon.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(handleUpdateSong.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(handleUpdateSong.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.userDetails.song = action.payload.updatedSong;
+      })
+      .addCase(handleUpdateSong.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       })

@@ -8,6 +8,8 @@ import {
 import BackButton from "../backButton";
 import { getBgImageSource, getIconSource } from "../../utils/helper";
 import FastImage from "react-native-fast-image";
+import GlowingBorder from "../glowingBorder";
+import UserSongCover from "./userSongCover";
 
 export default UserProfileHeader = ({
   userData,
@@ -25,6 +27,8 @@ export default UserProfileHeader = ({
         resizeMode="cover"
       />
       <View style={styles.userInfo}>
+        <GlowingBorder boxWidth={100} boxHeight={100} />
+        <UserSongCover />
         <View style={styles.iconBorder}>
           <FastImage
             style={[
@@ -34,9 +38,11 @@ export default UserProfileHeader = ({
             source={getIconSource(userData.userIcon)}
           />
         </View>
-        <Text style={styles.displayName}>{userData.displayName}</Text>
-        <Text style={styles.username}>@{userData.username}</Text>
-        <Text style={styles.userBio}>{userData.userBio}</Text>
+        <View style={styles.userInfoContainer}>
+          <Text style={styles.displayName}>{userData.displayName}</Text>
+          <Text style={styles.username}>@{userData.username}</Text>
+          <Text style={styles.userBio}>{userData.userBio}</Text>
+        </View>
         <View style={styles.moreInfo}>
           <View
             style={[
@@ -108,7 +114,7 @@ const styles = StyleSheet.create({
   userInfo: {
     height: 300,
     width: "100%",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "center",
   },
   iconBorder: {
@@ -118,11 +124,17 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     justifyContent: "center",
     alignItems: "center",
+    marginLeft: 10,
   },
   icon: {
     height: 110,
     width: 110,
     borderRadius: 110,
+  },
+  userInfoContainer: {
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    marginHorizontal: 15,
   },
   displayName: {
     textAlign: "center",
@@ -166,6 +178,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 80,
     gap: 10,
+    alignSelf: "center",
   },
   actionButton: {
     flex: 1,

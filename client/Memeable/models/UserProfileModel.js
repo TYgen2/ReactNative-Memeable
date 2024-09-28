@@ -14,5 +14,10 @@ export class UserProfileModel {
       customIcon: rawData.userIcon?.customIcon || null,
       id: rawData.userIcon?.id || null,
     };
+    this.song = {
+      borderColor: rawData.song?.borderColor || "#7546b3",
+      imageUri: rawData.song?.imageUri || null,
+      songUri: rawData.song?.songUri || null,
+    };
   }
 }

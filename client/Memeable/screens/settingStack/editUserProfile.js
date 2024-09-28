@@ -18,8 +18,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { useEditUserProfileViewModel } from "../../hooks/editUserProfile/useEditUserProfileViewModel";
 import { ActivityIndicator } from "react-native";
 import useUpdateSong from "../../hooks/updateUserProfile/useUpdateSong";
-import { Audio } from "expo-av";
-import { useEffect } from "react";
+import GlowingBorder from "../../components/glowingBorder";
 
 export default EditUserProfile = ({ route, navigation }) => {
   const { data } = route.params;
@@ -39,16 +38,6 @@ export default EditUserProfile = ({ route, navigation }) => {
   } = useEditUserProfileViewModel(data);
 
   const { newSong, setNewSong } = useUpdateSong(null);
-
-  const playAudio = async (uri) => {
-    const { sound } = await Audio.Sound.createAsync(
-      { uri },
-      {
-        isLooping: true,
-      }
-    );
-    await sound.playAsync();
-  };
 
   const handleSave = async () => {
     const success = await handleUpdateProfile();
@@ -134,18 +123,13 @@ export default EditUserProfile = ({ route, navigation }) => {
         </View>
       </View>
       <View style={styles.songContainer}>
-        <TouchableOpacity
-          style={{ width: 100, height: 100, backgroundColor: "pink" }}
-          onPress={() => selectSongForProfile(setNewSong)}
-        />
-
-        <TouchableOpacity
-          style={{ width: 100, height: 100, backgroundColor: "cyan" }}
-          onPress={async () => {
-            console.log(newSong);
-            playAudio(newSong);
-          }}
-        />
+        <Text>Profile song</Text>
+        <View
+          style={{ flex: 1, backgroundColor: "pink", flexDirection: "row" }}
+        >
+          <Text>Profile song</Text>
+          <GlowingBorder boxWidth={100} boxHeight={100} />
+        </View>
       </View>
     </View>
   );

@@ -126,6 +126,46 @@ export const handleUpdateIcon = createAsyncThunk(
   }
 );
 
+// update song in user profile
+export const handleUpdateSong = createAsyncThunk(
+  "user/handleUpdateSong",
+  async ({ imageUri, songUri }, { rejectWithValue }) => {
+    const formData = new FormData();
+
+    if (imageUri) {
+      const imageType = imageUri.endsWith(".png") ? "image/png" : "image/jpeg";
+      formData.append("albumImage", {
+        uri: imageUri,
+        type: imageType,
+        name: "albumImage",
+      });
+    }
+
+    if (songUri) {
+      const songType = songUri.endsWith(".mp3") ? "audio/mpeg" : "audio/wav";
+      formData.append("songAudio", {
+        uri: songUri,
+        type: songType,
+        name: "songAudio",
+      });
+    }
+
+    try {
+      const response = await apiClient.post("/handleUpdateSong", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Updated song using REDUX!!");
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // handling upload post action
 export const handleUploadPost = createAsyncThunk(
   "user/handleUploadPost",

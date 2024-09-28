@@ -1,20 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchUserPosts } from "../../handleAPIs/fetchData";
 import { apiQueue } from "../../utils/helper";
 
 export default useFetchPostsForUser = (targetId) => {
+  const { userDetails } = useSelector((state) => state.user);
   const [userPosts, setUserPosts] = useState([]);
   const userPostsRef = useRef(userPosts);
   const [currentPage, setCurrentPage] = useState(1);
   const [isPostsLoading, setIsPostsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const dispatch = useDispatch();
-
-  // this helps to get the lastest value of allPosts
-  useEffect(() => {
-    userPostsRef.current = userPosts;
-  }, [userPosts]);
 
   const fetchPosts = useCallback(
     async (page, reset = false) => {
@@ -49,5 +45,16 @@ export default useFetchPostsForUser = (targetId) => {
     await fetchPosts(currentPage + 1);
   }, [isPostsLoading, hasMore, userPosts.length, currentPage]);
 
-  return { userPosts, fetchPosts, isPostsLoading, loadMorePosts };
+  // this helps to get the lastest value of allPosts
+  useEffect(() => {
+    userPostsRef.current = userPosts;
+  }, [userPosts]);
+
+  useEffect(() => {
+    // first mount, or when user upload a new posts
+    console.log("UserProfile rendered");
+    fetchPosts(1, true);
+  }, [userDetails.postsCount]);
+
+  return { userPosts, isPostsLoading, loadMorePosts };
 };

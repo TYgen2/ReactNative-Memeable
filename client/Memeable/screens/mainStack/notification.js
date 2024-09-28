@@ -1,9 +1,7 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useDispatch } from "react-redux";
 import { reduxLogout } from "../../store/userReducer";
 import { clearPosts } from "../../store/postReducer";
-import { useContext } from "react";
-import { UpdateContext } from "../../context/loading";
 import { userLogout } from "../../handleAPIs/auth";
 
 export default Notify = () => {
