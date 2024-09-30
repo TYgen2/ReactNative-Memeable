@@ -1,26 +1,22 @@
 import { memo } from "react";
-import { StyleSheet } from "react-native";
 import FastImage from "react-native-fast-image";
+import { getSongImageSource } from "../../utils/helper";
 
-export default UserSongCover = memo(({ imageUri }) => {
+export default UserSongCover = memo(({ songImg, imgStyle }) => {
   return (
     <FastImage
-      source={require("../../assets/alya.jpg")}
-      style={styles.image}
+      source={getSongImageSource(songImg)}
+      style={{
+        width: imgStyle.width - 10,
+        height: imgStyle.height - 10,
+        marginRight: imgStyle.marginRight + 5,
+        marginTop: imgStyle.marginTop + 5,
+        position: imgStyle.position,
+        top: imgStyle.top,
+        right: imgStyle.right,
+        borderRadius: 5,
+      }}
       resizeMode="cover"
     />
   );
-});
-
-const styles = StyleSheet.create({
-  image: {
-    width: 90,
-    height: 90,
-    borderRadius: 5,
-    position: "absolute",
-    right: 0,
-    top: 0,
-    marginRight: 25,
-    marginTop: 25,
-  },
 });

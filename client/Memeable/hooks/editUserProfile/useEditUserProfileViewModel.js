@@ -2,6 +2,7 @@ import { useState } from "react";
 import useUpdateBgImage from "../updateUserProfile/useUpdateBgImage";
 import useUpdateIcon from "../updateUserProfile/useUpdateIcon";
 import useUpdateStrings from "../updateUserProfile/useUpdateStrings";
+import useUpdateSong from "../updateUserProfile/useUpdateSong";
 
 export const useEditUserProfileViewModel = (initialData) => {
   const [isUpdating, setIsUpdating] = useState(false);
@@ -11,6 +12,21 @@ export const useEditUserProfileViewModel = (initialData) => {
   const { newIcon, setNewIcon, updateIconInfo } = useUpdateIcon(
     initialData.userIcon
   );
+  const {
+    newSong,
+    setNewSong,
+    newCover,
+    setNewCover,
+    newColor,
+    setNewColor,
+    updateSongInfo,
+  } = useUpdateSong({
+    borderColor: initialData.song.borderColor,
+    imageUri: initialData.song.imageUri,
+    songUri: initialData.song.songUri,
+    songName: initialData.song.songName,
+  });
+
   const {
     displayName,
     setDisplayName,
@@ -32,6 +48,7 @@ export const useEditUserProfileViewModel = (initialData) => {
         updateStringInfo(),
         updateBgImageInfo(),
         updateIconInfo(),
+        updateSongInfo(),
       ]);
 
       const allSuccessful = results.every((result) => {
@@ -64,6 +81,12 @@ export const useEditUserProfileViewModel = (initialData) => {
     setUsername,
     userBio,
     setUserBio,
+    newSong,
+    setNewSong,
+    newCover,
+    setNewCover,
+    newColor,
+    setNewColor,
     handleUpdateProfile,
     isUpdating,
   };

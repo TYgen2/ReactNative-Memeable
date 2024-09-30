@@ -18,6 +18,7 @@ export class UserProfileModel {
       borderColor: rawData.song?.borderColor || "#7546b3",
       imageUri: rawData.song?.imageUri || null,
       songUri: rawData.song?.songUri || null,
+      songName: rawData.song?.songName || null,
     };
   }
 }

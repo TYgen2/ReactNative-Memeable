@@ -51,6 +51,7 @@ router.post(
       username: randomUserName(),
       refreshToken: signedRefreshToken,
       icon: {},
+      song: {},
     });
 
     try {
@@ -139,6 +140,7 @@ router.post("/api/auth/google", async (req, res) => {
         authMethod: "google",
         refreshToken: signedRefreshToken,
         icon: {},
+        song: {},
       });
     } else if (user && user.authMethod != "google") {
       // user already used the same email to register an account with other methods
@@ -196,6 +198,7 @@ router.post("/api/auth/facebook", async (req, res) => {
         authMethod: "facebook",
         refreshToken: signedRefreshToken,
         icon: {},
+        song: {},
       });
     } else if (user && user.authMethod != "facebook") {
       console.log(

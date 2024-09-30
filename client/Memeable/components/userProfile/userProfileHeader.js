@@ -11,6 +11,16 @@ import FastImage from "react-native-fast-image";
 import GlowingBorder from "../glowingBorder";
 import UserSongCover from "./userSongCover";
 
+const GLOW_BORDER_STYLE = {
+  width: 100,
+  height: 100,
+  marginRight: 20,
+  marginTop: 20,
+  position: "absolute",
+  right: 0,
+  top: 0,
+};
+
 export default UserProfileHeader = ({
   userData,
   isStack,
@@ -27,8 +37,20 @@ export default UserProfileHeader = ({
         resizeMode="cover"
       />
       <View style={styles.userInfo}>
-        <GlowingBorder boxWidth={100} boxHeight={100} />
-        <UserSongCover />
+        {/* If user have set their profile bgm, show it */}
+        {userData.song.songUri && (
+          <>
+            <GlowingBorder
+              boxStyle={GLOW_BORDER_STYLE}
+              color={userData.song.borderColor}
+            />
+            <UserSongCover
+              songImg={userData.song.imageUri}
+              imgStyle={GLOW_BORDER_STYLE}
+            />
+          </>
+        )}
+
         <View style={styles.iconBorder}>
           <FastImage
             style={[

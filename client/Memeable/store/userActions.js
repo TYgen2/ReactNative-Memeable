@@ -129,7 +129,7 @@ export const handleUpdateIcon = createAsyncThunk(
 // update song in user profile
 export const handleUpdateSong = createAsyncThunk(
   "user/handleUpdateSong",
-  async ({ imageUri, songUri }, { rejectWithValue }) => {
+  async ({ imageUri, songUri, songName, borderColor }, { rejectWithValue }) => {
     const formData = new FormData();
 
     if (imageUri) {
@@ -148,6 +148,15 @@ export const handleUpdateSong = createAsyncThunk(
         type: songType,
         name: "songAudio",
       });
+    }
+
+    // Append text fields
+    if (borderColor) {
+      formData.append("borderColor", borderColor);
+    }
+
+    if (songName) {
+      formData.append("songName", songName);
     }
 
     try {

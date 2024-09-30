@@ -11,27 +11,28 @@ export default useUpdateStrings = (stringData) => {
   const dispatch = useDispatch();
 
   const updateStringInfo = async () => {
-    if (
-      displayName !== initialStringsRef.current.displayName ||
-      username !== initialStringsRef.current.username ||
-      userBio !== initialStringsRef.current.userBio
-    ) {
+    const updates = {};
+
+    if (displayName !== initialStringsRef.current.displayName) {
+      updates.displayName = displayName;
+    }
+    if (username !== initialStringsRef.current.username) {
+      updates.username = username;
+    }
+    if (userBio !== initialStringsRef.current.userBio) {
+      updates.userBio = userBio;
+    }
+
+    if (Object.keys(updates).length > 0) {
       console.log("Proceed to update strings info!!");
       try {
-        return await apiQueue.add(() =>
-          dispatch(
-            handleUpdateStrings({
-              displayName,
-              username,
-              userBio,
-            })
-          )
-        );
+        return await apiQueue.add(() => dispatch(handleUpdateStrings(updates)));
       } catch (error) {
         console.error("Error when updating user profile", error.message);
         throw error;
       }
     }
+
     return Promise.resolve();
   };
 

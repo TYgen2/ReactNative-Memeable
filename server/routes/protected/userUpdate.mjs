@@ -1,10 +1,8 @@
 import { Router } from "express";
 import { authenticateToken, upload } from "../../utils/middleware.mjs";
 import dotenv from "dotenv";
-import { randomImageName } from "../../utils/helpers.mjs";
+import { randomImageName, uploadToS3 } from "../../utils/helpers.mjs";
 import sharp from "sharp";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { s3 } from "../../utils/config.mjs";
 import { checkSchema, validationResult } from "express-validator";
 import { updateProfileValidationSchema } from "../../validationSchemas.mjs";
 import { User } from "../../mongoose/schemas/user.mjs";
@@ -31,16 +29,16 @@ router.post(
       });
     }
 
+    const updates = {};
+    if (displayName) updates.displayName = displayName;
+    if (username) updates.username = username;
+    if (userBio) updates.bio = userBio;
+
     try {
-      const updatedUser = await User.findByIdAndUpdate(
-        req.userId,
-        {
-          displayName,
-          username,
-          bio: userBio,
-        },
-        { new: true, runValidators: true }
-      );
+      const updatedUser = await User.findByIdAndUpdate(req.userId, updates, {
+        new: true,
+        runValidators: true,
+      });
 
       if (!updatedUser) {
         return res.status(404).send({ msg: "User not found, update failed" });
@@ -77,16 +75,9 @@ router.post(
       const buffer = await sharp(req.file.buffer)
         .jpeg({ quality: 80 })
         .toBuffer();
-      const imageKey = `bgImages/${req.userId}/${randomImageName()}`;
-
-      const params = {
-        Bucket: process.env.AWS_S3_BUCKET_NAME,
-        Key: imageKey,
-        Body: buffer,
-        ContentType: req.file.mimetype,
-      };
-      const command = new PutObjectCommand(params);
-      await s3.send(command);
+      const imageKey = `userInfo/${req.userId}/bgImages/${randomImageName()}`;
+      const fileType = req.file.mimetype;
+      await uploadToS3(buffer, imageKey, fileType);
 
       // update icon field in database
       const updatedBgImage = await User.findByIdAndUpdate(
@@ -96,7 +87,7 @@ router.post(
       );
       if (!updatedBgImage) {
         return res
-          .status(400)
+          .status(404)
           .send({ msg: "User not found when uploading bgImage" });
       }
 
@@ -105,7 +96,7 @@ router.post(
         msg: "bgImage updated and uploaded to S3 successfully!!",
       };
 
-      return res.status(201).send(response);
+      return res.status(200).send(response);
     } catch (error) {
       console.log(error);
       return res
@@ -126,17 +117,10 @@ router.post(
       const buffer = await sharp(req.file.buffer)
         .jpeg({ quality: 80 })
         .toBuffer();
-      const imageKey = `icons/${req.userId}/${randomImageName()}`;
+      const imageKey = `userInfo/${req.userId}/icon/${randomImageName()}`;
+      const fileType = req.file.mimetype;
 
-      // upload image to S3
-      const params = {
-        Bucket: process.env.AWS_S3_BUCKET_NAME,
-        Key: imageKey,
-        Body: buffer,
-        ContentType: req.file.mimetype,
-      };
-      const command = new PutObjectCommand(params);
-      await s3.send(command);
+      await uploadToS3(buffer, imageKey, fileType);
 
       // update icon field in database
       const updatedIcon = await User.findByIdAndUpdate(
@@ -152,7 +136,7 @@ router.post(
       );
       if (!updatedIcon) {
         return res
-          .status(400)
+          .status(404)
           .send({ msg: "User not found when updating icon" });
       }
 
@@ -161,12 +145,87 @@ router.post(
         msg: "Icon updated to database and uploaded to S3!!",
       };
 
-      return res.status(201).send(response);
+      return res.status(200).send(response);
     } catch (error) {
       console.log(error);
       return res
         .status(400)
         .send({ msg: "Something is wrong when updating icon" });
+    }
+  }
+);
+
+// update song in user profile
+router.post(
+  "/api/handleUpdateSong",
+  upload.fields([
+    { name: "albumImage", maxCount: 1 },
+    { name: "songAudio", maxCount: 1 },
+  ]),
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const updates = {};
+
+      // update song cover image if exist
+      if (req.files.albumImage) {
+        const imageBuffer = await sharp(req.files.albumImage[0].buffer)
+          .jpeg({ quality: 80 })
+          .toBuffer();
+        const imageKey = `userInfo/${
+          req.userId
+        }/song/coverImage/${randomImageName()}`;
+        const imageType = req.files.albumImage[0].mimetype;
+
+        await uploadToS3(imageBuffer, imageKey, imageType);
+        updates["song.imageUri"] = `${CDN}` + `${imageKey}`;
+      }
+
+      // update song audio if exist
+      if (req.files.songAudio) {
+        const songBuffer = req.files.songAudio[0].buffer;
+        const songKey = `userInfo/${
+          req.userId
+        }/song/audio/${randomImageName()}`;
+        const songType = req.files.songAudio[0].mimetype;
+
+        await uploadToS3(songBuffer, songKey, songType);
+        updates["song.songUri"] = `${CDN}` + `${songKey}`;
+      }
+
+      // Include additional text fields
+      if (req.body.borderColor) {
+        updates["song.borderColor"] = req.body.borderColor;
+      }
+
+      if (req.body.songName) {
+        updates["song.songName"] = req.body.songName;
+      }
+
+      // update song field in the database
+      const updatedSong = await User.findByIdAndUpdate(
+        req.userId,
+        { $set: updates },
+        { new: true }
+      );
+
+      if (!updatedSong) {
+        return res
+          .status(400)
+          .send({ msg: "User not found when updating song" });
+      }
+
+      const response = {
+        updatedSong: updatedSong.song,
+        msg: "Song info updated to database and uploaded to S3!!",
+      };
+
+      return res.status(200).send(response);
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(400)
+        .send({ msg: "Something is wrong when updating song" });
     }
   }
 );

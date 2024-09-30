@@ -17,8 +17,18 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import { useEditUserProfileViewModel } from "../../hooks/editUserProfile/useEditUserProfileViewModel";
 import { ActivityIndicator } from "react-native";
-import useUpdateSong from "../../hooks/updateUserProfile/useUpdateSong";
 import GlowingBorder from "../../components/glowingBorder";
+import UserSongCover from "../../components/userProfile/userSongCover";
+
+const GLOW_BORDER_STYLE = {
+  width: 150,
+  height: 150,
+  marginRight: 20,
+  marginTop: 20,
+  position: "absolute",
+  right: 0,
+  top: 0,
+};
 
 export default EditUserProfile = ({ route, navigation }) => {
   const { data } = route.params;
@@ -33,11 +43,15 @@ export default EditUserProfile = ({ route, navigation }) => {
     setUsername,
     userBio,
     setUserBio,
+    newSong,
+    setNewSong,
+    newCover,
+    setNewCover,
+    newColor,
+    setNewColor,
     handleUpdateProfile,
     isUpdating,
   } = useEditUserProfileViewModel(data);
-
-  const { newSong, setNewSong } = useUpdateSong(null);
 
   const handleSave = async () => {
     const success = await handleUpdateProfile();
@@ -123,12 +137,43 @@ export default EditUserProfile = ({ route, navigation }) => {
         </View>
       </View>
       <View style={styles.songContainer}>
-        <Text>Profile song</Text>
-        <View
-          style={{ flex: 1, backgroundColor: "pink", flexDirection: "row" }}
-        >
-          <Text>Profile song</Text>
-          <GlowingBorder boxWidth={100} boxHeight={100} />
+        <Text style={styles.profileBGM}>🎵Profile BGM🎵</Text>
+        <View style={styles.configContainer}>
+          <View style={styles.configArea}>
+            <TouchableOpacity
+              style={styles.configButton}
+              activeOpacity={0.7}
+              onPress={async () => selectSongForProfile(setNewSong)}
+            >
+              <Text style={styles.configText}>
+                {newSong.name !== undefined
+                  ? newSong.name
+                  : "Song - select from device"}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.configButton}
+              activeOpacity={0.7}
+              onPress={() => selectImageForProfile(setNewCover, false)}
+            >
+              <Text style={styles.configText}>Cover - select from device</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.configButton}
+              activeOpacity={0.7}
+              onPress={() =>
+                navigation.navigate("EditBorderColor", {
+                  img: newCover,
+                  borderColor: newColor,
+                  onColorChange: (color) => setNewColor(color),
+                })
+              }
+            >
+              <Text style={styles.configText}>Change border color</Text>
+            </TouchableOpacity>
+          </View>
+          <GlowingBorder boxStyle={GLOW_BORDER_STYLE} color={newColor} />
+          <UserSongCover songImg={newCover} imgStyle={GLOW_BORDER_STYLE} />
         </View>
       </View>
     </View>
@@ -202,5 +247,32 @@ const styles = StyleSheet.create({
     alignItems: "center",
     zIndex: 2,
     elevation: 2,
+  },
+  profileBGM: {
+    paddingTop: 4,
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  configContainer: { flex: 1, flexDirection: "row" },
+  configArea: {
+    flex: 1,
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    marginLeft: 20,
+    marginRight: 200,
+  },
+  configButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: "black",
+    borderWidth: 1,
+  },
+  configText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });

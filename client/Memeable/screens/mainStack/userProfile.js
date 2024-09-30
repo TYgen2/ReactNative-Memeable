@@ -33,8 +33,6 @@ export default UserProfile = ({ route, navigation }) => {
   // handle instant UI reflect (follower, following)
   useFocusEffect(
     useCallback(() => {
-      console.log(userDetails);
-
       if (isMe && prevUserDetailsRef.current !== userDetails) {
         console.log("UserProfile re-rendered!!");
         setUserData(new UserProfileModel(userDetails));

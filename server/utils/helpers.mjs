@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { Follow } from "../mongoose/schemas/follow.mjs";
 import { User } from "../mongoose/schemas/user.mjs";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { s3 } from "./config.mjs";
 
 dotenv.config();
 
@@ -94,4 +96,16 @@ export const validateTokens = async (jwtToken, refreshToken) => {
       throw new Error("Both tokens expired");
     }
   }
+};
+
+export const uploadToS3 = async (fileBuffer, key, contentType) => {
+  const params = {
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Key: key,
+    Body: fileBuffer,
+    ContentType: contentType,
+  };
+
+  const command = new PutObjectCommand(params);
+  return await s3.send(command);
 };

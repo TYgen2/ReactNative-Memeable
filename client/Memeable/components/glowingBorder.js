@@ -1,5 +1,4 @@
 import React, { memo, useEffect } from "react";
-import { StyleSheet } from "react-native";
 import {
   Canvas,
   RoundedRect,
@@ -14,17 +13,18 @@ import {
   withTiming,
 } from "react-native-reanimated";
 
-const GLOW_COLOR = "#7546b3FF";
-const GLOW_BG_COLOR = "#7546b300"; // Should be the same color as GLOW_COLOR but fully transparent
-
-export default GlowingBorder = memo(({ boxWidth, boxHeight }) => {
+export default GlowingBorder = memo(({ boxStyle, color }) => {
+  console.log("glowing border component rendered");
   const rotation = useSharedValue(0);
+  const GLOW_COLOR = color + "FF";
+  const GLOW_BG_COLOR = color + "00"; // Should be the same color as GLOW_COLOR but fully transparent
 
-  const centerX = boxWidth / 2;
-  const centerY = boxHeight / 2;
+  const centerX = boxStyle.width / 2;
+  const centerY = boxStyle.height / 2;
   const centerVec = vec(centerX, centerY);
 
   useEffect(() => {
+    console.log("started animation...");
     const animation = withRepeat(
       withTiming(4, {
         duration: 4000,
@@ -48,7 +48,13 @@ export default GlowingBorder = memo(({ boxWidth, boxHeight }) => {
 
   const GlowGradient = () => {
     return (
-      <RoundedRect r={10} x={0} y={0} width={boxWidth} height={boxHeight}>
+      <RoundedRect
+        r={10}
+        x={0}
+        y={0}
+        width={boxStyle.width}
+        height={boxStyle.height}
+      >
         <SweepGradient
           origin={centerVec}
           c={centerVec}
@@ -62,20 +68,8 @@ export default GlowingBorder = memo(({ boxWidth, boxHeight }) => {
   };
 
   return (
-    <Canvas style={styles.canvas}>
+    <Canvas style={boxStyle}>
       <GlowGradient />
     </Canvas>
   );
-});
-
-const styles = StyleSheet.create({
-  canvas: {
-    width: 100,
-    height: 100,
-    position: "absolute",
-    right: 0,
-    top: 0,
-    marginRight: 20,
-    marginTop: 20,
-  },
 });

@@ -24,6 +24,7 @@ import { reduxLogin } from "./store/userReducer";
 import { enableScreens } from "react-native-screens";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import editBorderColor from "./screens/settingStack/editBorderColor";
 
 const persistor = persistStore(store);
 enableScreens();
@@ -78,6 +79,11 @@ const SettingScreen = () => {
         name="EditUserProfile"
         component={editUserProfile}
         options={{ title: "Edit user profile" }}
+      />
+      <SettingStack.Screen
+        name="EditBorderColor"
+        component={editBorderColor}
+        options={{ title: "Edit border color" }}
       />
     </SettingStack.Navigator>
   );

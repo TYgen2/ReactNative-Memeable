@@ -2,6 +2,7 @@ import * as ImagePicker from "expo-image-picker";
 import {
   DEFAULT_BGIMAGE,
   DEFAULT_ICONS,
+  DEFAULT_SONGIMAGE,
   screenWidth,
 } from "../utils/constants";
 import PQueue from "p-queue/dist";
@@ -89,8 +90,8 @@ export const selectSongForProfile = async (setNewSong) => {
       type: "audio/*",
     });
     if (!res.canceled) {
-      const { uri } = res.assets[0];
-      setNewSong(uri);
+      const { uri, name } = res.assets[0];
+      setNewSong({ uri, name });
     }
   } catch (err) {
     console.error("Error picking audio file:", err);
@@ -124,6 +125,16 @@ export const getBgImageSource = (bgImage) => {
 
   // bgImage is null by default
   return DEFAULT_BGIMAGE;
+};
+
+export const getSongImageSource = (songImg) => {
+  // user has set the bgImage before (must be an image uri)
+  if (songImg !== null) {
+    return { uri: songImg };
+  }
+
+  // bgImage is null by default
+  return DEFAULT_SONGIMAGE;
 };
 
 export const getSquareImageHeight = () => {

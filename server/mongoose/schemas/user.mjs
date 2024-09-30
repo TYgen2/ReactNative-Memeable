@@ -53,6 +53,24 @@ const UserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.String,
     default: null,
   },
+  song: {
+    borderColor: {
+      type: mongoose.Schema.Types.String,
+      default: null,
+    },
+    imageUri: {
+      type: mongoose.Schema.Types.String,
+      default: null,
+    },
+    songUri: {
+      type: mongoose.Schema.Types.String,
+      default: null,
+    },
+    songName: {
+      type: mongoose.Schema.Types.String,
+      default: null,
+    },
+  },
 });
 
 export const User = mongoose.model("User", UserSchema);

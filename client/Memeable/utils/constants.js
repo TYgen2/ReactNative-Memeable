@@ -60,6 +60,8 @@ export const ICON_BGCOLOR = [
 
 export const DEFAULT_BGIMAGE = require("../assets/default_bgImage.jpg");
 
+export const DEFAULT_SONGIMAGE = require("../assets/default_songImg.jpg");
+
 export const LOADING_INDICATOR = () => {
   return (
     <View style={styles.center}>

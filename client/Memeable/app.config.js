@@ -35,6 +35,7 @@ export default {
     },
     scheme: "com.tychow45.memeable",
     plugins: [
+      ["expo-image-picker"],
       [
         "react-native-fbsdk-next",
         {
