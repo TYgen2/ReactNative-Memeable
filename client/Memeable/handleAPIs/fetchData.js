@@ -21,7 +21,7 @@ export const fetchUserPosts = async (page, limit, targetId) => {
 
     return response.data;
   } catch (error) {
-    return rejectWithValue(error.response.data);
+    return { message: error.response.data.msg };
   }
 };
 
@@ -33,6 +33,6 @@ export const fetchComments = async (page, limit, postId) => {
 
     return response.data;
   } catch (error) {
-    return rejectWithValue(error.response.data);
+    return { message: error.response.data.msg };
   }
 };

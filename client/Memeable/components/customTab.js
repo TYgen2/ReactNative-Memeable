@@ -3,12 +3,15 @@ import { screenWidth } from "../utils/constants";
 import TabItem from "./tabItem";
 import PostButton from "./postButton";
 import { memo, useCallback } from "react";
+import useColorTheme from "../hooks/useColorTheme";
 
 export default CustomTab = memo(({ state, descriptors, navigation }) => {
+  const { colors } = useColorTheme();
+
   return (
     <View>
       <PostButton />
-      <View style={styles.tabBar}>
+      <View style={[styles.tabBar, { backgroundColor: colors.tabBar }]}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
           const label = options.title;
@@ -50,7 +53,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     position: "absolute",
     bottom: 5,
-    backgroundColor: "#2b2b2b",
     paddingVertical: 10,
     borderRadius: 10,
     elevation: 4,

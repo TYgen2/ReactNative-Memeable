@@ -10,6 +10,7 @@ import { getBgImageSource, getIconSource } from "../../utils/helper";
 import FastImage from "react-native-fast-image";
 import GlowingBorder from "../glowingBorder";
 import UserSongCover from "./userSongCover";
+import useColorTheme from "../../hooks/useColorTheme";
 
 const GLOW_BORDER_STYLE = {
   width: 100,
@@ -28,6 +29,8 @@ export default UserProfileHeader = ({
   navigation,
   handlePressed,
 }) => {
+  const { colors } = useColorTheme();
+
   return (
     <>
       {isStack && <BackButton navigation={navigation} />}
@@ -51,7 +54,7 @@ export default UserProfileHeader = ({
           </>
         )}
 
-        <View style={styles.iconBorder}>
+        <View style={[styles.iconBorder, { backgroundColor: colors.primary }]}>
           <FastImage
             style={[
               styles.icon,
@@ -61,9 +64,15 @@ export default UserProfileHeader = ({
           />
         </View>
         <View style={styles.userInfoContainer}>
-          <Text style={styles.displayName}>{userData.displayName}</Text>
-          <Text style={styles.username}>@{userData.username}</Text>
-          <Text style={styles.userBio}>{userData.userBio}</Text>
+          <Text style={[styles.displayName, { color: colors.text }]}>
+            {userData.displayName}
+          </Text>
+          <Text style={[styles.username, { color: colors.text }]}>
+            @{userData.username}
+          </Text>
+          <Text style={[styles.userBio, , { color: colors.text }]}>
+            {userData.userBio}
+          </Text>
         </View>
         <View style={styles.moreInfo}>
           <View
@@ -75,12 +84,20 @@ export default UserProfileHeader = ({
               },
             ]}
           >
-            <Text style={styles.infoText}>Followers</Text>
-            <Text style={styles.infoNumber}>{userData.followersCount}</Text>
+            <Text style={[styles.infoText, { color: colors.text }]}>
+              Followers
+            </Text>
+            <Text style={[styles.infoNumber, { color: colors.text }]}>
+              {userData.followersCount}
+            </Text>
           </View>
           <View style={styles.infoBox}>
-            <Text style={styles.infoText}>Following</Text>
-            <Text style={styles.infoNumber}>{userData.followingCount}</Text>
+            <Text style={[styles.infoText, { color: colors.text }]}>
+              Following
+            </Text>
+            <Text style={[styles.infoNumber, { color: colors.text }]}>
+              {userData.followingCount}
+            </Text>
           </View>
           <View
             style={[
@@ -91,13 +108,15 @@ export default UserProfileHeader = ({
               },
             ]}
           >
-            <Text style={styles.infoText}>Posts</Text>
-            <Text style={styles.infoNumber}>{userData.postsCount}</Text>
+            <Text style={[styles.infoText, { color: colors.text }]}>Posts</Text>
+            <Text style={[styles.infoNumber, { color: colors.text }]}>
+              {userData.postsCount}
+            </Text>
           </View>
         </View>
         <View style={styles.actionContainer}>
           <TouchableOpacity
-            style={styles.actionButton}
+            style={[styles.actionButton, { backgroundColor: colors.secondary }]}
             activeOpacity={0.8}
             onPress={async () => {
               if (isMe) {
@@ -110,7 +129,7 @@ export default UserProfileHeader = ({
               }
             }}
           >
-            <Text style={styles.actionText}>
+            <Text style={[styles.actionText, { color: colors.invertedText }]}>
               {isMe
                 ? "Edit profile"
                 : userData.isFollowing
@@ -118,8 +137,18 @@ export default UserProfileHeader = ({
                 : "Follow"}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton} activeOpacity={0.8}>
-            <Text style={styles.actionText}>
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: colors.secondary }]}
+            activeOpacity={0.8}
+            onPress={() => {
+              if (isMe) {
+                navigation.navigate("SettingStack", {
+                  screen: "AppSetting",
+                });
+              }
+            }}
+          >
+            <Text style={[styles.actionText, { color: colors.invertedText }]}>
               {isMe ? "Setting" : "Message"}
             </Text>
           </TouchableOpacity>

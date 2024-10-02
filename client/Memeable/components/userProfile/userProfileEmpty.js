@@ -1,10 +1,14 @@
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
-export default UserProfileEmpty = ({ isPostsLoading }) => {
+export default UserProfileEmpty = ({ isPostsLoading, colors }) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.primary }]}>
       {isPostsLoading ? (
-        <ActivityIndicator size={30} style={styles.loading} color="grey" />
+        <ActivityIndicator
+          size={30}
+          style={[styles.loading, { backgroundColor: colors.primary }]}
+          color="grey"
+        />
       ) : (
         <Text style={styles.text}>This user has no posts</Text>
       )}
@@ -20,7 +24,6 @@ const styles = StyleSheet.create({
   },
   loading: {
     flex: 1,
-    backgroundColor: "white",
     paddingBottom: 100,
   },
   text: {

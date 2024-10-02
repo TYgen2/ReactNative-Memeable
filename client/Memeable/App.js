@@ -1,4 +1,8 @@
-import { NavigationContainer } from "@react-navigation/native";
+import {
+  DarkTheme,
+  DefaultTheme,
+  NavigationContainer,
+} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Splash from "./screens/splash";
 import login from "./screens/authStack/login";
@@ -10,6 +14,7 @@ import notify from "./screens/mainStack/notification";
 import upload from "./screens/uploadStack/upload";
 import editProfile from "./screens/authStack/editProfile";
 import editUserProfile from "./screens/settingStack/editUserProfile";
+import appSetting from "./screens/settingStack/appSetting";
 import { useContext, useEffect, useState } from "react";
 import { StatusBar } from "react-native";
 import { store } from "./store/store";
@@ -25,6 +30,10 @@ import { enableScreens } from "react-native-screens";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import editBorderColor from "./screens/settingStack/editBorderColor";
+import { ThemeContext } from "./context/theme";
+import { colors } from "./config/colorScheme";
+import { getData, storeData } from "./config/asyncStorage";
+import useColorTheme from "./hooks/useColorTheme";
 
 const persistor = persistStore(store);
 enableScreens();
@@ -73,8 +82,16 @@ const ExploreScreen = () => {
 
 // Setting tab
 const SettingScreen = () => {
+  const { colors } = useColorTheme();
+
   return (
-    <SettingStack.Navigator screenOptions={{ headerShown: true }}>
+    <SettingStack.Navigator
+      screenOptions={{
+        headerShown: true,
+        headerStyle: { backgroundColor: colors.primary },
+        headerTintColor: colors.text,
+      }}
+    >
       <SettingStack.Screen
         name="EditUserProfile"
         component={editUserProfile}
@@ -83,7 +100,15 @@ const SettingScreen = () => {
       <SettingStack.Screen
         name="EditBorderColor"
         component={editBorderColor}
-        options={{ title: "Edit border color" }}
+        options={{
+          title: "Edit border color",
+          animation: "slide_from_bottom",
+        }}
+      />
+      <SettingStack.Screen
+        name="AppSetting"
+        component={appSetting}
+        options={{ title: "Setting" }}
       />
     </SettingStack.Navigator>
   );
@@ -146,6 +171,8 @@ const MainStackNavigator = () => {
 };
 
 const App = () => {
+  const { mode } = useColorTheme();
+
   const { isLoading } = useContext(UpdateContext);
   const [isUserInfoReady, setIsUserInfoReady] = useState(false);
   const { loginStatus, userDetails } = useSelector((state) => state.user);
@@ -167,9 +194,9 @@ const App = () => {
   return (
     <NavigationContainer>
       <StatusBar
-        barStyle="dark-content"
+        barStyle={mode === "dark" ? "light-content" : "dark-content"}
         translucent={true}
-        backgroundColor="white"
+        backgroundColor="transparent"
       />
       {loginStatus && isUserInfoReady ? (
         <MainStackNavigator />
@@ -181,6 +208,32 @@ const App = () => {
 };
 
 export default function Root() {
+  const [theme, setTheme] = useState({ mode: "dark" });
+  const updateTheme = (newTheme) => {
+    let mode;
+    if (!newTheme) {
+      mode = theme.mode === "dark" ? "light" : "dark";
+      newTheme = { mode };
+    }
+    setTheme(newTheme);
+    storeData("theme", newTheme);
+  };
+
+  const fetchStoredTheme = async () => {
+    try {
+      const themeData = await getData("theme");
+      if (themeData) {
+        updateTheme(themeData);
+      }
+    } catch ({ message }) {
+      alert(message);
+    }
+  };
+
+  useEffect(() => {
+    fetchStoredTheme();
+  }, []);
+
   return (
     <EventProvider>
       <Provider store={store}>
@@ -188,7 +241,9 @@ export default function Root() {
           <LoadingContextProvider>
             <GestureHandlerRootView>
               <BottomSheetModalProvider>
-                <App />
+                <ThemeContext.Provider value={{ theme, updateTheme }}>
+                  <App />
+                </ThemeContext.Provider>
               </BottomSheetModalProvider>
             </GestureHandlerRootView>
           </LoadingContextProvider>

@@ -3,8 +3,10 @@ import { useDispatch } from "react-redux";
 import { reduxLogout } from "../../store/userReducer";
 import { clearPosts } from "../../store/postReducer";
 import { userLogout } from "../../handleAPIs/auth";
+import useColorTheme from "../../hooks/useColorTheme";
 
 export default Notify = () => {
+  const { colors } = useColorTheme();
   const dispatch = useDispatch();
 
   const handleLogout = async () => {
@@ -14,7 +16,7 @@ export default Notify = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.primary }]}>
       <TouchableOpacity style={styles.testingBox} onPress={handleLogout}>
         <Text>LOGOUT</Text>
       </TouchableOpacity>

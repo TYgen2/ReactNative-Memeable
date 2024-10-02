@@ -19,6 +19,7 @@ import { useEditUserProfileViewModel } from "../../hooks/editUserProfile/useEdit
 import { ActivityIndicator } from "react-native";
 import GlowingBorder from "../../components/glowingBorder";
 import UserSongCover from "../../components/userProfile/userSongCover";
+import useColorTheme from "../../hooks/useColorTheme";
 
 const GLOW_BORDER_STYLE = {
   width: 150,
@@ -31,6 +32,8 @@ const GLOW_BORDER_STYLE = {
 };
 
 export default EditUserProfile = ({ route, navigation }) => {
+  const { colors } = useColorTheme();
+
   const { data } = route.params;
   const {
     newBgImage,
@@ -63,7 +66,7 @@ export default EditUserProfile = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.primary }]}>
       {isUpdating && (
         <View style={styles.overlay}>
           <ActivityIndicator size="large" color="white" />
@@ -72,7 +75,10 @@ export default EditUserProfile = ({ route, navigation }) => {
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => selectImageForBgImage(setNewBgImage)}
-        style={{ justifyContent: "center", alignItems: "center" }}
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
         <Icon
           name="create-outline"
@@ -85,7 +91,7 @@ export default EditUserProfile = ({ route, navigation }) => {
           style={styles.backgroundImage}
         />
       </TouchableOpacity>
-      <View style={styles.iconBorder}>
+      <View style={[styles.iconBorder, { backgroundColor: colors.primary }]}>
         <TouchableOpacity
           activeOpacity={0.9}
           onPress={() => selectImageForProfile(setNewIcon, true)}
@@ -115,6 +121,7 @@ export default EditUserProfile = ({ route, navigation }) => {
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
+            style={{ color: colors.text }}
           />
         </View>
         <View
@@ -125,6 +132,7 @@ export default EditUserProfile = ({ route, navigation }) => {
             value={displayName}
             onChangeText={setDisplayName}
             autoCapitalize="none"
+            style={{ color: colors.text }}
           />
         </View>
         <View style={[styles.textInput, { height: 120, paddingTop: 4 }]}>
@@ -133,11 +141,14 @@ export default EditUserProfile = ({ route, navigation }) => {
             value={userBio}
             onChangeText={setUserBio}
             autoCapitalize="none"
+            style={{ color: colors.text }}
           />
         </View>
       </View>
       <View style={styles.songContainer}>
-        <Text style={styles.profileBGM}>🎵Profile BGM🎵</Text>
+        <Text style={[styles.profileBGM, { color: colors.text }]}>
+          🎵Profile BGM🎵
+        </Text>
         <View style={styles.configContainer}>
           <View style={styles.configArea}>
             <TouchableOpacity
@@ -165,6 +176,7 @@ export default EditUserProfile = ({ route, navigation }) => {
                 navigation.navigate("EditBorderColor", {
                   img: newCover,
                   borderColor: newColor,
+                  colors,
                   onColorChange: (color) => setNewColor(color),
                 })
               }

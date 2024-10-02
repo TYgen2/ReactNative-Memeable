@@ -6,8 +6,11 @@ import { popInAnimations, popOutAnimations } from "../utils/animation";
 import OutsidePressHandler from "react-native-outside-press";
 import { selectImageForUpload } from "../utils/helper";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
+import useColorTheme from "../hooks/useColorTheme";
 
 export default PostButton = () => {
+  const { colors } = useColorTheme();
+
   const [icon_bottom] = useState(new Animated.Value(40));
   const [icon_opacity] = useState(new Animated.Value(0));
   const [icon_folder] = useState(new Animated.Value(170));
@@ -49,7 +52,12 @@ export default PostButton = () => {
       <Animated.View
         style={[
           styles.subButton,
-          { bottom: icon_bottom, right: icon_folder, opacity: icon_opacity },
+          {
+            bottom: icon_bottom,
+            right: icon_folder,
+            opacity: icon_opacity,
+            backgroundColor: colors.tertiary,
+          },
         ]}
       >
         <TouchableOpacity>
@@ -60,7 +68,12 @@ export default PostButton = () => {
       <Animated.View
         style={[
           styles.subButton,
-          { bottom: icon_bottom, left: icon_camera, opacity: icon_opacity },
+          {
+            bottom: icon_bottom,
+            left: icon_camera,
+            opacity: icon_opacity,
+            backgroundColor: colors.tertiary,
+          },
         ]}
       >
         <TouchableOpacity
@@ -70,25 +83,16 @@ export default PostButton = () => {
         </TouchableOpacity>
       </Animated.View>
       <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          alignSelf: "center",
-          width: 40,
-          height: 40,
-          borderRadius: 40,
-          bottom: 55,
-          backgroundColor: "white",
-        }}
+        style={[styles.buttonBorder, { backgroundColor: colors.secondary }]}
       >
         <TouchableOpacity
-          style={styles.button}
+          style={[styles.button, { backgroundColor: colors.tabBar }]}
           activeOpacity={0.7}
           onPress={() => {
             pop === false ? popIn() : popOut();
           }}
         >
-          <IonIcon name="add-outline" size={28} color="white" />
+          <IonIcon name="add-outline" size={28} color={colors.secondary} />
         </TouchableOpacity>
       </View>
     </OutsidePressHandler>
@@ -96,6 +100,15 @@ export default PostButton = () => {
 };
 
 const styles = StyleSheet.create({
+  buttonBorder: {
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    width: 40,
+    height: 40,
+    borderRadius: 40,
+    bottom: 55,
+  },
   button: {
     justifyContent: "center",
     alignItems: "center",

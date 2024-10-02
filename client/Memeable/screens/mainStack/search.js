@@ -11,24 +11,29 @@ import { barOffset } from "../../utils/constants";
 import Icon from "react-native-vector-icons/Ionicons";
 import useSearch from "../../hooks/useSearch";
 import { useCallback } from "react";
+import useColorTheme from "../../hooks/useColorTheme";
 
 export default Search = ({ navigation }) => {
+  const { colors } = useColorTheme();
   const { query, setQuery, results, setResults, isSearching } = useSearch();
 
   const renderItem = useCallback(
     ({ item }) => {
-      return <SearchedUser item={item} navigation={navigation} />;
+      return (
+        <SearchedUser item={item} navigation={navigation} colors={colors} />
+      );
     },
-    [navigation]
+    [navigation, colors]
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.searchBox}>
-        <Icon name="search" size={24} color="#2b2b2b" />
+    <View style={[styles.container, { backgroundColor: colors.primary }]}>
+      <View style={[styles.searchBox, { backgroundColor: colors.searchBar }]}>
+        <Icon name="search" size={24} color="grey" />
         <TextInput
-          style={styles.textInput}
+          style={[styles.textInput, { color: colors.text }]}
           placeholder="Search here"
+          placeholderTextColor="grey"
           value={query}
           onChangeText={setQuery}
         />
@@ -66,12 +71,10 @@ const styles = StyleSheet.create({
   },
   searchBox: {
     flexDirection: "row",
-    backgroundColor: "cyan",
     marginTop: barOffset + 10,
     justifyContent: "flex-start",
     alignItems: "center",
     width: "95%",
-    backgroundColor: "rgba(0,0,0,0.1)",
     borderRadius: 10,
     paddingLeft: 10,
   },

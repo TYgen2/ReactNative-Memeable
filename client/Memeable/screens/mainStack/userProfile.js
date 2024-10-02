@@ -14,8 +14,11 @@ import { useFocusEffect } from "@react-navigation/native";
 import { UserProfileModel } from "../../models/UserProfileModel";
 import UserProfileHeader from "../../components/userProfile/userProfileHeader";
 import UserProfileEmpty from "../../components/userProfile/userProfileEmpty";
+import useColorTheme from "../../hooks/useColorTheme";
 
 export default UserProfile = ({ route, navigation }) => {
+  const { colors } = useColorTheme();
+
   const { userDetails, status } = useSelector((state) => state.user);
   const { isStack, targetId } = route.params || {};
   const prevUserDetailsRef = useRef(userDetails);
@@ -43,7 +46,13 @@ export default UserProfile = ({ route, navigation }) => {
 
   // handle first mount by local loading state
   if (isInfoLoading || status === "loading") {
-    return <ActivityIndicator size={30} style={styles.loading} color="grey" />;
+    return (
+      <ActivityIndicator
+        size={30}
+        style={[styles.loading, { backgroundColor: colors.primary }]}
+        color="grey"
+      />
+    );
   }
 
   if (!userData) {
@@ -59,11 +68,16 @@ export default UserProfile = ({ route, navigation }) => {
       data={userPosts}
       renderItem={renderPost}
       numColumns={3}
-      contentContainerStyle={styles.container}
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: colors.primary },
+      ]}
       overScrollMode="never"
       onEndReached={loadMorePosts}
       refreshing={isPostsLoading}
-      ListEmptyComponent={<UserProfileEmpty isPostsLoading={isPostsLoading} />}
+      ListEmptyComponent={
+        <UserProfileEmpty isPostsLoading={isPostsLoading} colors={colors} />
+      }
       ListHeaderComponent={
         <UserProfileHeader
           userData={userData}
@@ -80,7 +94,6 @@ export default UserProfile = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: "white",
     paddingBottom: 70,
   },
   userNotFound: {
@@ -89,5 +102,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "white",
   },
-  loading: { flex: 1, backgroundColor: "white" },
+  loading: { flex: 1 },
 });

@@ -24,7 +24,7 @@ import { useSelector } from "react-redux";
 import { LOADING_INDICATOR } from "../utils/constants";
 import { usePostViewModel } from "../hooks/usePostViewModel";
 
-export default MainPost = memo(({ item, navigation }) => {
+export default MainPost = memo(({ item, navigation, colors }) => {
   const { userDetails } = useSelector((state) => state.user);
   const myIcon = getIconSource(userDetails?.userIcon);
 
@@ -59,9 +59,11 @@ export default MainPost = memo(({ item, navigation }) => {
 
   const renderCommentItem = useCallback(
     ({ item }) => {
-      return <CommentItem item={item} navigation={navigation} />;
+      return (
+        <CommentItem item={item} navigation={navigation} colors={colors} />
+      );
     },
-    [navigation]
+    [navigation, colors]
   );
 
   const renderEmpty = () => {
@@ -93,9 +95,13 @@ export default MainPost = memo(({ item, navigation }) => {
             <Pressable
               onPress={() => navigateToUserProfile(navigation, post.userId)}
             >
-              <Text style={styles.uploaderName}>{post.userDisplayName}</Text>
+              <Text style={[styles.uploaderName, { color: colors.text }]}>
+                {post.userDisplayName}
+              </Text>
             </Pressable>
-            <Text style={styles.title}>{post.title}</Text>
+            <Text style={[styles.title, { color: colors.text }]}>
+              {post.title}
+            </Text>
           </View>
           <Text style={styles.timeAgo}>{post.timeAgo}</Text>
         </View>
@@ -116,9 +122,13 @@ export default MainPost = memo(({ item, navigation }) => {
             <Pressable
               onPress={() => navigateToUserProfile(navigation, post.userId)}
             >
-              <Text style={styles.uploaderName2}>{post.userDisplayName}</Text>
+              <Text style={[styles.uploaderName2, { color: colors.text }]}>
+                {post.userDisplayName}
+              </Text>
             </Pressable>
-            <Text style={styles.description}>{" ‧ " + post.description}</Text>
+            <Text style={[styles.description, { color: colors.text }]}>
+              {" ‧ " + post.description}
+            </Text>
           </View>
         )}
         <Text style={styles.hashtag}>{post.hashtag}</Text>
@@ -129,23 +139,30 @@ export default MainPost = memo(({ item, navigation }) => {
           <Icon
             name={postState.saved ? "bookmark" : "bookmark-outline"}
             size={32}
+            color={colors.inactiveIcon}
           />
         </TouchableOpacity>
         {/* like, comment */}
         <View style={styles.actionsContainer}>
           {/* like button */}
           <View style={styles.center}>
-            <Text>{displayLikes(postState.likes)}</Text>
+            <Text style={{ color: colors.text }}>
+              {displayLikes(postState.likes)}
+            </Text>
             <TouchableOpacity onPress={toggleLike}>
               <Icon
                 name={postState.liked ? "heart" : "heart-outline"}
                 size={32}
-                color={postState.liked ? "#FF4433" : "grey"}
+                color={postState.liked ? "#FF4433" : colors.inactiveIcon}
               />
             </TouchableOpacity>
           </View>
           <TouchableOpacity onPress={openCommentModal}>
-            <Icon name="chatbox-ellipses-outline" size={32} color="grey" />
+            <Icon
+              name="chatbox-ellipses-outline"
+              size={32}
+              color={colors.inactiveIcon}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -155,10 +172,11 @@ export default MainPost = memo(({ item, navigation }) => {
         index={0}
         snapPoints={["80%"]}
         backdropComponent={renderBackdrop}
-        style={styles.bottomSheet}
         keyboardBehavior="extend"
         keyboardBlurBehavior="restore"
         onChange={onChange}
+        backgroundStyle={{ backgroundColor: colors.primary }}
+        handleIndicatorStyle={{ backgroundColor: colors.secondary }}
       >
         <View style={styles.commentModalContent}>
           <BottomSheetFlatList
@@ -176,6 +194,7 @@ export default MainPost = memo(({ item, navigation }) => {
               postId={item._id}
               userIcon={myIcon}
               onCommentPosted={handleNewComment}
+              colors={colors}
             />
           </View>
         </View>

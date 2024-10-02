@@ -10,8 +10,10 @@ import IonIcon from "react-native-vector-icons/Ionicons";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getIconSource } from "../utils/helper";
+import useColorTheme from "../hooks/useColorTheme";
 
 export default TabItem = ({ onPress, isFocused, routeName, label }) => {
+  const { colors } = useColorTheme();
   const scale = useSharedValue(0);
 
   const { userDetails } = useSelector((state) => state.user);
@@ -65,7 +67,7 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
           style={[{ flex: 1, alignItems: "center" }, animatedIconStyle]}
         >
           {icon[routeName]({
-            color: isFocused ? "#96DED1" : "white",
+            color: isFocused ? colors.tertiary : "white",
           })}
           <Animated.Text
             style={[
@@ -85,10 +87,17 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
           <View
             style={[
               styles.iconBorder1,
-              { backgroundColor: isFocused ? "#96DED1" : "black" },
+              {
+                backgroundColor: isFocused ? colors.tertiary : colors.primary,
+              },
             ]}
           >
-            <View style={styles.iconBorder2}>
+            <View
+              style={[
+                styles.iconBorder2,
+                { backgroundColor: colors.secondary },
+              ]}
+            >
               <Image
                 style={[styles.userIcon, { backgroundColor: iconBgColor }]}
                 source={iconSource}

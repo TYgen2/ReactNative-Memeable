@@ -4,7 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import FastImage from "react-native-fast-image";
 import { handleComment } from "../handleAPIs/userActions";
 
-const CommentInput = memo(({ postId, userIcon, onCommentPosted }) => {
+const CommentInput = memo(({ postId, userIcon, onCommentPosted, colors }) => {
   const [comment, setComment] = useState("");
   const [isFocused, setIsFocused] = useState(false);
 
@@ -22,7 +22,7 @@ const CommentInput = memo(({ postId, userIcon, onCommentPosted }) => {
         <FastImage source={userIcon} style={styles.userIcon} />
       </View>
       <BottomSheetTextInput
-        style={styles.commentInputField}
+        style={[styles.commentInputField, { color: colors.text }]}
         placeholder="Add a comment..."
         placeholderTextColor="grey"
         value={comment}
@@ -30,9 +30,16 @@ const CommentInput = memo(({ postId, userIcon, onCommentPosted }) => {
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
       />
-      <View style={styles.postButtonContainer}>
+      <View
+        style={[
+          styles.postButtonContainer,
+          { backgroundColor: colors.tertiary },
+        ]}
+      >
         <TouchableOpacity style={styles.postButton} onPress={submitComment}>
-          <Text style={styles.commentButtonText}>Post</Text>
+          <Text style={[styles.commentButtonText, { color: colors.text }]}>
+            Post
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -65,12 +72,14 @@ const styles = StyleSheet.create({
     width: 60,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#96DED1",
   },
   postButton: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  commentButtonText: {
+    fontWeight: "bold",
   },
 });
 

@@ -21,8 +21,7 @@ const GLOW_BORDER_STYLE = {
 };
 
 export default EditBorderColor = ({ route, navigation }) => {
-  console.log("edit border page rendered");
-  const { img, borderColor, onColorChange } = route.params;
+  const { img, borderColor, colors, onColorChange } = route.params;
   const [currentColor, setCurrentColor] = useState(borderColor);
 
   const handleColorChange = debounce((color) => setCurrentColor(color), 100);
@@ -33,9 +32,11 @@ export default EditBorderColor = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.primary }]}>
       <View style={styles.preview}>
-        <Text style={styles.previewText}>Preview</Text>
+        <Text style={[styles.previewText, { color: colors.text }]}>
+          Preview
+        </Text>
         <GlowingBorder boxStyle={GLOW_BORDER_STYLE} color={currentColor} />
         <UserSongCover songImg={img} imgStyle={GLOW_BORDER_STYLE} />
       </View>

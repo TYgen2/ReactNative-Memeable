@@ -3,7 +3,7 @@ import { screenWidth } from "../utils/constants";
 import { getIconSource, navigateToUserProfile } from "../utils/helper";
 import { memo } from "react";
 
-export default SearchedUser = memo(({ item, navigation }) => {
+export default SearchedUser = memo(({ item, navigation, colors }) => {
   const iconBgColor = item.icon?.bgColor || "transparent";
   const iconSource = getIconSource(item?.icon);
 
@@ -18,7 +18,9 @@ export default SearchedUser = memo(({ item, navigation }) => {
         style={[styles.icon, { backgroundColor: iconBgColor }]}
       />
       <View style={styles.textInfo}>
-        <Text style={styles.displayName}>{item.displayName}</Text>
+        <Text style={[styles.displayName, { color: colors.text }]}>
+          {item.displayName}
+        </Text>
         {item.isFollowing === true && (
           <Text style={styles.followStatus}>following</Text>
         )}

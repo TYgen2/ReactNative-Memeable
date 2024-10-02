@@ -3,7 +3,7 @@ import { getIconSource, navigateToUserProfile } from "../utils/helper";
 import { memo } from "react";
 import Icon from "react-native-vector-icons/Ionicons";
 
-export default CommentItem = memo(({ item, navigation }) => {
+export default CommentItem = memo(({ item, navigation, colors }) => {
   const iconBgColor = item.user?.icon.bgColor || "transparent";
   const iconSource = getIconSource(item.user?.icon);
 
@@ -20,10 +20,14 @@ export default CommentItem = memo(({ item, navigation }) => {
       {/* text info */}
       <View style={styles.textInfo}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={styles.displayName}>{item.user?.displayName}</Text>
+          <Text style={[styles.displayName, { color: colors.text }]}>
+            {item.user?.displayName}
+          </Text>
           <Text style={styles.timeAgo}>{item.timeAgo}</Text>
         </View>
-        <Text style={styles.content}>{item.content}</Text>
+        <Text style={[styles.content, { color: colors.text }]}>
+          {item.content}
+        </Text>
       </View>
 
       {/* like count */}
@@ -55,7 +59,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   displayName: { fontWeight: "bold", fontSize: 16 },
-  timeAgo: { color: "grey", fontSize: 14, paddingLeft: 6 },
+  timeAgo: { color: "grey", fontSize: 14, paddingLeft: 10 },
   content: { fontSize: 16 },
   followStatus: { color: "grey" },
   likeInfo: {

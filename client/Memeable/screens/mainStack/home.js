@@ -4,26 +4,31 @@ import MainPost from "../../components/mainPost";
 import { useSelector } from "react-redux";
 import useFetchPosts from "../../hooks/fetchData/useFetchPosts";
 import { useCallback } from "react";
+import useColorTheme from "../../hooks/useColorTheme";
 
 export default Home = ({ navigation }) => {
+  const { colors } = useColorTheme();
+
   const { allPosts } = useSelector((state) => state.post);
   const { isLoading, loadMorePosts, refreshPosts } = useFetchPosts();
 
   const renderPost = useCallback(
     ({ item }) => {
-      return <MainPost item={item} navigation={navigation} />;
+      return <MainPost item={item} navigation={navigation} colors={colors} />;
     },
-    [navigation]
+    [navigation, colors]
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.appName}>
+    <View style={[styles.container, { backgroundColor: colors.primary }]}>
+      <View
+        style={[styles.appName, { borderBottomColor: colors.titleBottomBar }]}
+      >
         <Image
           source={require("../../assets/popcat.png")}
           style={styles.titleIcon}
         />
-        <Text style={styles.title}>Memeable</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Memeable</Text>
       </View>
       <View style={styles.content}>
         <FlatList
@@ -62,8 +67,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: barOffset,
-    backgroundColor: "white",
+    paddingTop: barOffset,
   },
   flatlistContainer: {
     flexGrow: 1,
@@ -84,12 +88,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingLeft: 20,
     borderBottomWidth: 0.3,
-    borderBottomColor: "rgba(0,0,0,0.3)",
   },
   title: {
     fontWeight: "bold",
     fontSize: 24,
-    paddingLeft: 4,
+    paddingLeft: 6,
   },
   titleIcon: { width: 25, height: 25 },
   loadingIcon: {
