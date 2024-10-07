@@ -23,7 +23,7 @@ import { LoadingContextProvider, UpdateContext } from "./context/loading";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistStore } from "redux-persist";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import CustomTab from "./components/customTab";
+import CustomTab from "./components/bottomTab/customTab";
 import { EventProvider } from "react-native-outside-press";
 import { reduxLogin } from "./store/userReducer";
 import { enableScreens } from "react-native-screens";
@@ -31,7 +31,6 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import editBorderColor from "./screens/settingStack/editBorderColor";
 import { ThemeContext } from "./context/theme";
-import { colors } from "./config/colorScheme";
 import { getData, storeData } from "./config/asyncStorage";
 import useColorTheme from "./hooks/useColorTheme";
 
@@ -44,6 +43,7 @@ const Tab = createBottomTabNavigator();
 const AuthStack = createNativeStackNavigator();
 const HomeStack = createNativeStackNavigator();
 const ExploreStack = createNativeStackNavigator();
+const UserProfileStack = createNativeStackNavigator();
 const SettingStack = createNativeStackNavigator();
 
 const MainStack = createNativeStackNavigator();
@@ -77,6 +77,21 @@ const ExploreScreen = () => {
       <ExploreStack.Screen name="Search" component={search} />
       <ExploreStack.Screen name="UserProfile" component={userProfile} />
     </ExploreStack.Navigator>
+  );
+};
+
+// User profile tab
+const UserProfileScreen = () => {
+  const { userDetails } = useSelector((state) => state.user);
+
+  return (
+    <UserProfileStack.Navigator screenOptions={{ headerShown: false }}>
+      <UserProfileStack.Screen
+        name="UserProfile"
+        component={userProfile}
+        initialParams={{ targetId: userDetails.userId }}
+      />
+    </UserProfileStack.Navigator>
   );
 };
 
@@ -116,8 +131,6 @@ const SettingScreen = () => {
 
 // For main screen UI
 const MainStackScreen = () => {
-  const { userDetails } = useSelector((state) => state.user);
-
   return (
     <Tab.Navigator
       screenOptions={{
@@ -141,9 +154,8 @@ const MainStackScreen = () => {
         options={{ title: "Noti" }}
       />
       <Tab.Screen
-        name="UserProfile"
-        component={userProfile}
-        initialParams={{ targetId: userDetails.userId }}
+        name="UserProfileStack"
+        component={UserProfileScreen}
         options={{ title: "me" }}
       />
     </Tab.Navigator>

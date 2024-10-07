@@ -74,27 +74,60 @@ export const createPostValidationSchema = {
 
 export const updateProfileValidationSchema = {
   username: {
-    notEmpty: {
-      errorMessage: "Username cannnot be empty",
-    },
-    isLength: {
-      options: { max: 16 },
-      errorMessage: "Username length should not exceeds 16 characters",
+    optional: true,
+    custom: {
+      options: (value, { req }) => {
+        if (value !== undefined) {
+          if (value.trim() === "") {
+            throw new Error("Username cannot be empty");
+          }
+          if (value.length < 6) {
+            throw new Error(
+              "Username length should not less than 6 characters"
+            );
+          }
+          if (value.length > 16) {
+            throw new Error("Username length should not exceed 16 characters");
+          }
+        }
+        return true;
+      },
     },
   },
   displayName: {
-    notEmpty: {
-      errorMessage: "Display name cannnot be empty",
-    },
-    isLength: {
-      options: { max: 32 },
-      errorMessage: "Display name length should not exceeds 32 characters",
+    optional: true,
+    custom: {
+      options: (value, { req }) => {
+        if (value !== undefined) {
+          if (value.trim() === "") {
+            throw new Error("Display name cannot be empty");
+          }
+          if (value.length < 4) {
+            throw new Error(
+              "Display name length should not less than 4 characters"
+            );
+          }
+          if (value.length > 32) {
+            throw new Error(
+              "Display name length should not exceed 32 characters"
+            );
+          }
+        }
+        return true;
+      },
     },
   },
   userBio: {
-    isLength: {
-      options: { max: 150 },
-      errorMessage: "Personal bio length should not exceeds 150 characters",
+    optional: true,
+    custom: {
+      options: (value, { req }) => {
+        if (value !== undefined && value.length > 150) {
+          throw new Error(
+            "Personal bio length should not exceed 150 characters"
+          );
+        }
+        return true;
+      },
     },
   },
 };

@@ -6,6 +6,7 @@ import {
   comparePassword,
   generateJWT,
   generateRefreshToken,
+  handleTokens,
   hashPassword,
   randomUserName,
   validateTokens,
@@ -15,6 +16,7 @@ import { OAuth2Client } from "google-auth-library";
 import dotenv from "dotenv";
 import axios from "axios";
 import { authenticateToken } from "../utils/middleware.mjs";
+import redisClient from "../services/redisClient.mjs";
 
 dotenv.config();
 
@@ -44,22 +46,22 @@ router.post(
     const data = matchedData(req);
     data.password = hashPassword(data.password);
 
-    const signedRefreshToken = generateRefreshToken();
-
+    // create the new user instance in db
     const newUser = new User({
       ...data,
       username: randomUserName(),
-      refreshToken: signedRefreshToken,
       icon: {},
       song: {},
     });
 
     try {
+      // save the user to db to obtain the id
       const savedUser = await newUser.save();
-      const token = generateJWT({ id: savedUser.id });
 
-      res.setHeader("x-new-token", token);
-      res.setHeader("x-new-refresh-token", signedRefreshToken);
+      const { headers } = await handleTokens(savedUser);
+      Object.entries(headers).forEach(([key, value]) => {
+        res.setHeader(key, value);
+      });
 
       return res.status(201).send({
         isNew: true,
@@ -91,17 +93,12 @@ router.post("/api/auth/login", async (req, res) => {
       return res.status(400).send({ msg: "Invalid credentials" });
     }
 
-    const token = generateJWT({ id: user.id });
-    const signedRefreshToken = generateRefreshToken();
+    const { headers } = await handleTokens(user);
+    Object.entries(headers).forEach(([key, value]) => {
+      res.setHeader(key, value);
+    });
 
-    // update refreshToken in db
-    user.refreshToken = signedRefreshToken;
-    await user.save();
-
-    res.setHeader("x-new-token", token);
-    res.setHeader("x-new-refresh-token", signedRefreshToken);
-
-    return res.status(201).send({
+    return res.status(200).send({
       isNew: false,
       userId: user.id,
     });
@@ -123,9 +120,6 @@ router.post("/api/auth/google", async (req, res) => {
     // if it's valid, get the info from the ticket
     const payload = ticket.getPayload();
 
-    // get refreshToken
-    const signedRefreshToken = generateRefreshToken();
-
     // check whether the user is exist or not by using googleId
     let user = await User.findOne({ email: payload.email });
     let isNew;
@@ -138,7 +132,6 @@ router.post("/api/auth/google", async (req, res) => {
         username: randomUserName(),
         googleId: payload.sub,
         authMethod: "google",
-        refreshToken: signedRefreshToken,
         icon: {},
         song: {},
       });
@@ -148,19 +141,16 @@ router.post("/api/auth/google", async (req, res) => {
         msg: `You have used this email to register an account before! Method: ${user.authMethod}`,
       });
     } else {
+      // user already registered with google
       isNew = false;
-      // if exist, update the refreshToken in db
-      user.refreshToken = signedRefreshToken;
     }
-    await user.save();
 
-    // return the generated JWT to client
-    const token = generateJWT({ id: user.id });
+    const { headers } = await handleTokens(user);
+    Object.entries(headers).forEach(([key, value]) => {
+      res.setHeader(key, value);
+    });
 
-    res.setHeader("x-new-token", token);
-    res.setHeader("x-new-refresh-token", signedRefreshToken);
-
-    return res.status(201).send({
+    return res.status(200).send({
       isNew,
       userId: user.id,
     });
@@ -184,8 +174,6 @@ router.post("/api/auth/facebook", async (req, res) => {
 
     // if success, response.data will contains the user's info
     // if failed, the error will be catched by the trycatch
-    const signedRefreshToken = generateRefreshToken();
-
     let user = await User.findOne({ email: response.data.email });
     let isNew;
     if (!user) {
@@ -196,7 +184,6 @@ router.post("/api/auth/facebook", async (req, res) => {
         username: randomUserName(),
         facebookId: response.data.id,
         authMethod: "facebook",
-        refreshToken: signedRefreshToken,
         icon: {},
         song: {},
       });
@@ -209,16 +196,14 @@ router.post("/api/auth/facebook", async (req, res) => {
       });
     } else {
       isNew = false;
-      user.refreshToken = signedRefreshToken;
     }
-    await user.save();
 
-    const token = generateJWT({ id: user.id });
+    const { headers } = await handleTokens(user);
+    Object.entries(headers).forEach(([key, value]) => {
+      res.setHeader(key, value);
+    });
 
-    res.setHeader("x-new-token", token);
-    res.setHeader("x-new-refresh-token", signedRefreshToken);
-
-    return res.status(201).send({
+    return res.status(200).send({
       isNew,
       userId: user.id,
     });
@@ -238,11 +223,11 @@ router.post("/api/auth/token-validation", async (req, res) => {
   }
 
   try {
-    const { user, newTokens } = await validateTokens(jwtToken, refreshToken);
+    const { newTokens } = await validateTokens(jwtToken, refreshToken);
 
     if (newTokens) {
       res.setHeader("x-new-token", newTokens.token);
-      res.setHeader("x-new-refresh-token", newTokens.signedRefreshToken);
+      res.setHeader("x-new-refresh-token", newTokens.refreshToken);
     }
 
     res.status(200).send({
@@ -260,6 +245,9 @@ router.post("/api/auth/token-validation", async (req, res) => {
 // logout
 router.post("/api/auth/logout", authenticateToken, async (req, res) => {
   try {
+    await redisClient
+      .del(`user:${req.userId}:refreshToken`)
+      .catch(console.error);
     await User.findByIdAndUpdate(req.userId, { refreshToken: null });
     res.status(200).send({ msg: "Logged out successfully" });
   } catch (error) {

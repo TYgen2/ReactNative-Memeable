@@ -1,5 +1,12 @@
-import { View, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { getIconSource, navigateToUserProfile } from "../utils/helper";
+import {
+  View,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
+import { getIconSource, navigateToUserProfile } from "../../utils/helper";
 import { memo } from "react";
 import Icon from "react-native-vector-icons/Ionicons";
 
@@ -10,12 +17,12 @@ export default CommentItem = memo(({ item, navigation, colors }) => {
   return (
     <View style={styles.container}>
       {/* icon */}
-      <TouchableOpacity style={styles.icon} activeOpacity={0.5}>
+      <Pressable style={styles.icon}>
         <Image
           source={iconSource}
           style={[styles.icon, { backgroundColor: iconBgColor }]}
         />
-      </TouchableOpacity>
+      </Pressable>
 
       {/* text info */}
       <View style={styles.textInfo}>

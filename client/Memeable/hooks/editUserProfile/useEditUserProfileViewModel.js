@@ -26,7 +26,6 @@ export const useEditUserProfileViewModel = (initialData) => {
     songUri: initialData.song.songUri,
     songName: initialData.song.songName,
   });
-
   const {
     displayName,
     setDisplayName,

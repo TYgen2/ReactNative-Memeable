@@ -11,7 +11,7 @@ import {
   displayLikes,
   getIconSource,
   navigateToUserProfile,
-} from "../utils/helper";
+} from "../../utils/helper";
 import FastImage from "react-native-fast-image";
 import {
   BottomSheetModal,
@@ -21,8 +21,8 @@ import {
 import CommentInput from "./commentInput";
 import CommentItem from "./commentItem";
 import { useSelector } from "react-redux";
-import { LOADING_INDICATOR } from "../utils/constants";
-import { usePostViewModel } from "../hooks/usePostViewModel";
+import { LOADING_INDICATOR } from "../../utils/constants";
+import { usePostViewModel } from "../../hooks/usePostViewModel";
 
 export default MainPost = memo(({ item, navigation, colors }) => {
   const { userDetails } = useSelector((state) => state.user);
@@ -157,13 +157,25 @@ export default MainPost = memo(({ item, navigation, colors }) => {
               />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={openCommentModal}>
-            <Icon
-              name="chatbox-ellipses-outline"
-              size={32}
-              color={colors.inactiveIcon}
-            />
-          </TouchableOpacity>
+
+          <View style={styles.center}>
+            <Text
+              style={{
+                color: colors.text,
+                fontSize: 14,
+                paddingBottom: 2,
+              }}
+            >
+              {displayLikes(post.commentCount)}
+            </Text>
+            <TouchableOpacity onPress={openCommentModal}>
+              <Icon
+                name="chatbox-ellipses-outline"
+                size={32}
+                color={colors.inactiveIcon}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 

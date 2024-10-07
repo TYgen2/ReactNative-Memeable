@@ -1,5 +1,5 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
-import { screenWidth } from "../utils/constants";
+import { screenWidth } from "../../utils/constants";
 import FastImage from "react-native-fast-image";
 import { memo } from "react";
 

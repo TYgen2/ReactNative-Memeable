@@ -1,9 +1,9 @@
 import { StyleSheet, View } from "react-native";
-import { screenWidth } from "../utils/constants";
+import { screenWidth } from "../../utils/constants";
 import TabItem from "./tabItem";
 import PostButton from "./postButton";
 import { memo, useCallback } from "react";
-import useColorTheme from "../hooks/useColorTheme";
+import useColorTheme from "../../hooks/useColorTheme";
 
 export default CustomTab = memo(({ state, descriptors, navigation }) => {
   const { colors } = useColorTheme();

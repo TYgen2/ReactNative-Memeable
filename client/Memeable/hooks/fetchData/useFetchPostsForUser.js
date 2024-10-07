@@ -52,7 +52,6 @@ export default useFetchPostsForUser = (targetId) => {
 
   useEffect(() => {
     // first mount, or when user upload a new posts
-    console.log("UserProfile rendered");
     fetchPosts(1, true);
   }, [userDetails.postsCount]);
 

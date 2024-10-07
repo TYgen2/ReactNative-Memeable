@@ -2,6 +2,7 @@ import {
   Image,
   ImageBackground,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   TouchableOpacity,
@@ -28,7 +29,6 @@ const GLOW_BORDER_STYLE = {
   marginTop: 20,
   position: "absolute",
   right: 0,
-  top: 0,
 };
 
 export default EditUserProfile = ({ route, navigation }) => {
@@ -149,6 +149,7 @@ export default EditUserProfile = ({ route, navigation }) => {
         <Text style={[styles.profileBGM, { color: colors.text }]}>
           🎵Profile BGM🎵
         </Text>
+
         <View style={styles.configContainer}>
           <View style={styles.configArea}>
             <TouchableOpacity
@@ -157,7 +158,7 @@ export default EditUserProfile = ({ route, navigation }) => {
               onPress={async () => selectSongForProfile(setNewSong)}
             >
               <Text style={styles.configText}>
-                {newSong.name !== undefined
+                {newSong.name !== null
                   ? newSong.name
                   : "Song - select from device"}
               </Text>

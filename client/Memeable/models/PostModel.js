@@ -18,6 +18,7 @@ export class PostModel {
     this.likes = rawPostData.likes;
     this.hasLiked = rawPostData.hasLiked;
     this.timeAgo = rawPostData.timeAgo;
+    this.commentCount = rawPostData.commentCount;
   }
 
   calculateImageHeight(height, width) {
@@ -42,6 +43,7 @@ export class PostModel {
       likes: this.likes,
       hasLiked: this.hasLiked,
       timeAgo: this.timeAgo,
+      commentCount: this.commentCount,
     };
   }
 }

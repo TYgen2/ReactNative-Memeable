@@ -44,6 +44,7 @@ export const googleLogin = async (idToken) => {
     const { isNew, userId } = res.data;
     const token = res.headers["x-new-token"];
     const refreshToken = res.headers["x-new-refresh-token"];
+    console.log({ token, refreshToken });
     await storeTokens(token, refreshToken);
 
     console.log("User logged in successfully!");

@@ -2,7 +2,7 @@ import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { memo, useCallback, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import FastImage from "react-native-fast-image";
-import { handleComment } from "../handleAPIs/userActions";
+import { handleComment } from "../../handleAPIs/userActions";
 
 const CommentInput = memo(({ postId, userIcon, onCommentPosted, colors }) => {
   const [comment, setComment] = useState("");

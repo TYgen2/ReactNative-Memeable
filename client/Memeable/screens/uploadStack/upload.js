@@ -8,21 +8,14 @@ import {
   View,
 } from "react-native";
 import { screenWidth } from "../../utils/constants";
-import { Formik, useFormikContext } from "formik";
+import { Formik } from "formik";
 import { uploadReviewSchema } from "../../utils/validationSchema";
 import Icon from "react-native-vector-icons/Ionicons";
-import { useContext, useEffect, useState } from "react";
-import { UpdateContext } from "../../context/loading";
 import useUpload from "../../hooks/useUpload";
 
 export default Upload = ({ route, navigation }) => {
   const { imageUri } = route.params;
-  const { shouldFetch, setShouldFetch } = useContext(UpdateContext);
-  const { isUploading, setIsUploading, uploadPost } = useUpload(imageUri);
-
-  useEffect(() => {
-    console.log("upload page re render");
-  }, []);
+  const { isUploading, uploadPost } = useUpload(imageUri);
 
   return (
     <View style={[styles.container, { backgroundColor: "white" }]}>
@@ -58,7 +51,12 @@ export default Upload = ({ route, navigation }) => {
         }}
         validationSchema={uploadReviewSchema}
         onSubmit={async (values) => {
-          uploadPost(values).then(() => navigation.pop());
+          try {
+            await uploadPost(values);
+            navigation.pop();
+          } catch (error) {
+            console.error("Upload failed:", error);
+          }
         }}
       >
         {(props) => (

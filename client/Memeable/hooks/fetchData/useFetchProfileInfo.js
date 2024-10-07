@@ -41,7 +41,7 @@ export default useFetchProfileInfo = (userId, targetId) => {
     };
 
     fetchUserProfile();
-  }, [userId, targetId]);
+  }, []);
 
   // handle local UI state update
   const handleFollowersCount = (action) => {
@@ -82,6 +82,7 @@ export default useFetchProfileInfo = (userId, targetId) => {
     userData,
     setUserData,
     isInfoLoading,
+    setIsInfoLoading,
     handleFollowersCount,
     isMe,
     handlePressed,

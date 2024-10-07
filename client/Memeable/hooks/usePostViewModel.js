@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import useFetchComments from "../hooks/fetchData/useFetchComments";
-import { handleLike } from "../handleAPIs/userActions";
+import { handleLike, handleSavePost } from "../handleAPIs/userActions";
 import { useSelector } from "react-redux";
 import { PostModel } from "../models/PostModel";
 
@@ -26,15 +26,20 @@ export const usePostViewModel = (initialPostData) => {
       likes: prevState.liked ? prevState.likes - 1 : prevState.likes + 1,
     }));
 
-    await handleLike(initialPostData._id);
-  }, [postModel.id]);
+    await handleLike(initialPostData._id, postState.liked ? "unlike" : "like");
+  }, [postModel.id, postState.liked]);
 
-  const toggleSave = useCallback(() => {
+  const toggleSave = useCallback(async () => {
     setPostState((prevState) => ({
       ...prevState,
       saved: !prevState.saved,
     }));
-  }, []);
+
+    await handleSavePost(
+      initialPostData._id,
+      postState.saved ? "unsave" : "save"
+    );
+  }, [postModel.id, postState.saved]);
 
   const {
     comments,

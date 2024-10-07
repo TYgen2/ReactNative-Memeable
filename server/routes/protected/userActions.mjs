@@ -11,6 +11,7 @@ import { createPostValidationSchema } from "../../validationSchemas.mjs";
 import { Like } from "../../mongoose/schemas/like.mjs";
 import { Follow } from "../../mongoose/schemas/follow.mjs";
 import { Comment } from "../../mongoose/schemas/comment.mjs";
+import { SavedPost } from "../../mongoose/schemas/savedPost.mjs";
 dotenv.config();
 
 const router = Router();
@@ -87,22 +88,23 @@ router.post(
 
 // user like / unlike posts
 router.post("/api/handleLike", authenticateToken, async (req, res) => {
-  const { postId } = req.body;
+  const { postId, action } = req.body;
+  const userId = req.userId;
 
   try {
-    const target = await Like.findOne({ userId: req.userId, postId });
-    if (target) {
-      await target.deleteOne();
+    if (action === "like") {
+      await Like.create({ userId, postId });
+      await Post.findByIdAndUpdate(postId, { $inc: { likes: 1 } });
+      return res.status(200).send({ msg: "Liked the post!" });
+    } else if (action === "unlike") {
+      await Like.deleteOne({ userId, postId });
+      await Post.findByIdAndUpdate(postId, { $inc: { likes: -1 } });
+      return res.status(200).send({ msg: "Unliked the post!" });
     } else {
-      const like = new Like({ userId: req.userId, postId });
-      await like.save();
+      return res.status(400).send({ msg: "Invalid action" });
     }
-    await Post.findByIdAndUpdate(postId, { $inc: { likes: target ? -1 : 1 } });
-
-    res.status(200).send({
-      msg: target ? "Unliked the post!" : "Liked the post!",
-    });
   } catch (error) {
+    console.error("Error in handleLike:", error);
     res.status(400).send({ msg: "Error when handling the like function" });
   }
 });
@@ -174,6 +176,27 @@ router.post("/api/handleSubComment", authenticateToken, async (req, res) => {
     });
   } catch (error) {
     res.status(400).send({ msg: "Error creating sub-comment" });
+  }
+});
+
+// save a post
+router.post("/api/handleSavePost", authenticateToken, async (req, res) => {
+  const { postId, action } = req.body;
+  const userId = req.userId;
+
+  try {
+    if (action === "save") {
+      const savedPost = new SavedPost({ userId, postId });
+      await savedPost.save();
+      return res.status(200).send({ msg: "saved successfully!" });
+    } else if (action === "unsave") {
+      await SavedPost.deleteOne({ userId, postId });
+      return res.status(200).send({ msg: "unsaved successfully!" });
+    } else {
+      return res.status(400).send({ msg: "Invalid action" });
+    }
+  } catch (error) {
+    res.status(400).send({ msg: "Error when handling save/unsave" });
   }
 });
 

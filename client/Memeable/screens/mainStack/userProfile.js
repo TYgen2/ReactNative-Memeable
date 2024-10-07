@@ -6,7 +6,7 @@ import {
   View,
 } from "react-native";
 import { useSelector } from "react-redux";
-import UserPost from "../../components/userPost";
+import UserPost from "../../components/post/userPost";
 import { useCallback, useRef } from "react";
 import useFetchProfileInfo from "../../hooks/fetchData/useFetchProfileInfo";
 import useFetchPostsForUser from "../../hooks/fetchData/useFetchPostsForUser";

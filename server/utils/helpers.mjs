@@ -6,6 +6,7 @@ import { Follow } from "../mongoose/schemas/follow.mjs";
 import { User } from "../mongoose/schemas/user.mjs";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { s3 } from "./config.mjs";
+import redisClient from "../services/redisClient.mjs";
 
 dotenv.config();
 
@@ -25,9 +26,8 @@ export const generateJWT = (payload) => {
   });
 };
 
-export const generateRefreshToken = () => {
-  const refreshToken = crypto.randomBytes(40).toString("hex");
-  return jwt.sign({ refreshToken }, process.env.REFRESH_SECRET, {
+export const generateRefreshToken = (payload) => {
+  return jwt.sign(payload, process.env.REFRESH_SECRET, {
     expiresIn: "7d",
   });
 };
@@ -69,28 +69,62 @@ export const getFollowingIds = async (userId) => {
 };
 
 export const validateTokens = async (jwtToken, refreshToken) => {
-  const user = await User.findOne({ refreshToken });
-  if (!user) {
-    console.log("Invalid refresh token");
-    return res.status(404).send({ msg: "Invalid refresh token" });
-  }
-
+  // handle jwtToken checking first
   try {
-    jwt.verify(jwtToken, process.env.JWT_SECRET);
+    // get the user id from the jwt token
+    const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    if (!user) throw new Error("User not found");
 
     console.log("JWT still valid, passed the token check from middleware!!");
     return { user, newTokens: null };
   } catch (jwtError) {
-    try {
-      jwt.verify(refreshToken, process.env.REFRESH_SECRET);
-      const token = generateJWT({ id: user.id });
-      const signedRefreshToken = generateRefreshToken();
+    if (jwtError.name !== "TokenExpiredError") throw jwtError;
+    console.log("JWT expired, checking refresh token from Redis");
 
-      user.refreshToken = signedRefreshToken;
+    // in case jwtToken is invalid, check the refresh token
+    try {
+      const decoded = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+      const userId = decoded.id;
+      let storedRefreshToken;
+
+      // firstly check whether the refresh token exists in Redis
+      try {
+        storedRefreshToken = await redisClient.get(
+          `user:${userId}:refreshToken`
+        );
+        console.log("refreshToken found in Redis!!!!!!");
+      } catch (redisError) {
+        console.error("Redis error:", redisError, "fallback to use MongoDB...");
+
+        // If Redis fails, fall back to MongoDB
+        const user = await User.findById(userId);
+        storedRefreshToken = user ? user.refreshToken : null;
+      }
+
+      // if the refresh token is not found in Redis/database,
+      // or it doesn't match the one in the request
+      if (!storedRefreshToken || storedRefreshToken !== refreshToken)
+        throw new Error("Invalid refresh token");
+
+      const user = await User.findById(userId);
+      if (!user) throw new Error("User not found");
+
+      const newToken = generateJWT({ id: user.id });
+      const newRefreshToken = generateRefreshToken({ id: user.id });
+
+      await redisClient.set(`user:${userId}:refreshToken`, newRefreshToken, {
+        EX: 60 * 60 * 24 * 7,
+      });
+
+      user.refreshToken = newRefreshToken;
       await user.save();
 
       console.log("TOKENS generated successfully from middleware!!");
-      return { user, newTokens: { token, signedRefreshToken } };
+      return {
+        user,
+        newTokens: { token: newToken, refreshToken: newRefreshToken },
+      };
     } catch (refreshError) {
       console.log("Both tokens are expired!! Checked from middleware");
       throw new Error("Both tokens expired");
@@ -108,4 +142,23 @@ export const uploadToS3 = async (fileBuffer, key, contentType) => {
 
   const command = new PutObjectCommand(params);
   return await s3.send(command);
+};
+
+export const handleTokens = async (user) => {
+  const token = generateJWT({ id: user.id });
+  const signedRefreshToken = generateRefreshToken({ id: user.id });
+
+  await redisClient.set(`user:${user.id}:refreshToken`, signedRefreshToken, {
+    EX: 60 * 60 * 24 * 7,
+  });
+
+  user.refreshToken = signedRefreshToken;
+  await user.save();
+
+  return {
+    headers: {
+      "x-new-token": token,
+      "x-new-refresh-token": signedRefreshToken,
+    },
+  };
 };

@@ -5,10 +5,10 @@ import useColorTheme from "../../hooks/useColorTheme";
 export default AppSetting = () => {
   const { colors, mode, updateTheme } = useColorTheme();
 
-  const [isEnabled, setIsEnabled] = useState(mode === "dark");
+  const [isDark, setIsDark] = useState(mode === "dark");
   const toggleSwitch = () => {
     updateTheme();
-    setIsEnabled((previousState) => !previousState);
+    setIsDark((prev) => !prev);
   };
 
   return (
@@ -20,9 +20,9 @@ export default AppSetting = () => {
         <Text style={[styles.darkMode, { color: colors.text }]}>Dark mode</Text>
         <Switch
           trackColor={{ false: "#767577", true: "#CCCCFF" }}
-          thumbColor={isEnabled ? "#7F00FF" : "#f4f3f4"}
+          thumbColor={isDark ? "#7F00FF" : "#f4f3f4"}
           onValueChange={toggleSwitch}
-          value={isEnabled}
+          value={isDark}
         />
       </View>
     </View>

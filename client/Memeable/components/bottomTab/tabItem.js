@@ -9,8 +9,8 @@ import MCIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import IonIcon from "react-native-vector-icons/Ionicons";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { getIconSource } from "../utils/helper";
-import useColorTheme from "../hooks/useColorTheme";
+import { getIconSource } from "../../utils/helper";
+import useColorTheme from "../../hooks/useColorTheme";
 
 export default TabItem = ({ onPress, isFocused, routeName, label }) => {
   const { colors } = useColorTheme();
@@ -62,7 +62,7 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
       onPress={onPress}
     >
       {/* Home, Search, Notify tabs */}
-      {routeName != "UserProfile" ? (
+      {routeName != "UserProfileStack" ? (
         <Animated.View
           style={[{ flex: 1, alignItems: "center" }, animatedIconStyle]}
         >

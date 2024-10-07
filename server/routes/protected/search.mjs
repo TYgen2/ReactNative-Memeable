@@ -13,7 +13,14 @@ router.get("/api/searchUser", authenticateToken, async (req, res) => {
   try {
     const users = await User.find(
       { displayName: new RegExp(query, "i") },
-      { authMethod: 0, email: 0, refreshToken: 0, googleId: 0, facebookId: 0 }
+      {
+        authMethod: 0,
+        email: 0,
+        refreshToken: 0,
+        googleId: 0,
+        facebookId: 0,
+        password: 0,
+      }
     );
 
     const userData = await Promise.all(

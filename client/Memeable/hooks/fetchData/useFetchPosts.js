@@ -21,7 +21,7 @@ export default useFetchPosts = () => {
 
   const fetchPosts = useCallback(
     async (page, reset = false) => {
-      // if (isLoading) return;
+      if (isLoading) return;
       setIsLoading(true);
       try {
         const response = await dispatch(

@@ -7,6 +7,7 @@ import { authenticateToken } from "../../utils/middleware.mjs";
 import { Follow } from "../../mongoose/schemas/follow.mjs";
 import mongoose from "mongoose";
 import { Comment } from "../../mongoose/schemas/comment.mjs";
+import { SavedPost } from "../../mongoose/schemas/savedPost.mjs";
 dotenv.config();
 
 const router = Router();
@@ -168,6 +169,30 @@ router.get("/api/fetchAllPosts", authenticateToken, async (req, res) => {
       },
       { $unwind: "$user" },
       {
+        $lookup: {
+          from: "comments",
+          let: { postId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$postId", "$$postId"] },
+              },
+            },
+            {
+              $count: "total",
+            },
+          ],
+          as: "commentCount",
+        },
+      },
+      {
+        $addFields: {
+          commentCount: {
+            $ifNull: [{ $arrayElemAt: ["$commentCount.total", 0] }, 0],
+          },
+        },
+      },
+      {
         $project: {
           _id: 1,
           userId: {
@@ -184,6 +209,7 @@ router.get("/api/fetchAllPosts", authenticateToken, async (req, res) => {
           createDate: 1,
           likes: 1, // Keep the original likes field
           hasLiked: 1,
+          commentCount: 1,
           timeAgo: { $literal: "" }, // Placeholder for timeAgo, to be calculated in application code
         },
       },
@@ -398,6 +424,68 @@ router.get("/api/fetchSubComments", authenticateToken, async (req, res) => {
     res.status(200).send({ subCommentData, hasMore });
   } catch (error) {
     res.status(400).send({ msg: "Error fetching sub-comments" });
+  }
+});
+
+router.get("/api/fetchSavedPosts", authenticateToken, async (req, res) => {
+  const { page, limit } = req.query;
+
+  try {
+    const savedPosts = await SavedPost.aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(req.userId) } },
+      { $sort: { savedAt: -1 } },
+      { $skip: (page - 1) * limit },
+      { $limit: Number(limit) + 1 },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "postId",
+          foreignField: "_id",
+          as: "post",
+        },
+      },
+      { $unwind: "$post" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "post.userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unwind: "$user" },
+      {
+        $project: {
+          _id: "$post._id",
+          userId: {
+            _id: "$user._id",
+            displayName: "$user.displayName",
+            icon: "$user.icon",
+          },
+          imageUri: "$post.imageUri",
+          width: "$post.width",
+          height: "$post.height",
+          title: "$post.title",
+          description: "$post.description",
+          hashtag: "$post.hashtag",
+          createDate: "$post.createDate",
+          likes: "$post.likes",
+          isSaved: { $literal: true },
+          timeAgo: { $literal: "" },
+        },
+      },
+    ]);
+
+    const hasMore = savedPosts.length > limit;
+    const postData = savedPosts.slice(0, limit).map((post) => {
+      post.timeAgo = getTimeDifference(post.createDate);
+      return post;
+    });
+
+    return res.status(200).send({ postData, hasMore });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(400).send({ msg: "Error when fetching saved posts" });
   }
 });
 

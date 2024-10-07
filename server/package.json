@@ -34,6 +34,7 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "react-native-dotenv": "^3.4.11",
+    "redis": "^4.7.0",
     "sharp": "^0.33.5"
   },
   "type": "module",

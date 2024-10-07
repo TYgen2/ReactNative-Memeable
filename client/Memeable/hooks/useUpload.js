@@ -8,8 +8,8 @@ export default useUpload = (imageUri) => {
 
   // handle post upload
   const uploadPost = async (values) => {
-    setIsUploading(true);
-    try {
+    return new Promise((resolve, reject) => {
+      setIsUploading(true);
       dispatch(
         handleUploadPost({
           imageUri,
@@ -17,12 +17,19 @@ export default useUpload = (imageUri) => {
           description: values.description,
           hashtag: values.hashtag,
         })
-      );
-    } catch (error) {
-      console.error(error.response?.data?.msg || "Error when uploading post");
-    } finally {
-      setIsUploading(false);
-    }
+      )
+        .then(() => {
+          setIsUploading(false);
+          resolve();
+        })
+        .catch((error) => {
+          setIsUploading(false);
+          console.error(
+            error.response?.data?.msg || "Error when uploading post"
+          );
+          reject(error);
+        });
+    });
   };
 
   return { isUploading, setIsUploading, uploadPost };

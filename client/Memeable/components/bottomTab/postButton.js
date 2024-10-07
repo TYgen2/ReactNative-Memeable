@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { Animated, View } from "react-native";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import IonIcon from "react-native-vector-icons/Ionicons";
-import { popInAnimations, popOutAnimations } from "../utils/animation";
+import { popInAnimations, popOutAnimations } from "../../utils/animation";
 import OutsidePressHandler from "react-native-outside-press";
-import { selectImageForUpload } from "../utils/helper";
+import { selectImageForUpload } from "../../utils/helper";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
-import useColorTheme from "../hooks/useColorTheme";
+import useColorTheme from "../../hooks/useColorTheme";
 
 export default PostButton = () => {
   const { colors } = useColorTheme();
@@ -82,9 +82,7 @@ export default PostButton = () => {
           <IonIcon name="folder-open-outline" size={30} color="white" />
         </TouchableOpacity>
       </Animated.View>
-      <View
-        style={[styles.buttonBorder, { backgroundColor: colors.secondary }]}
-      >
+      <View style={[styles.buttonBorder, { backgroundColor: "white" }]}>
         <TouchableOpacity
           style={[styles.button, { backgroundColor: colors.tabBar }]}
           activeOpacity={0.7}
@@ -92,7 +90,7 @@ export default PostButton = () => {
             pop === false ? popIn() : popOut();
           }}
         >
-          <IonIcon name="add-outline" size={28} color={colors.secondary} />
+          <IonIcon name="add-outline" size={28} color="white" />
         </TouchableOpacity>
       </View>
     </OutsidePressHandler>

@@ -14,7 +14,6 @@ import {
 } from "react-native-reanimated";
 
 export default GlowingBorder = memo(({ boxStyle, color }) => {
-  console.log("glowing border component rendered");
   const rotation = useSharedValue(0);
   const GLOW_COLOR = color + "FF";
   const GLOW_BG_COLOR = color + "00"; // Should be the same color as GLOW_COLOR but fully transparent
@@ -24,7 +23,6 @@ export default GlowingBorder = memo(({ boxStyle, color }) => {
   const centerVec = vec(centerX, centerY);
 
   useEffect(() => {
-    console.log("started animation...");
     const animation = withRepeat(
       withTiming(4, {
         duration: 4000,
