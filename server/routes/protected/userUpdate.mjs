@@ -230,4 +230,31 @@ router.post(
   }
 );
 
+// update pushToken in database
+router.post(
+  "/api/handleUpdatePushToken",
+  authenticateToken,
+  async (req, res) => {
+    const { pushToken } = req.body;
+
+    try {
+      await User.findByIdAndUpdate(
+        req.userId,
+        {
+          $set: {
+            pushToken,
+          },
+        },
+        { new: true }
+      );
+      return res.status(200).send({ msg: "pushToken updated successfully!" });
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(400)
+        .send({ msg: "Something is wrong when updating pushToken" });
+    }
+  }
+);
+
 export default router;

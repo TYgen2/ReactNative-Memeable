@@ -2,6 +2,19 @@ import axios from "axios";
 import { LOCAL_HOST } from "@env";
 import { clearTokens, storeTokens } from "../utils/tokenActions";
 import apiClient from "../utils/axiosHelper";
+import { getPushToken, sendPushTokenToServer } from "./firebaseFCM";
+
+const handleTokens = async (res) => {
+  // save the returned tokens using react-native-keychain
+  const token = res.headers["x-new-token"];
+  const refreshToken = res.headers["x-new-refresh-token"];
+  await storeTokens(token, refreshToken);
+
+  // get push token, then send it to the server to store in the database
+  const pushToken = await getPushToken();
+  const response = await sendPushTokenToServer(pushToken);
+  console.log(response.msg);
+};
 
 // local register
 export const userRegister = async (json) => {
@@ -24,9 +37,7 @@ export const userLogin = async (json) => {
   try {
     const res = await axios.post(`${LOCAL_HOST}/api/auth/login`, json);
     const { isNew, userId } = res.data;
-    const token = res.headers["x-new-token"];
-    const refreshToken = res.headers["x-new-refresh-token"];
-    await storeTokens(token, refreshToken);
+    await handleTokens(res);
 
     console.log("User logged in successfully!");
     return { success: true, isNew, userId };
@@ -42,10 +53,7 @@ export const googleLogin = async (idToken) => {
       idToken,
     });
     const { isNew, userId } = res.data;
-    const token = res.headers["x-new-token"];
-    const refreshToken = res.headers["x-new-refresh-token"];
-    console.log({ token, refreshToken });
-    await storeTokens(token, refreshToken);
+    await handleTokens(res);
 
     console.log("User logged in successfully!");
     return { success: true, isNew, userId };
@@ -61,9 +69,7 @@ export const facebookLogin = async (accessToken) => {
       accessToken,
     });
     const { isNew, userId } = res.data;
-    const token = res.headers["x-new-token"];
-    const refreshToken = res.headers["x-new-refresh-token"];
-    await storeTokens(token, refreshToken);
+    await handleTokens(res);
 
     console.log("User logged in successfully!");
     return { success: true, isNew, userId };

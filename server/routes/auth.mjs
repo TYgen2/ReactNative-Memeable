@@ -4,8 +4,6 @@ import { createUserValidationSchema } from "../validationSchemas.mjs";
 import { User } from "../mongoose/schemas/user.mjs";
 import {
   comparePassword,
-  generateJWT,
-  generateRefreshToken,
   handleTokens,
   hashPassword,
   randomUserName,
@@ -50,8 +48,6 @@ router.post(
     const newUser = new User({
       ...data,
       username: randomUserName(),
-      icon: {},
-      song: {},
     });
 
     try {
@@ -132,8 +128,6 @@ router.post("/api/auth/google", async (req, res) => {
         username: randomUserName(),
         googleId: payload.sub,
         authMethod: "google",
-        icon: {},
-        song: {},
       });
     } else if (user && user.authMethod != "google") {
       // user already used the same email to register an account with other methods
@@ -184,8 +178,6 @@ router.post("/api/auth/facebook", async (req, res) => {
         username: randomUserName(),
         facebookId: response.data.id,
         authMethod: "facebook",
-        icon: {},
-        song: {},
       });
     } else if (user && user.authMethod != "facebook") {
       console.log(
@@ -248,7 +240,10 @@ router.post("/api/auth/logout", authenticateToken, async (req, res) => {
     await redisClient
       .del(`user:${req.userId}:refreshToken`)
       .catch(console.error);
-    await User.findByIdAndUpdate(req.userId, { refreshToken: null });
+    await User.findByIdAndUpdate(req.userId, {
+      refreshToken: null,
+      pushToken: null,
+    });
     res.status(200).send({ msg: "Logged out successfully" });
   } catch (error) {
     res.status(500).send({ msg: "Error during logout" });

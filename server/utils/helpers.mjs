@@ -7,6 +7,7 @@ import { User } from "../mongoose/schemas/user.mjs";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { s3 } from "./config.mjs";
 import redisClient from "../services/redisClient.mjs";
+import admin from "../services/firebase.mjs";
 
 dotenv.config();
 
@@ -161,4 +162,21 @@ export const handleTokens = async (user) => {
       "x-new-refresh-token": signedRefreshToken,
     },
   };
+};
+
+export const sendPushNotification = async (body, token) => {
+  const message = {
+    notification: {
+      title: "Memeable",
+      body,
+    },
+    token,
+  };
+
+  try {
+    const response = await admin.messaging().send(message);
+    console.log("Notification sent successfully:", response);
+  } catch (error) {
+    console.error("Error sending notification:", error);
+  }
 };

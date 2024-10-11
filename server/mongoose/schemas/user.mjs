@@ -71,6 +71,10 @@ const UserSchema = new mongoose.Schema({
       default: null,
     },
   },
+  pushToken: {
+    type: mongoose.Schema.Types.String,
+    default: null,
+  },
 });
 
 export const User = mongoose.model("User", UserSchema);

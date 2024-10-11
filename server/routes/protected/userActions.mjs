@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { authenticateToken, upload } from "../../utils/middleware.mjs";
 import dotenv from "dotenv";
-import { getTimeDifference, randomImageName } from "../../utils/helpers.mjs";
+import {
+  getTimeDifference,
+  randomImageName,
+  sendPushNotification,
+} from "../../utils/helpers.mjs";
 import sharp from "sharp";
 import { Post } from "../../mongoose/schemas/post.mjs";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
@@ -95,6 +99,13 @@ router.post("/api/handleLike", authenticateToken, async (req, res) => {
     if (action === "like") {
       await Like.create({ userId, postId });
       await Post.findByIdAndUpdate(postId, { $inc: { likes: 1 } });
+
+      // working!!! temp token
+      await sendPushNotification(
+        "WTF MAN",
+        "foH2m8oxSNmOJfaDws2yR4:APA91bEdR8ID0YaqxOEMXfxUafn2YLO0iUQ2nwj3DkcuD2ZzajbaRCHajwza1V3Hdm62MhUhgK4nZZl7fvElliq7h9eOMvr7G6CIXBcuiSQ4sj37lYBl487pTq6tBWSixjVCIIdWm8J3"
+      );
+
       return res.status(200).send({ msg: "Liked the post!" });
     } else if (action === "unlike") {
       await Like.deleteOne({ userId, postId });
