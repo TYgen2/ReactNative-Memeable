@@ -1,7 +1,7 @@
 import { Formik } from "formik";
 import {
+  ActivityIndicator,
   Alert,
-  Image,
   ImageBackground,
   StyleSheet,
   Text,
@@ -13,23 +13,40 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { barOffset, screenWidth } from "../../utils/constants";
 import { userRegister } from "../../handleAPIs/auth";
 import { registerReviewSchema } from "../../utils/validationSchema";
+import FastImage from "react-native-fast-image";
+import { useState } from "react";
 
 export default Register = ({ navigation }) => {
-  const handleRegister = async (json) => {
-    // calling register API for getting JWT token
-    const res = await userRegister(json);
+  const [isLoading, setIsLoading] = useState(false);
 
-    // retreive the saved JWT token from localStorage
-    // and store it to global state
-    if (res.success) {
-      navigation.replace("Edit Profile", { userId: res.userId });
-    } else {
-      Alert.alert("Register failed: ", res.message);
+  const handleRegister = async (json) => {
+    setIsLoading(true);
+    try {
+      // calling register API for getting JWT token
+      const res = await userRegister(json);
+
+      // retreive the saved JWT token from localStorage
+      // and store it to global state
+      if (res.success) {
+        navigation.replace("Edit Profile", { userId: res.userId });
+      } else {
+        Alert.alert("Register failed: ", res.message);
+      }
+    } catch (error) {
+      Alert.alert("Unexpected error", error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
+      {isLoading && (
+        <View style={styles.overlay}>
+          <ActivityIndicator size="large" color="#fff" />
+          <Text style={{ color: "white", fontSize: 14 }}>chotto matte...</Text>
+        </View>
+      )}
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => navigation.pop()}
@@ -146,7 +163,7 @@ export default Register = ({ navigation }) => {
       </Formik>
       <View style={styles.gif}>
         <Text style={styles.omg}>OhmyGotto{"\n"}it's new user!</Text>
-        <Image
+        <FastImage
           source={require("../../assets/dance1.gif")}
           style={{
             flex: 1,
@@ -154,7 +171,7 @@ export default Register = ({ navigation }) => {
             height: 235,
           }}
         />
-        <Image
+        <FastImage
           source={require("../../assets/dance2.gif")}
           style={{ flex: 1, width: 250, height: 250 }}
         />
@@ -169,6 +186,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "white",
+  },
+  overlay: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
+    elevation: 1,
   },
   backButton: {
     width: 60,

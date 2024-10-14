@@ -1,8 +1,9 @@
 import axios from "axios";
-import { LOCAL_HOST } from "@env";
 import { clearTokens, storeTokens } from "../utils/tokenActions";
 import apiClient from "../utils/axiosHelper";
 import { getPushToken, sendPushTokenToServer } from "./firebaseFCM";
+
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 const handleTokens = async (res) => {
   // save the returned tokens using react-native-keychain
@@ -19,11 +20,9 @@ const handleTokens = async (res) => {
 // local register
 export const userRegister = async (json) => {
   try {
-    const res = await axios.post(`${LOCAL_HOST}/api/auth/register`, json);
+    const res = await axios.post(`${BACKEND_URL}/api/auth/register`, json);
     const { isNew, userId } = res.data;
-    const token = res.headers["x-new-token"];
-    const refreshToken = res.headers["x-new-refresh-token"];
-    await storeTokens(token, refreshToken);
+    await handleTokens(res);
 
     console.log("User registered and logged in successfully!");
     return { success: true, isNew, userId };
@@ -35,7 +34,7 @@ export const userRegister = async (json) => {
 // local login
 export const userLogin = async (json) => {
   try {
-    const res = await axios.post(`${LOCAL_HOST}/api/auth/login`, json);
+    const res = await axios.post(`${BACKEND_URL}/api/auth/login`, json);
     const { isNew, userId } = res.data;
     await handleTokens(res);
 
@@ -49,7 +48,7 @@ export const userLogin = async (json) => {
 // google login
 export const googleLogin = async (idToken) => {
   try {
-    const res = await axios.post(`${LOCAL_HOST}/api/auth/google`, {
+    const res = await axios.post(`${BACKEND_URL}/api/auth/google`, {
       idToken,
     });
     const { isNew, userId } = res.data;
@@ -65,7 +64,7 @@ export const googleLogin = async (idToken) => {
 // facebook login
 export const facebookLogin = async (accessToken) => {
   try {
-    const res = await axios.post(`${LOCAL_HOST}/api/auth/facebook`, {
+    const res = await axios.post(`${BACKEND_URL}/api/auth/facebook`, {
       accessToken,
     });
     const { isNew, userId } = res.data;

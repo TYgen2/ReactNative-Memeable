@@ -1,5 +1,4 @@
 import { Dimensions, StatusBar, StyleSheet, View } from "react-native";
-import { GOOGLE_ANDROID_CLIENT_ID, GOOGLE_WEB_CLIENT_ID } from "@env";
 import { ActivityIndicator } from "react-native";
 
 const dimensions = Dimensions.get("screen");
@@ -8,8 +7,8 @@ export const screenHeight = dimensions.height;
 export const barOffset = StatusBar.currentHeight;
 
 export const googleLoginConfig = {
-  webClientId: GOOGLE_WEB_CLIENT_ID,
-  androidClientId: GOOGLE_ANDROID_CLIENT_ID,
+  webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+  androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
 };
 
 export const DEFAULT_ICONS = [

@@ -7,10 +7,19 @@
       "developmentClient": true,
       "distribution": "internal"
     },
+    "production": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_BACKEND_URL": "EXPO_PUBLIC_BACKEND_URL",
+        "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID",
+        "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID",
+        "EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN": "EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN",
+        "EXPO_PUBLIC_FACEBOOK_APP_ID": "EXPO_PUBLIC_FACEBOOK_APP_ID"
+      }
+    },
     "preview": {
       "distribution": "internal"
-    },
-    "production": {}
+    }
   },
   "submit": {
     "production": {}

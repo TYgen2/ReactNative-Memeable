@@ -39,9 +39,9 @@ export default {
       [
         "react-native-fbsdk-next",
         {
-          appID: process.env.FACEBOOK_APP_ID,
+          appID: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID,
           displayName: "Memeable",
-          clientToken: process.env.FACEBOOK_CLIENT_TOKEN,
+          clientToken: process.env.EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN,
           scheme: "com.tychow45.memeable",
         },
       ],

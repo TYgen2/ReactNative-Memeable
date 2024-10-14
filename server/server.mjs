@@ -5,14 +5,15 @@ import passport from "passport";
 import mongoose from "mongoose";
 import morgan from "morgan";
 import dotenv from "dotenv";
-import serverless from "serverless-http";
 dotenv.config();
 
 const app = express();
+const connectedDB =
+  process.env.NODE_ENV === "development" ? "localhost" : "Atlas";
 
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("Connected to MongoDB"))
+  .then(() => console.log(`Connected to MongoDB ${connectedDB}`))
   .catch((err) => console.log(`Error: `, err));
 
 app.use(express.json());
@@ -22,7 +23,6 @@ app.use(morgan("dev"));
 app.use(passport.initialize());
 app.use(routes);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server listening to port ${PORT}...`));
-
-// export const handler = serverless(app);
+app.listen(5000, "0.0.0.0", () =>
+  console.log(`Server listening to port 5000...`)
+);
