@@ -1,7 +1,7 @@
-# 😎Memeable (React Native, Express, MongoDB)
+# 😎Memeable (React Native, Express, MongoDB, AWS)
 A social-media-like mobile app for posting and viewing images. Unlike the
 previous project using Firebase service as the backend, I'm using Express
-to build some API for handling all the request (local development).
+to build some API for handling all the request, hosted on AWS EC2.
 
 The authentication uses the JWT-based method to handle login and register.
 Local login using Email&Password, Google and Facebook login is supported. If user is
