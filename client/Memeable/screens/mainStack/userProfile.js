@@ -3,10 +3,11 @@ import {
   FlatList,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { useSelector } from "react-redux";
-import UserPost from "../../components/post/userPost";
+import UserPostGrid from "../../components/post/userPostGrid";
 import { useCallback, useRef } from "react";
 import useFetchProfileInfo from "../../hooks/fetchData/useFetchProfileInfo";
 import useFetchPostsForUser from "../../hooks/fetchData/useFetchPostsForUser";
@@ -29,9 +30,12 @@ export default UserProfile = ({ route, navigation }) => {
   const { userPosts, isPostsLoading, loadMorePosts } =
     useFetchPostsForUser(targetId);
 
-  const renderPost = useCallback(({ item }) => {
-    return <UserPost item={item} />;
-  }, []);
+  const renderPost = useCallback(
+    ({ item }) => {
+      return <UserPostGrid item={item} navigation={navigation} />;
+    },
+    [navigation]
+  );
 
   // handle instant UI reflect (follower, following)
   useFocusEffect(

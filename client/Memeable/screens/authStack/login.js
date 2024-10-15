@@ -1,5 +1,5 @@
 import {
-  Alert,
+  ActivityIndicator,
   Image,
   ImageBackground,
   Pressable,
@@ -11,82 +11,12 @@ import {
 } from "react-native";
 import { Formik } from "formik";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { googleLoginConfig, screenWidth } from "../../utils/constants";
+import { screenWidth } from "../../utils/constants";
 import { loginReviewSchema } from "../../utils/validationSchema";
-import { useDispatch } from "react-redux";
-import { facebookLogin, googleLogin, userLogin } from "../../handleAPIs/auth";
-import * as WebBrowser from "expo-web-browser";
-import * as Google from "expo-auth-session/providers/google";
-import { useEffect } from "react";
-import { LoginManager, AccessToken } from "react-native-fbsdk-next";
-import { fetchUserInfo } from "../../store/userActions";
-import { apiQueue } from "../../utils/helper";
-
-WebBrowser.maybeCompleteAuthSession();
+import useLogin from "../../hooks/auth/useLogin";
 
 export default Login = ({ navigation }) => {
-  const dispatch = useDispatch();
-
-  const handleLogin = async (method, payload) => {
-    let loginFunction;
-    switch (method) {
-      case "Local":
-        loginFunction = () => userLogin(payload);
-        break;
-      case "Google":
-        loginFunction = () => googleLogin(payload);
-        break;
-      case "Facebook":
-        loginFunction = () => facebookLogin(payload);
-        break;
-      default:
-        return;
-    }
-
-    const res = await apiQueue.add(loginFunction);
-
-    if (!res.success) {
-      Alert.alert(`${method} login failed: `, res.message);
-      return;
-    }
-    console.log(`Logged in with ${method} method!`);
-
-    await apiQueue.add(() => {
-      if (res.isNew) {
-        navigation.replace("Edit Profile", { userId: res.userId });
-      } else {
-        // User exist, proceed to fetch user info before login
-        dispatch(fetchUserInfo());
-      }
-    });
-  };
-
-  const [request, response, promptAsync] =
-    Google.useAuthRequest(googleLoginConfig);
-
-  useEffect(() => {
-    // handle google login
-    if (response?.type == "success") {
-      const { authentication } = response;
-      const idToken = authentication?.idToken;
-
-      handleLogin("Google", idToken);
-    }
-  }, [response]);
-
-  const handleFacebook = async () => {
-    LoginManager.logInWithPermissions(["public_profile", "email"]).then(
-      (res) => {
-        if (res.grantedPermissions) {
-          AccessToken.getCurrentAccessToken().then((data) => {
-            handleLogin("Facebook", data.accessToken);
-          });
-        } else {
-          console.log("Facebook login failed WTF???");
-        }
-      }
-    );
-  };
+  const { isLoading, handleLogin, promptAsync, handleFacebook } = useLogin();
 
   return (
     <View style={styles.container}>
@@ -146,7 +76,11 @@ export default Login = ({ navigation }) => {
               activeOpacity={0.6}
               onPress={props.handleSubmit}
             >
-              <Text style={{ fontWeight: "bold", color: "white" }}>LOGIN</Text>
+              {isLoading ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <Text style={styles.loginText}>LOGIN</Text>
+              )}
             </TouchableOpacity>
           </View>
         )}
@@ -155,15 +89,7 @@ export default Login = ({ navigation }) => {
         {/* helper */}
         <Text>Don't have an account yet?</Text>
         <Pressable onPress={() => navigation.push("Register")}>
-          <Text
-            style={{
-              fontWeight: "bold",
-              color: "#4682B4",
-              textAlign: "center",
-            }}
-          >
-            Register now 😎
-          </Text>
+          <Text style={styles.registerNowText}>Register now 😎</Text>
         </Pressable>
       </View>
       {/* gap line */}
@@ -190,21 +116,21 @@ export default Login = ({ navigation }) => {
         </Text>
         <View style={styles.methodContainer}>
           <TouchableOpacity
-            style={styles.methodIcon}
+            style={styles.methodIconContainer}
             onPress={() => handleFacebook()}
           >
             <Image
               source={require("../../assets/facebook.png")}
-              style={{ width: 50, height: 50, borderRadius: 50 }}
+              style={styles.methodIcon}
             />
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.methodIcon}
+            style={styles.methodIconContainer}
             onPress={() => promptAsync()}
           >
             <Image
               source={require("../../assets/google.png")}
-              style={{ width: 50, height: 50, borderRadius: 50 }}
+              style={styles.methodIcon}
             />
           </TouchableOpacity>
         </View>
@@ -290,11 +216,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
   },
-  methodIcon: {
+  methodIconContainer: {
     width: 50,
     height: 50,
     borderRadius: 50,
     elevation: 6,
     marginHorizontal: 10,
   },
+  methodIcon: { width: 50, height: 50, borderRadius: 50 },
+  registerNowText: {
+    fontWeight: "bold",
+    color: "#4682B4",
+    textAlign: "center",
+  },
+  loginText: { fontWeight: "bold", color: "white" },
 });

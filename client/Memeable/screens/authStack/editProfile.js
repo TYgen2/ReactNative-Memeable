@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
 import {
-  Animated,
+  ActivityIndicator,
   FlatList,
   Image,
   StyleSheet,
@@ -14,21 +13,21 @@ import {
   screenWidth,
 } from "../../utils/constants";
 import EffectiveGIF from "../../components/effectiveGIF";
-import { hideGIF, showGIF } from "../../utils/animation";
 import { selectImageForProfile } from "../../utils/helper";
+import useEditProfile from "../../hooks/auth/useEditProfile";
 
-import { useDispatch, useSelector } from "react-redux";
-import { handleIconUpload } from "../../handleAPIs/userActions";
-import { fetchUserInfo } from "../../store/userActions";
-
-export default EditProfile = ({ route }) => {
-  const { userId } = route.params;
-  const [icon, setIcon] = useState(DEFAULT_ICONS[0]);
-  const [customIcon, setCustomIcon] = useState(null);
-  const [bgColor, setBgColor] = useState("white");
-  const [gif] = useState(new Animated.Value(0));
-
-  const dispatch = useDispatch();
+const EditProfile = () => {
+  const {
+    icon,
+    bgColor,
+    customIcon,
+    gif,
+    isLoading,
+    setCustomIcon,
+    setIcon,
+    setBgColor,
+    handleContinue,
+  } = useEditProfile();
 
   // Flatlist render item (Icons)
   const renderIcons = ({ item }) => {
@@ -43,14 +42,7 @@ export default EditProfile = ({ route }) => {
         }}
       >
         <View style={styles.defaultIconInnerBorder}>
-          <Image
-            source={item.source}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 40,
-            }}
-          />
+          <Image source={item.source} style={styles.defaultIconOption} />
         </View>
       </TouchableOpacity>
     );
@@ -59,13 +51,7 @@ export default EditProfile = ({ route }) => {
   const renderBGcolor = ({ item }) => {
     return (
       <TouchableOpacity
-        style={{
-          width: 30,
-          height: 30,
-          borderRadius: 30,
-          margin: 5,
-          backgroundColor: item,
-        }}
+        style={[styles.bgColorOption, { backgroundColor: item }]}
         disabled={customIcon ? true : false}
         onPress={() => {
           setBgColor(item);
@@ -77,43 +63,21 @@ export default EditProfile = ({ route }) => {
     );
   };
 
-  useEffect(() => {
-    if (icon != DEFAULT_ICONS[1].source || customIcon) {
-      hideGIF(gif);
-    }
-  }, [icon, customIcon]);
-
   return (
     <View style={styles.container}>
       <View style={styles.title}>
-        <Text style={{ fontWeight: "bold", fontSize: 28 }}>
-          Profile picture 😎
-        </Text>
+        <Text style={styles.titleText}>Profile picture 😎</Text>
       </View>
       <EffectiveGIF gif={gif} />
       <View style={styles.iconContainer}>
         <View style={styles.iconBorder}>
           <View style={styles.iconInsideBorder}>
             {customIcon ? (
-              <Image
-                source={{ uri: customIcon }}
-                style={{
-                  width: 260,
-                  height: 260,
-                  borderRadius: 260,
-                  resizeMode: "cover",
-                }}
-              />
+              <Image source={{ uri: customIcon }} style={styles.customIcon} />
             ) : (
               <Image
                 source={icon.source}
-                style={{
-                  width: 260,
-                  height: 260,
-                  borderRadius: 260,
-                  resizeMode: "cover",
-                  backgroundColor: bgColor,
-                }}
+                style={[styles.defaultIcon, { backgroundColor: bgColor }]}
               />
             )}
           </View>
@@ -122,21 +86,17 @@ export default EditProfile = ({ route }) => {
 
       {/* some default icons */}
       <View style={styles.optionContainer}>
-        <Text style={{ fontWeight: "bold", fontSize: 20, paddingBottom: 10 }}>
-          Default meme icons
-        </Text>
+        <Text style={styles.subTitleText}>Default meme icons</Text>
         <FlatList
           data={DEFAULT_ICONS}
           renderItem={renderIcons}
           horizontal={true}
         />
         <Text
-          style={{
-            fontWeight: "bold",
-            fontSize: 20,
-            paddingBottom: 10,
-            color: customIcon ? "grey" : "black",
-          }}
+          style={[
+            styles.subTitleText,
+            { color: customIcon ? "grey" : "black" },
+          ]}
         >
           Icon background colors
         </Text>
@@ -144,12 +104,10 @@ export default EditProfile = ({ route }) => {
           data={ICON_BGCOLOR}
           renderItem={renderBGcolor}
           numColumns={5}
-          contentContainerStyle={{
-            backgroundColor: "rgba(0,0,0, 0.1)",
-            padding: 10,
-            borderRadius: 10,
-            opacity: customIcon ? 0.3 : 1,
-          }}
+          contentContainerStyle={[
+            styles.flatList,
+            { opacity: customIcon ? 0.3 : 1 },
+          ]}
         />
         <View style={styles.gapContainer}>
           <View
@@ -175,32 +133,25 @@ export default EditProfile = ({ route }) => {
             selectImageForProfile(setCustomIcon);
           }}
         >
-          <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>
-            Select from album
-          </Text>
+          <Text style={styles.buttonText}>Select from album</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
           activeOpacity={0.8}
-          onPress={async () => {
-            const iconJSON = {
-              id: icon.id,
-              bgColor,
-              customIcon,
-            };
-            await handleIconUpload(iconJSON);
-
-            dispatch(fetchUserInfo());
-          }}
+          onPress={handleContinue}
         >
-          <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>
-            Continue
-          </Text>
+          {isLoading ? (
+            <ActivityIndicator size="large" color="white" />
+          ) : (
+            <Text style={styles.buttonText}>Continue</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
   );
 };
+
+export default EditProfile;
 
 const styles = StyleSheet.create({
   container: {
@@ -215,6 +166,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingTop: 60,
   },
+  titleText: { fontWeight: "bold", fontSize: 28 },
   gif: {
     position: "absolute",
     zIndex: 1,
@@ -247,6 +199,18 @@ const styles = StyleSheet.create({
     flex: 2,
     justifyContent: "center",
     alignItems: "center",
+  },
+  subTitleText: { fontWeight: "bold", fontSize: 20, paddingBottom: 10 },
+  defaultIcon: {
+    width: 260,
+    height: 260,
+    borderRadius: 260,
+    resizeMode: "cover",
+  },
+  defaultIconOption: {
+    width: 40,
+    height: 40,
+    borderRadius: 40,
   },
   defaultIconBorder: {
     width: 50,
@@ -290,5 +254,23 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  bgColorOption: {
+    width: 30,
+    height: 30,
+    borderRadius: 30,
+    margin: 5,
+  },
+  customIcon: {
+    width: 260,
+    height: 260,
+    borderRadius: 260,
+    resizeMode: "cover",
+  },
+  buttonText: { color: "white", fontSize: 24, fontWeight: "bold" },
+  flatList: {
+    backgroundColor: "rgba(0,0,0, 0.1)",
+    padding: 10,
+    borderRadius: 10,
   },
 });

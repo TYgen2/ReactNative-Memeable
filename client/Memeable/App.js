@@ -33,6 +33,7 @@ import editBorderColor from "./screens/settingStack/editBorderColor";
 import { ThemeContext } from "./context/theme";
 import { getData, storeData } from "./config/asyncStorage";
 import useColorTheme from "./hooks/useColorTheme";
+import DetailedPost from "./screens/mainStack/detailedPost";
 
 const persistor = persistStore(store);
 enableScreens();
@@ -90,6 +91,11 @@ const UserProfileScreen = () => {
         name="UserProfile"
         component={userProfile}
         initialParams={{ targetId: userDetails.userId }}
+      />
+      <UserProfileStack.Screen
+        name="DetailedPost"
+        component={DetailedPost}
+        options={{ headerShown: true, title: "Posts" }}
       />
     </UserProfileStack.Navigator>
   );

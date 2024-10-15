@@ -101,10 +101,10 @@ router.post("/api/handleLike", authenticateToken, async (req, res) => {
       await Post.findByIdAndUpdate(postId, { $inc: { likes: 1 } });
 
       // working!!! temp token
-      await sendPushNotification(
-        "WTF MAN",
-        "foH2m8oxSNmOJfaDws2yR4:APA91bEdR8ID0YaqxOEMXfxUafn2YLO0iUQ2nwj3DkcuD2ZzajbaRCHajwza1V3Hdm62MhUhgK4nZZl7fvElliq7h9eOMvr7G6CIXBcuiSQ4sj37lYBl487pTq6tBWSixjVCIIdWm8J3"
-      );
+      // await sendPushNotification(
+      //   "WTF MAN",
+      //   "foH2m8oxSNmOJfaDws2yR4:APA91bEdR8ID0YaqxOEMXfxUafn2YLO0iUQ2nwj3DkcuD2ZzajbaRCHajwza1V3Hdm62MhUhgK4nZZl7fvElliq7h9eOMvr7G6CIXBcuiSQ4sj37lYBl487pTq6tBWSixjVCIIdWm8J3"
+      // );
 
       return res.status(200).send({ msg: "Liked the post!" });
     } else if (action === "unlike") {

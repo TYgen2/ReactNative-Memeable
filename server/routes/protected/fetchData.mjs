@@ -290,6 +290,30 @@ router.get("/api/fetchUserPosts", authenticateToken, async (req, res) => {
       },
       { $unwind: "$user" },
       {
+        $lookup: {
+          from: "comments",
+          let: { postId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$postId", "$$postId"] },
+              },
+            },
+            {
+              $count: "total",
+            },
+          ],
+          as: "commentCount",
+        },
+      },
+      {
+        $addFields: {
+          commentCount: {
+            $ifNull: [{ $arrayElemAt: ["$commentCount.total", 0] }, 0],
+          },
+        },
+      },
+      {
         $project: {
           _id: 1,
           userId: {
@@ -306,6 +330,7 @@ router.get("/api/fetchUserPosts", authenticateToken, async (req, res) => {
           createDate: 1,
           likes: 1, // Keep the original likes field
           hasLiked: 1,
+          commentCount: 1,
           timeAgo: { $literal: "" }, // Placeholder for timeAgo, to be calculated in application code
         },
       },

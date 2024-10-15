@@ -1,7 +1,6 @@
 import { Formik } from "formik";
 import {
   ActivityIndicator,
-  Alert,
   ImageBackground,
   StyleSheet,
   Text,
@@ -11,42 +10,15 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { barOffset, screenWidth } from "../../utils/constants";
-import { userRegister } from "../../handleAPIs/auth";
 import { registerReviewSchema } from "../../utils/validationSchema";
 import FastImage from "react-native-fast-image";
-import { useState } from "react";
+import useRegister from "../../hooks/auth/useRegister";
 
 export default Register = ({ navigation }) => {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleRegister = async (json) => {
-    setIsLoading(true);
-    try {
-      // calling register API for getting JWT token
-      const res = await userRegister(json);
-
-      // retreive the saved JWT token from localStorage
-      // and store it to global state
-      if (res.success) {
-        navigation.replace("Edit Profile", { userId: res.userId });
-      } else {
-        Alert.alert("Register failed: ", res.message);
-      }
-    } catch (error) {
-      Alert.alert("Unexpected error", error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { isLoading, handleRegister } = useRegister();
 
   return (
     <View style={styles.container}>
-      {isLoading && (
-        <View style={styles.overlay}>
-          <ActivityIndicator size="large" color="#fff" />
-          <Text style={{ color: "white", fontSize: 14 }}>chotto matte...</Text>
-        </View>
-      )}
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => navigation.pop()}
@@ -154,9 +126,11 @@ export default Register = ({ navigation }) => {
               activeOpacity={0.6}
               onPress={props.handleSubmit}
             >
-              <Text style={{ fontWeight: "bold", color: "white" }}>
-                SIGN UP
-              </Text>
+              {isLoading ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <Text style={styles.signUpText}>SIGN UP</Text>
+              )}
             </TouchableOpacity>
           </View>
         )}
@@ -165,15 +139,11 @@ export default Register = ({ navigation }) => {
         <Text style={styles.omg}>OhmyGotto{"\n"}it's new user!</Text>
         <FastImage
           source={require("../../assets/dance1.gif")}
-          style={{
-            flex: 1,
-            width: 235,
-            height: 235,
-          }}
+          style={styles.danceGIF1}
         />
         <FastImage
           source={require("../../assets/dance2.gif")}
-          style={{ flex: 1, width: 250, height: 250 }}
+          style={styles.danceGIF2}
         />
       </View>
     </View>
@@ -276,5 +246,16 @@ const styles = StyleSheet.create({
   thinking: {
     width: 160,
     height: 160,
+  },
+  signUpText: { fontWeight: "bold", color: "white" },
+  danceGIF1: {
+    flex: 1,
+    width: 235,
+    height: 235,
+  },
+  danceGIF2: {
+    flex: 1,
+    width: 250,
+    height: 250,
   },
 });

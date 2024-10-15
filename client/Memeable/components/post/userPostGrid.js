@@ -3,12 +3,14 @@ import { screenWidth } from "../../utils/constants";
 import FastImage from "react-native-fast-image";
 import { memo } from "react";
 
-export default UserPost = memo(({ item }) => {
+export default UserPostGrid = memo(({ item, navigation }) => {
   return (
     <TouchableOpacity
       style={styles.imageContainer}
       activeOpacity={0.8}
-      onPress={() => console.log(item)}
+      onPress={() => {
+        navigation.navigate("DetailedPost", { item });
+      }}
     >
       <FastImage source={{ uri: item.imageUri }} style={styles.image} />
     </TouchableOpacity>
