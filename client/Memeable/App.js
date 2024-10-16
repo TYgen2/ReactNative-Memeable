@@ -63,26 +63,51 @@ const AuthStackScreen = () => {
 
 // For logged in users, Home tab
 const HomeScreen = () => {
+  const { colors } = useColorTheme();
+
   return (
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
       <HomeStack.Screen name="Home" component={home} />
       <HomeStack.Screen name="UserProfile" component={userProfile} />
+      <HomeStack.Screen
+        name="DetailedPost"
+        component={DetailedPost}
+        options={{
+          headerShown: true,
+          title: "Posts",
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: colors.text,
+        }}
+      />
     </HomeStack.Navigator>
   );
 };
 
 // Explore tab
 const ExploreScreen = () => {
+  const { colors } = useColorTheme();
+
   return (
     <ExploreStack.Navigator screenOptions={{ headerShown: false }}>
       <ExploreStack.Screen name="Search" component={search} />
       <ExploreStack.Screen name="UserProfile" component={userProfile} />
+      <ExploreStack.Screen
+        name="DetailedPost"
+        component={DetailedPost}
+        options={{
+          headerShown: true,
+          title: "Posts",
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: colors.text,
+        }}
+      />
     </ExploreStack.Navigator>
   );
 };
 
 // User profile tab
 const UserProfileScreen = () => {
+  const { colors } = useColorTheme();
   const { userDetails } = useSelector((state) => state.user);
 
   return (
@@ -95,7 +120,12 @@ const UserProfileScreen = () => {
       <UserProfileStack.Screen
         name="DetailedPost"
         component={DetailedPost}
-        options={{ headerShown: true, title: "Posts" }}
+        options={{
+          headerShown: true,
+          title: "Posts",
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: colors.text,
+        }}
       />
     </UserProfileStack.Navigator>
   );

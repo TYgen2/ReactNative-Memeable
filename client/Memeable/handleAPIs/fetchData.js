@@ -25,10 +25,10 @@ export const fetchUserPosts = async (page, limit, targetId) => {
   }
 };
 
-export const fetchComments = async (page, limit, postId) => {
+export const fetchComments = async (page, limit, postId, parentCommentId) => {
   try {
     const response = await apiClient.get("/fetchComments", {
-      params: { postId, page, limit },
+      params: { postId, parentCommentId, page, limit },
     });
 
     return response.data;

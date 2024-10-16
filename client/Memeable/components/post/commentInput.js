@@ -1,50 +1,80 @@
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import FastImage from "react-native-fast-image";
 import { handleComment } from "../../handleAPIs/userActions";
 
-const CommentInput = memo(({ postId, userIcon, onCommentPosted, colors }) => {
-  const [comment, setComment] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
+const CommentInput = memo(
+  ({
+    postId,
+    userIcon,
+    onCommentPosted,
+    colors,
+    replyInfo,
+    onReplyComplete,
+  }) => {
+    const [comment, setComment] = useState("");
+    const [isFocused, setIsFocused] = useState(false);
 
-  const submitComment = useCallback(async () => {
-    const res = await handleComment(postId, comment);
-    if (res.comment) {
-      onCommentPosted(res.comment);
-      setComment("");
-    }
-  }, [postId, comment, onCommentPosted]);
+    useEffect(() => {
+      if (replyInfo) {
+        setComment(`@${replyInfo.username} `);
+      } else {
+        setComment("");
+      }
+    }, [replyInfo]);
 
-  return (
-    <View style={styles.commentInputContainer}>
-      <View style={styles.userIconContainer}>
-        <FastImage source={userIcon} style={styles.userIcon} />
+    const submitComment = useCallback(async () => {
+      let isSubComment = false;
+      let finalComment = comment.trim();
+
+      if (replyInfo && finalComment.startsWith(`@${replyInfo.username}`)) {
+        isSubComment = true;
+      }
+
+      console.log(isSubComment ? "sub comment" : "main comment");
+      const res = await handleComment(
+        postId,
+        isSubComment ? replyInfo.commentId : null,
+        finalComment
+      );
+      if (res.comment) {
+        onCommentPosted(res.comment);
+        setComment("");
+        onReplyComplete();
+      }
+    }, [postId, comment, onCommentPosted, replyInfo, onReplyComplete]);
+
+    return (
+      <View style={styles.commentInputContainer}>
+        <View style={styles.userIconContainer}>
+          <FastImage source={userIcon} style={styles.userIcon} />
+        </View>
+        <BottomSheetTextInput
+          style={[styles.commentInputField, { color: colors.text }]}
+          placeholder="Add a comment..."
+          placeholderTextColor="grey"
+          value={comment}
+          onChangeText={(text) => setComment(text)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+        />
+        <View
+          style={[
+            styles.postButtonContainer,
+            { backgroundColor: colors.tertiary },
+          ]}
+        >
+          <TouchableOpacity style={styles.postButton} onPress={submitComment}>
+            <Text style={[styles.commentButtonText, { color: colors.text }]}>
+              Post
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-      <BottomSheetTextInput
-        style={[styles.commentInputField, { color: colors.text }]}
-        placeholder="Add a comment..."
-        placeholderTextColor="grey"
-        value={comment}
-        onChangeText={(text) => setComment(text)}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-      />
-      <View
-        style={[
-          styles.postButtonContainer,
-          { backgroundColor: colors.tertiary },
-        ]}
-      >
-        <TouchableOpacity style={styles.postButton} onPress={submitComment}>
-          <Text style={[styles.commentButtonText, { color: colors.text }]}>
-            Post
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-});
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   commentInputContainer: {

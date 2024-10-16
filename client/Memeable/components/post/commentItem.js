@@ -6,18 +6,20 @@ import {
   TouchableOpacity,
   Pressable,
 } from "react-native";
-import { getIconSource, navigateToUserProfile } from "../../utils/helper";
-import { memo } from "react";
+import { getIconSource } from "../../utils/helper";
+import { memo, useState } from "react";
 import Icon from "react-native-vector-icons/Ionicons";
 
-export default CommentItem = memo(({ item, navigation, colors }) => {
+export default CommentItem = memo(({ item, navigation, colors, onReply }) => {
   const iconBgColor = item.user?.icon.bgColor || "transparent";
   const iconSource = getIconSource(item.user?.icon);
+
+  const [isSubCommentsExpanded, setIsSubCommentsExpanded] = useState(false);
 
   return (
     <View style={styles.container}>
       {/* icon */}
-      <Pressable style={styles.icon}>
+      <Pressable style={styles.icon} onPress={() => navigation(item?.userId)}>
         <Image
           source={iconSource}
           style={[styles.icon, { backgroundColor: iconBgColor }]}
@@ -27,14 +29,42 @@ export default CommentItem = memo(({ item, navigation, colors }) => {
       {/* text info */}
       <View style={styles.textInfo}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={[styles.displayName, { color: colors.text }]}>
-            {item.user?.displayName}
-          </Text>
+          {/* display name */}
+          <Pressable onPress={() => navigation(item?.userId)}>
+            <Text style={[styles.displayName, { color: colors.text }]}>
+              {item.user?.displayName}
+            </Text>
+          </Pressable>
+
+          {/* comment time ago */}
           <Text style={styles.timeAgo}>{item.timeAgo}</Text>
         </View>
+
+        {/* comment content */}
         <Text style={[styles.content, { color: colors.text }]}>
           {item.content}
         </Text>
+
+        {/* reply button */}
+        <Pressable onPress={() => onReply(item.user.displayName, item._id)}>
+          <Text style={styles.replyText}>Reply</Text>
+        </Pressable>
+
+        {/* see sub comments */}
+        {item.hasSubComment && (
+          <Pressable
+            onPress={() => {
+              setIsSubCommentsExpanded(!isSubCommentsExpanded);
+              if (!isSubCommentsExpanded) {
+                onFetchSubComments(item._id);
+              }
+            }}
+          >
+            <Text style={styles.otherReplyText}>
+              {isSubCommentsExpanded ? "Hide replies" : "See other replies"}
+            </Text>
+          </Pressable>
+        )}
       </View>
 
       {/* like count */}
@@ -76,4 +106,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   likes: { fontSize: 14, color: "grey" },
+  replyText: { fontSize: 12, color: "grey" },
+  otherReplyText: { marginLeft: 20, marginTop: 10, color: "grey" },
 });

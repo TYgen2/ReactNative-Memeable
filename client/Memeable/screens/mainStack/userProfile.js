@@ -3,7 +3,6 @@ import {
   FlatList,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { useSelector } from "react-redux";
@@ -27,7 +26,7 @@ export default UserProfile = ({ route, navigation }) => {
   const { userData, setUserData, isMe, isInfoLoading, handlePressed } =
     useFetchProfileInfo(userDetails?.userId, targetId);
 
-  const { userPosts, isPostsLoading, loadMorePosts } =
+  const { userPosts, isPostsLoading, loadMorePosts, refreshPosts } =
     useFetchPostsForUser(targetId);
 
   const renderPost = useCallback(
@@ -79,6 +78,7 @@ export default UserProfile = ({ route, navigation }) => {
       overScrollMode="never"
       onEndReached={loadMorePosts}
       refreshing={isPostsLoading}
+      onRefresh={refreshPosts}
       ListEmptyComponent={
         <UserProfileEmpty isPostsLoading={isPostsLoading} colors={colors} />
       }

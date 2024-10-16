@@ -1,6 +1,7 @@
-import { View, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { screenWidth } from "../utils/constants";
 import { getIconSource, navigateToUserProfile } from "../utils/helper";
+import FastImage from "react-native-fast-image";
 import { memo } from "react";
 
 export default SearchedUser = memo(({ item, navigation, colors }) => {
@@ -13,7 +14,7 @@ export default SearchedUser = memo(({ item, navigation, colors }) => {
       activeOpacity={0.5}
       onPress={() => navigateToUserProfile(navigation, item._id)}
     >
-      <Image
+      <FastImage
         source={iconSource}
         style={[styles.icon, { backgroundColor: iconBgColor }]}
       />

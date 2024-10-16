@@ -71,7 +71,7 @@ export const usePostViewModel = (initialPostData) => {
         userId: userDetails.userId,
       };
 
-      setComments((prevComments) => [enhancedComment, ...prevComments]);
+      setComments((prevComments) => [...prevComments, enhancedComment]);
     },
     [userDetails]
   );

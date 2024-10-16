@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchComments } from "../../handleAPIs/fetchData";
 import { debounce } from "lodash";
 
-export default useFetchComments = (postId) => {
+const useFetchComments = (postId) => {
   const [comments, setComments] = useState([]);
   const commentsRef = useRef(comments);
 
@@ -50,6 +50,8 @@ export default useFetchComments = (postId) => {
     ]
   );
 
+  const fetchSubComments = useCallback((parentCommentId) => {});
+
   return {
     comments,
     setComments,
@@ -59,3 +61,5 @@ export default useFetchComments = (postId) => {
     isLoadingMore,
   };
 };
+
+export default useFetchComments;

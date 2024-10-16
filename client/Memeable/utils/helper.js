@@ -149,7 +149,7 @@ export const calculatePostHeight = (imageHeight, imageWidth) => {
 };
 
 export const navigateToUserProfile = (navigation, targetId) => {
-  navigation.navigate("UserProfile", {
+  navigation.push("UserProfile", {
     isStack: true,
     targetId,
   });

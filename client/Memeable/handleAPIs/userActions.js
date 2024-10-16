@@ -88,9 +88,13 @@ export const handleSavePost = async (postId, action) => {
   }
 };
 
-export const handleComment = async (postId, content) => {
+export const handleComment = async (postId, parentCommentId, content) => {
   try {
-    const res = await apiClient.post("/handleComment", { postId, content });
+    const res = await apiClient.post("/handleComment", {
+      postId,
+      parentCommentId,
+      content,
+    });
     const { msg, comment } = res.data;
 
     console.log("Commented successfully!");

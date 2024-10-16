@@ -45,6 +45,11 @@ export default useFetchPostsForUser = (targetId) => {
     await fetchPosts(currentPage + 1);
   }, [isPostsLoading, hasMore, userPosts.length, currentPage]);
 
+  const refreshPosts = async () => {
+    console.log("refreshing...");
+    await fetchPosts(1, true);
+  };
+
   // this helps to get the lastest value of allPosts
   useEffect(() => {
     userPostsRef.current = userPosts;
@@ -55,5 +60,5 @@ export default useFetchPostsForUser = (targetId) => {
     fetchPosts(1, true);
   }, [userDetails.postsCount]);
 
-  return { userPosts, isPostsLoading, loadMorePosts };
+  return { userPosts, isPostsLoading, loadMorePosts, refreshPosts };
 };

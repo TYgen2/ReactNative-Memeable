@@ -1,4 +1,4 @@
-import { memo, useCallback, useRef } from "react";
+import { memo, useCallback, useRef, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -27,6 +27,8 @@ import { usePostViewModel } from "../../hooks/usePostViewModel";
 export default MainPost = memo(({ item, navigation, colors }) => {
   const { userDetails } = useSelector((state) => state.user);
   const myIcon = getIconSource(userDetails?.userIcon);
+
+  const [replyInfo, setReplyInfo] = useState(null);
 
   const {
     post,
@@ -57,13 +59,25 @@ export default MainPost = memo(({ item, navigation, colors }) => {
     []
   );
 
+  const navigateAndCloseModal = (targetId) => {
+    bottomSheetModalRef.current?.close();
+    navigation.push("UserProfile", { isStack: true, targetId });
+  };
+
   const renderCommentItem = useCallback(
     ({ item }) => {
       return (
-        <CommentItem item={item} navigation={navigation} colors={colors} />
+        <CommentItem
+          item={item}
+          navigation={navigateAndCloseModal}
+          colors={colors}
+          onReply={(username, commentId) => {
+            setReplyInfo({ username, commentId });
+          }}
+        />
       );
     },
-    [navigation, colors]
+    [navigation, colors, setReplyInfo]
   );
 
   const renderEmpty = () => {
@@ -179,6 +193,7 @@ export default MainPost = memo(({ item, navigation, colors }) => {
         </View>
       </View>
 
+      {/* comment modal */}
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={0}
@@ -186,7 +201,11 @@ export default MainPost = memo(({ item, navigation, colors }) => {
         backdropComponent={renderBackdrop}
         keyboardBehavior="extend"
         keyboardBlurBehavior="restore"
-        onChange={onChange}
+        onChange={(index) => {
+          if (index === 0) {
+            onChange(index);
+          }
+        }}
         backgroundStyle={{ backgroundColor: colors.primary }}
         handleIndicatorStyle={{ backgroundColor: colors.secondary }}
       >
@@ -207,6 +226,8 @@ export default MainPost = memo(({ item, navigation, colors }) => {
               userIcon={myIcon}
               onCommentPosted={handleNewComment}
               colors={colors}
+              replyInfo={replyInfo}
+              onReplyComplete={() => setReplyInfo(null)}
             />
           </View>
         </View>
@@ -281,5 +302,9 @@ const styles = StyleSheet.create({
   footerLoader: {
     paddingVertical: 30,
     alignItems: "center",
+  },
+  subCommentContainer: {
+    paddingLeft: 40,
+    backgroundColor: "rgba(0,0,0,0.02)",
   },
 });
