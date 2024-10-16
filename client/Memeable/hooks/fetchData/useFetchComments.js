@@ -3,7 +3,7 @@ import { fetchComments } from "../../handleAPIs/fetchData";
 import { debounce } from "lodash";
 
 const useFetchComments = (postId) => {
-  const [comments, setComments] = useState([]);
+  const [comments, setComments] = useState({});
   const commentsRef = useRef(comments);
 
   const [isCommentLoading, setIsCommentLoading] = useState(false);
@@ -21,7 +21,16 @@ const useFetchComments = (postId) => {
       try {
         const response = await fetchComments(page, 20, postId);
 
-        setComments([...comments, ...response.commentData]);
+        setComments((prevComments) => {
+          const newComments = { ...prevComments };
+          response.commentData.forEach((comment) => {
+            newComments[comment._id] = {
+              ...comment,
+              subComments: [],
+            };
+          });
+          return newComments;
+        });
         setCurrentPage(page);
         setHasMore(response.hasMore);
       } catch (error) {
@@ -50,7 +59,24 @@ const useFetchComments = (postId) => {
     ]
   );
 
-  const fetchSubComments = useCallback((parentCommentId) => {});
+  const fetchSubComments = useCallback(
+    async (parentCommentId) => {
+      try {
+        const response = await fetchComments(1, 20, postId, parentCommentId);
+        setComments((prevComments) => ({
+          ...prevComments,
+          [parentCommentId]: {
+            ...prevComments[parentCommentId],
+            subComments: response.commentData,
+            hasSubComment: true,
+          },
+        }));
+      } catch (error) {
+        console.error("Error fetching sub-comments:", error);
+      }
+    },
+    [postId]
+  );
 
   return {
     comments,
@@ -59,6 +85,7 @@ const useFetchComments = (postId) => {
     fetchCommentsForPost,
     loadMoreComments,
     isLoadingMore,
+    fetchSubComments,
   };
 };
 

@@ -48,16 +48,17 @@ export const usePostViewModel = (initialPostData) => {
     fetchCommentsForPost,
     loadMoreComments,
     isLoadingMore,
+    fetchSubComments,
   } = useFetchComments(postModel.id);
 
   const onChange = useCallback(
     (index) => {
-      if (index === 0 && comments.length === 0) {
+      if (index === 0 && Object.keys(comments).length === 0) {
         console.log("fetching comments..");
         fetchCommentsForPost(1);
       }
     },
-    [fetchCommentsForPost, comments.length]
+    [fetchCommentsForPost, comments]
   );
 
   const handleNewComment = useCallback(
@@ -89,5 +90,6 @@ export const usePostViewModel = (initialPostData) => {
     loadMoreComments,
     onChange,
     handleNewComment,
+    fetchSubComments,
   };
 };

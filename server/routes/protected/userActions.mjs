@@ -141,12 +141,13 @@ router.post("/api/handleFollow", authenticateToken, async (req, res) => {
 
 // comment on a post
 router.post("/api/handleComment", authenticateToken, async (req, res) => {
-  const { postId, content } = req.body;
+  const { postId, parentCommentId, content } = req.body;
 
   try {
     const newComment = new Comment({
       userId: req.userId,
       postId,
+      parentCommentId,
       content,
     });
 
@@ -162,31 +163,6 @@ router.post("/api/handleComment", authenticateToken, async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(400).send({ msg: "Error creating comment" });
-  }
-});
-
-// comment on a comment
-router.post("/api/handleSubComment", authenticateToken, async (req, res) => {
-  const { parentCommentId, content } = req.body;
-
-  try {
-    const newSubComment = new Comment({
-      userId: req.userId,
-      parentCommentId,
-      content,
-    });
-
-    await newSubComment.save();
-
-    const subCommentData = newSubComment.toObject();
-    subCommentData.timeAgo = getTimeDifference(subCommentData.createDate);
-
-    res.status(201).send({
-      msg: "Sub-comment created successfully",
-      subComment: subCommentData,
-    });
-  } catch (error) {
-    res.status(400).send({ msg: "Error creating sub-comment" });
   }
 });
 

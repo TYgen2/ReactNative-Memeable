@@ -25,7 +25,7 @@ export const authenticateToken = async (req, res, next) => {
       res.setHeader("x-new-token", newTokens.token);
       res.setHeader("x-new-refresh-token", newTokens.refreshToken);
     } else {
-      console.log(`Using existing tokens for user ${user.displayName}`);
+      // console.log(`Using existing tokens for user ${user.displayName}`);
     }
 
     next();

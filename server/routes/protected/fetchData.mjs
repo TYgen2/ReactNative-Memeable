@@ -351,15 +351,16 @@ router.get("/api/fetchUserPosts", authenticateToken, async (req, res) => {
 
 // fetch comments in post page
 router.get("/api/fetchComments", authenticateToken, async (req, res) => {
-  const { postId, page, limit } = req.query;
+  const { postId, parentCommentId, page, limit } = req.query;
 
   try {
+    const matchStage = parentCommentId
+      ? { parentCommentId: new mongoose.Types.ObjectId(parentCommentId) }
+      : { postId: new mongoose.Types.ObjectId(postId), parentCommentId: null };
+
     const comments = await Comment.aggregate([
       {
-        $match: {
-          postId: new mongoose.Types.ObjectId(postId),
-          parentCommentId: null,
-        },
+        $match: matchStage,
       },
       {
         $lookup: {
@@ -411,44 +412,6 @@ router.get("/api/fetchComments", authenticateToken, async (req, res) => {
     res.status(200).send({ commentData, hasMore });
   } catch (error) {
     res.status(400).send({ msg: "Error fetching comments" });
-  }
-});
-
-// fetch sub comments in post page
-router.get("/api/fetchSubComments", authenticateToken, async (req, res) => {
-  const { parentCommentId, page, limit } = req.query;
-
-  try {
-    const subComments = await Comment.aggregate([
-      {
-        $match: {
-          parentCommentId: new mongoose.Types.ObjectId(parentCommentId),
-        },
-      },
-      { $sort: { createDate: -1 } },
-      { $skip: (page - 1) * limit },
-      { $limit: Number(limit) + 1 },
-      {
-        $project: {
-          _id: 1,
-          userId: 1,
-          content: 1,
-          createDate: 1,
-          likes: 1,
-          timeAgo: { $literal: "" },
-        },
-      },
-    ]);
-
-    const hasMore = subComments.length > limit;
-    const subCommentData = subComments.slice(0, limit).map((comment) => {
-      comment.timeAgo = getTimeDifference(comment.createdAt);
-      return comment;
-    });
-
-    res.status(200).send({ subCommentData, hasMore });
-  } catch (error) {
-    res.status(400).send({ msg: "Error fetching sub-comments" });
   }
 });
 

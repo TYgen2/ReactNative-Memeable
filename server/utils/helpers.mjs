@@ -77,7 +77,7 @@ export const validateTokens = async (jwtToken, refreshToken) => {
     const user = await User.findById(decoded.id);
     if (!user) throw new Error("User not found");
 
-    console.log("JWT still valid, passed the token check from middleware!!");
+    // console.log("JWT still valid, passed the token check from middleware!!");
     return { user, newTokens: null };
   } catch (jwtError) {
     if (jwtError.name !== "TokenExpiredError") throw jwtError;

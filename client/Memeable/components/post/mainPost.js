@@ -41,6 +41,7 @@ export default MainPost = memo(({ item, navigation, colors }) => {
     isLoadingMore,
     onChange,
     handleNewComment,
+    fetchSubComments,
   } = usePostViewModel(item);
 
   const bottomSheetModalRef = useRef(null);
@@ -66,18 +67,23 @@ export default MainPost = memo(({ item, navigation, colors }) => {
 
   const renderCommentItem = useCallback(
     ({ item }) => {
+      const commentData = comments[item];
+      if (!commentData) return null;
+
       return (
         <CommentItem
-          item={item}
+          item={commentData}
           navigation={navigateAndCloseModal}
           colors={colors}
+          isSubComment={false}
           onReply={(username, commentId) => {
             setReplyInfo({ username, commentId });
           }}
+          onFetchSubComments={fetchSubComments}
         />
       );
     },
-    [navigation, colors, setReplyInfo]
+    [comments, navigation, colors, setReplyInfo]
   );
 
   const renderEmpty = () => {
@@ -211,7 +217,7 @@ export default MainPost = memo(({ item, navigation, colors }) => {
       >
         <View style={styles.commentModalContent}>
           <BottomSheetFlatList
-            data={comments}
+            data={Object.keys(comments)}
             renderItem={renderCommentItem}
             refreshing={isCommentLoading}
             onEndReached={loadMoreComments}
