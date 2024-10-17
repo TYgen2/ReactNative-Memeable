@@ -103,3 +103,17 @@ export const handleComment = async (postId, parentCommentId, content) => {
     return { msg: error.response.data.msg };
   }
 };
+
+export const handleCommentLike = async (commentId, action) => {
+  try {
+    const res = await apiClient.post("/handleCommentLike", {
+      commentId,
+      action,
+    });
+
+    console.log("Comment like updated locally!");
+    return { msg: res.data.msg };
+  } catch (error) {
+    return { msg: error.response.data.msg };
+  }
+};

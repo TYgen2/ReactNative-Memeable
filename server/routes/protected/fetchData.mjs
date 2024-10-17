@@ -364,6 +364,32 @@ router.get("/api/fetchComments", authenticateToken, async (req, res) => {
       },
       {
         $lookup: {
+          from: "commentlikes",
+          let: { commentId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$commentId", "$$commentId"] },
+                    {
+                      $eq: ["$userId", new mongoose.Types.ObjectId(req.userId)],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "userLike",
+        },
+      },
+      {
+        $addFields: {
+          hasLiked: { $gt: [{ $size: "$userLike" }, 0] },
+        },
+      },
+      {
+        $lookup: {
           from: "comments",
           localField: "_id",
           foreignField: "parentCommentId",
@@ -395,6 +421,7 @@ router.get("/api/fetchComments", authenticateToken, async (req, res) => {
           content: 1,
           createDate: 1,
           likes: 1,
+          hasLiked: 1,
           hasSubComment: 1,
           timeAgo: { $literal: "" },
           "user.displayName": 1,

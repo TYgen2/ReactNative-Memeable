@@ -16,6 +16,7 @@ import { Like } from "../../mongoose/schemas/like.mjs";
 import { Follow } from "../../mongoose/schemas/follow.mjs";
 import { Comment } from "../../mongoose/schemas/comment.mjs";
 import { SavedPost } from "../../mongoose/schemas/savedPost.mjs";
+import { CommentLike } from "../../mongoose/schemas/commentLike.mjs";
 dotenv.config();
 
 const router = Router();
@@ -155,6 +156,7 @@ router.post("/api/handleComment", authenticateToken, async (req, res) => {
 
     const commentData = newComment.toObject();
     commentData.timeAgo = getTimeDifference(commentData.createDate);
+    commentData.hasLiked = false; // Set initial hasLiked status
 
     res.status(201).send({
       msg: "Comment created successfully",
@@ -163,6 +165,31 @@ router.post("/api/handleComment", authenticateToken, async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(400).send({ msg: "Error creating comment" });
+  }
+});
+
+// like a comment
+router.post("/api/handleCommentLike", authenticateToken, async (req, res) => {
+  const { commentId, action } = req.body;
+  const userId = req.userId;
+
+  try {
+    if (action === "like") {
+      await CommentLike.create({ userId, commentId });
+      await Comment.findByIdAndUpdate(commentId, { $inc: { likes: 1 } });
+      return res.status(200).send({ msg: "Liked the comment!" });
+    } else if (action === "unlike") {
+      await CommentLike.deleteOne({ userId, commentId });
+      await Comment.findByIdAndUpdate(commentId, { $inc: { likes: -1 } });
+      return res.status(200).send({ msg: "Unliked the comment!" });
+    } else {
+      return res.status(400).send({ msg: "Invalid action" });
+    }
+  } catch (error) {
+    console.error("Error in handleCommentLike:", error);
+    res
+      .status(400)
+      .send({ msg: "Error when handling the comment like function" });
   }
 });
 

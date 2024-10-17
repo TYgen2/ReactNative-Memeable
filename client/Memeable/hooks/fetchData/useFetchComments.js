@@ -10,6 +10,7 @@ const useFetchComments = (postId) => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
+  const [fetchedSubComments, setFetchedSubComments] = useState({});
 
   useEffect(() => {
     commentsRef.current = comments;
@@ -19,18 +20,21 @@ const useFetchComments = (postId) => {
     async (page) => {
       setIsCommentLoading(true);
       try {
-        const response = await fetchComments(page, 20, postId);
+        const response = await fetchComments(page, 10, postId);
+        const newComments = response.commentData.reduce((acc, comment) => {
+          acc[comment._id] = {
+            ...comment,
+            hasLiked: comment.hasLiked,
+            subComments: [],
+            isSubCommentsExpanded: false,
+          };
+          return acc;
+        }, {});
 
-        setComments((prevComments) => {
-          const newComments = { ...prevComments };
-          response.commentData.forEach((comment) => {
-            newComments[comment._id] = {
-              ...comment,
-              subComments: [],
-            };
-          });
-          return newComments;
-        });
+        setComments((prevComments) => ({
+          ...prevComments,
+          ...newComments,
+        }));
         setCurrentPage(page);
         setHasMore(response.hasMore);
       } catch (error) {
@@ -39,7 +43,7 @@ const useFetchComments = (postId) => {
         setIsCommentLoading(false);
       }
     },
-    [postId, comments]
+    [postId]
   );
 
   const loadMoreComments = useCallback(
@@ -61,21 +65,39 @@ const useFetchComments = (postId) => {
 
   const fetchSubComments = useCallback(
     async (parentCommentId) => {
-      try {
-        const response = await fetchComments(1, 20, postId, parentCommentId);
+      if (fetchedSubComments[parentCommentId]) {
         setComments((prevComments) => ({
           ...prevComments,
           [parentCommentId]: {
             ...prevComments[parentCommentId],
-            subComments: response.commentData,
-            hasSubComment: true,
+            isSubCommentsExpanded: true,
           },
+        }));
+        return;
+      }
+
+      try {
+        const response = await fetchComments(1, 5, postId, parentCommentId);
+        setComments((prevComments) => ({
+          ...prevComments,
+          [parentCommentId]: {
+            ...prevComments[parentCommentId],
+            subComments: response.commentData.map((subComment) => ({
+              ...subComment,
+              parentCommentId,
+            })),
+            isSubCommentsExpanded: true,
+          },
+        }));
+        setFetchedSubComments((prev) => ({
+          ...prev,
+          [parentCommentId]: true,
         }));
       } catch (error) {
         console.error("Error fetching sub-comments:", error);
       }
     },
-    [postId]
+    [postId, fetchedSubComments]
   );
 
   return {

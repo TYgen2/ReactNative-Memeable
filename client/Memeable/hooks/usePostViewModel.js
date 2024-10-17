@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useFetchComments from "../hooks/fetchData/useFetchComments";
 import { handleLike, handleSavePost } from "../handleAPIs/userActions";
 import { useSelector } from "react-redux";
@@ -61,6 +61,13 @@ export const usePostViewModel = (initialPostData) => {
     [fetchCommentsForPost, comments]
   );
 
+  const commentsRef = useRef(comments);
+
+  // Update the ref whenever comments change
+  useEffect(() => {
+    commentsRef.current = comments;
+  }, [comments]);
+
   const handleNewComment = useCallback(
     (newComment) => {
       const enhancedComment = {
@@ -69,12 +76,70 @@ export const usePostViewModel = (initialPostData) => {
           displayName: userDetails.displayName,
           icon: userDetails.userIcon,
         },
-        userId: userDetails.userId,
+        hasLiked: false,
+        subComments: [],
       };
 
-      setComments((prevComments) => [...prevComments, enhancedComment]);
+      setComments((prevComments) => {
+        const updatedComments = { ...prevComments };
+        if (newComment.parentCommentId) {
+          const parentComment = updatedComments[newComment.parentCommentId];
+          if (parentComment) {
+            updatedComments[newComment.parentCommentId] = {
+              ...parentComment,
+              subComments: [
+                enhancedComment,
+                ...(parentComment.subComments || []),
+              ],
+              hasSubComment: true,
+            };
+          }
+        } else {
+          return {
+            [enhancedComment._id]: enhancedComment,
+            ...prevComments, // Spread the existing comments after the new one
+          };
+        }
+        return prevComments;
+      });
     },
     [userDetails]
+  );
+
+  const onCommentLikeUpdate = useCallback(
+    (commentId, newLikesCount, newLikedState, isSubComment = false) => {
+      setComments((prevComments) => {
+        const updatedComments = { ...prevComments };
+        if (isSubComment) {
+          const [parentId, subId] = commentId.split("-");
+          const parentComment = updatedComments[parentId];
+          if (parentComment) {
+            updatedComments[parentId] = {
+              ...parentComment,
+              subComments: parentComment.subComments.map((subComment) =>
+                subComment._id === subId
+                  ? {
+                      ...subComment,
+                      likes: newLikesCount,
+                      hasLiked: newLikedState,
+                    }
+                  : subComment
+              ),
+            };
+          }
+        } else {
+          if (updatedComments[commentId]) {
+            updatedComments[commentId] = {
+              ...updatedComments[commentId],
+              likes: newLikesCount,
+              hasLiked: newLikedState,
+            };
+          }
+        }
+        return updatedComments;
+      });
+    },
+    []
   );
 
   return {
@@ -91,5 +156,6 @@ export const usePostViewModel = (initialPostData) => {
     onChange,
     handleNewComment,
     fetchSubComments,
+    onCommentLikeUpdate,
   };
 };

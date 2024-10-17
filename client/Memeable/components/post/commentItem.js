@@ -7,11 +7,20 @@ import {
   Pressable,
 } from "react-native";
 import { getIconSource } from "../../utils/helper";
-import { memo, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import Icon from "react-native-vector-icons/Ionicons";
+import { handleCommentLike } from "../../handleAPIs/userActions";
 
 export default CommentItem = memo(
-  ({ item, navigation, colors, onReply, onFetchSubComments, isSubComment }) => {
+  ({
+    item,
+    navigation,
+    colors,
+    onReply,
+    onFetchSubComments,
+    isSubComment,
+    onCommentLikeUpdate,
+  }) => {
     const iconBgColor = item.user?.icon.bgColor || "transparent";
     const iconSource = getIconSource(item.user?.icon);
 
@@ -22,6 +31,64 @@ export default CommentItem = memo(
         onFetchSubComments(item._id);
       }
     };
+
+    const [commentState, setCommentState] = useState({
+      likes: item.likes,
+      liked: item.hasLiked,
+    });
+
+    useEffect(() => {
+      setCommentState({
+        likes: item.likes,
+        liked: item.hasLiked,
+      });
+    }, [item.likes, item.hasLiked]);
+
+    const toggleLike = useCallback(async () => {
+      const newLikedState = !commentState.liked;
+      const newLikesCount = newLikedState
+        ? commentState.likes + 1
+        : commentState.likes - 1;
+
+      setCommentState((prevState) => ({
+        ...prevState,
+        likes: newLikesCount,
+        liked: newLikedState,
+      }));
+
+      try {
+        await handleCommentLike(item._id, newLikedState ? "like" : "unlike");
+        const commentId = isSubComment
+          ? `${item.parentCommentId}-${item._id}`
+          : item._id;
+        onCommentLikeUpdate(
+          commentId,
+          newLikesCount,
+          newLikedState,
+          isSubComment
+        );
+      } catch (error) {
+        setCommentState((prevState) => ({
+          ...prevState,
+          likes: prevState.likes,
+          liked: !newLikedState,
+        }));
+        console.error("Error toggling comment like:", error);
+      }
+    }, [
+      item._id,
+      item.parentCommentId,
+      commentState.liked,
+      commentState.likes,
+      onCommentLikeUpdate,
+      isSubComment,
+    ]);
+
+    useEffect(() => {
+      if (item.lastSubCommentTimestamp) {
+        setIsSubCommentsExpanded(true);
+      }
+    }, [item.lastSubCommentTimestamp]);
 
     return (
       <View style={styles.container}>
@@ -36,14 +103,7 @@ export default CommentItem = memo(
           />
         </Pressable>
 
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            alignItems: "flex-start",
-            marginLeft: 6,
-          }}
-        >
+        <View style={styles.contentWrapper}>
           {/* text info */}
           <View style={styles.textInfo}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -72,15 +132,6 @@ export default CommentItem = memo(
               </Pressable>
             )}
 
-            {/* see sub comments */}
-            {item.hasSubComment && (
-              <Pressable onPress={handleSeeReplies}>
-                <Text style={styles.otherReplyText}>
-                  {isSubCommentsExpanded ? "Hide replies" : "See other replies"}
-                </Text>
-              </Pressable>
-            )}
-
             {isSubCommentsExpanded && item.subComments && (
               <View style={styles.subCommentsContainer}>
                 {item.subComments.map((subComment) => (
@@ -91,17 +142,31 @@ export default CommentItem = memo(
                     colors={colors}
                     onReply={onReply}
                     isSubComment={true}
+                    onCommentLikeUpdate={onCommentLikeUpdate}
                   />
                 ))}
               </View>
+            )}
+
+            {/* see sub comments */}
+            {item.hasSubComment && (
+              <Pressable onPress={handleSeeReplies}>
+                <Text style={styles.otherReplyText}>
+                  {isSubCommentsExpanded ? "Hide replies" : "See other replies"}
+                </Text>
+              </Pressable>
             )}
           </View>
 
           {/* like count */}
           <View style={styles.likeInfo}>
-            <Text style={styles.likes}>{item.likes}</Text>
-            <TouchableOpacity>
-              <Icon name={"heart-outline"} size={14} color={"grey"} />
+            <Text style={styles.likes}>{commentState.likes}</Text>
+            <TouchableOpacity onPress={toggleLike}>
+              <Icon
+                name={commentState.liked ? "heart" : "heart-outline"}
+                size={14}
+                color={commentState.liked ? "#FF4433" : "grey"}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -118,9 +183,9 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   icon: {
-    width: 50,
-    height: 50,
-    borderRadius: 50,
+    width: 40,
+    height: 40,
+    borderRadius: 40,
   },
   textInfo: {
     flex: 1,
@@ -128,7 +193,7 @@ const styles = StyleSheet.create({
   },
   displayName: { fontWeight: "bold", fontSize: 16 },
   timeAgo: { color: "grey", fontSize: 14, paddingLeft: 10 },
-  content: { fontSize: 16, marginRight: 40 },
+  content: { fontSize: 14, marginRight: 40 },
   followStatus: { color: "grey" },
   likeInfo: {
     width: 50,
@@ -140,5 +205,16 @@ const styles = StyleSheet.create({
   },
   likes: { fontSize: 14, color: "grey" },
   replyText: { fontSize: 12, color: "grey" },
-  otherReplyText: { marginLeft: 20, marginTop: 10, color: "grey" },
+  otherReplyText: {
+    marginLeft: 20,
+    marginTop: 10,
+    color: "grey",
+    fontSize: 14,
+  },
+  contentWrapper: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginLeft: 6,
+  },
 });

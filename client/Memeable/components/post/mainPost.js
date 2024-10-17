@@ -42,6 +42,7 @@ export default MainPost = memo(({ item, navigation, colors }) => {
     onChange,
     handleNewComment,
     fetchSubComments,
+    onCommentLikeUpdate,
   } = usePostViewModel(item);
 
   const bottomSheetModalRef = useRef(null);
@@ -80,6 +81,7 @@ export default MainPost = memo(({ item, navigation, colors }) => {
             setReplyInfo({ username, commentId });
           }}
           onFetchSubComments={fetchSubComments}
+          onCommentLikeUpdate={onCommentLikeUpdate}
         />
       );
     },
