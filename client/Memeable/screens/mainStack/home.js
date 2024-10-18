@@ -1,6 +1,6 @@
 import { FlatList, Image, StyleSheet, Text, View } from "react-native";
 import { barOffset, screenWidth } from "../../utils/constants";
-import MainPost from "../../components/post/mainPost";
+import MainPost from "../../components/post/MainPost";
 import { useSelector } from "react-redux";
 import useFetchPosts from "../../hooks/fetchData/useFetchPosts";
 import { useCallback } from "react";

@@ -12,7 +12,7 @@ import {
   ICON_BGCOLOR,
   screenWidth,
 } from "../../utils/constants";
-import EffectiveGIF from "../../components/effectiveGIF";
+import EffectiveGIF from "../../components/EffectiveGIF";
 import { selectImageForProfile } from "../../utils/helper";
 import useEditProfile from "../../hooks/auth/useEditProfile";
 

@@ -1,6 +1,6 @@
 import { memo } from "react";
 import useColorTheme from "../../hooks/useColorTheme";
-import MainPost from "../../components/post/mainPost";
+import MainPost from "../../components/post/MainPost";
 import { ScrollView, View } from "react-native";
 
 const DetailedPost = ({ route, navigation }) => {

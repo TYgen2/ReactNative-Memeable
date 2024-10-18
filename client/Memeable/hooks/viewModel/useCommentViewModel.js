@@ -1,45 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import useFetchComments from "../hooks/fetchData/useFetchComments";
-import { handleLike, handleSavePost } from "../handleAPIs/userActions";
+import { useCallback, useEffect, useRef, useState } from "react";
+import useFetchComments from "../fetchData/useFetchComments";
 import { useSelector } from "react-redux";
-import { PostModel } from "../models/PostModel";
 
-export const usePostViewModel = (initialPostData) => {
+export const useCommentViewModel = (postId) => {
   const { userDetails } = useSelector((state) => state.user);
 
-  const postModel = useMemo(
-    () => new PostModel(initialPostData).toJSON(),
-    [initialPostData]
-  );
-
-  const [postState, setPostState] = useState({
-    likes: postModel.likes,
-    liked: postModel.hasLiked,
-    saved: false,
-  });
-
-  // update local like status and like count
-  const toggleLike = useCallback(async () => {
-    setPostState((prevState) => ({
-      ...prevState,
-      liked: !prevState.liked,
-      likes: prevState.liked ? prevState.likes - 1 : prevState.likes + 1,
-    }));
-
-    await handleLike(initialPostData._id, postState.liked ? "unlike" : "like");
-  }, [postModel.id, postState.liked]);
-
-  const toggleSave = useCallback(async () => {
-    setPostState((prevState) => ({
-      ...prevState,
-      saved: !prevState.saved,
-    }));
-
-    await handleSavePost(
-      initialPostData._id,
-      postState.saved ? "unsave" : "save"
-    );
-  }, [postModel.id, postState.saved]);
+  const [replyInfo, setReplyInfo] = useState(null);
+  const commentsRef = useRef(comments);
 
   const {
     comments,
@@ -49,8 +16,14 @@ export const usePostViewModel = (initialPostData) => {
     loadMoreComments,
     isLoadingMore,
     fetchSubComments,
-  } = useFetchComments(postModel.id);
+  } = useFetchComments(postId);
 
+  // Update the ref whenever comments change
+  useEffect(() => {
+    commentsRef.current = comments;
+  }, [comments]);
+
+  // initial fetch
   const onChange = useCallback(
     (index) => {
       if (index === 0 && Object.keys(comments).length === 0) {
@@ -61,13 +34,7 @@ export const usePostViewModel = (initialPostData) => {
     [fetchCommentsForPost, comments]
   );
 
-  const commentsRef = useRef(comments);
-
-  // Update the ref whenever comments change
-  useEffect(() => {
-    commentsRef.current = comments;
-  }, [comments]);
-
+  // handle new comment
   const handleNewComment = useCallback(
     (newComment) => {
       const enhancedComment = {
@@ -143,19 +110,15 @@ export const usePostViewModel = (initialPostData) => {
   );
 
   return {
-    post: postModel,
-    postState,
-    toggleLike,
-    toggleSave,
     comments,
-    setComments,
     isCommentLoading,
-    fetchCommentsForPost,
-    isLoadingMore,
     loadMoreComments,
+    isLoadingMore,
     onChange,
     handleNewComment,
     fetchSubComments,
     onCommentLikeUpdate,
+    replyInfo,
+    setReplyInfo,
   };
 };

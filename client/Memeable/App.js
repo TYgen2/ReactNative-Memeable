@@ -1,20 +1,20 @@
-import {
-  DarkTheme,
-  DefaultTheme,
-  NavigationContainer,
-} from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Splash from "./screens/splash";
-import login from "./screens/authStack/login";
-import register from "./screens/authStack/register";
-import home from "./screens/mainStack/home";
-import search from "./screens/mainStack/search";
-import userProfile from "./screens/mainStack/userProfile";
-import notify from "./screens/mainStack/notification";
-import upload from "./screens/uploadStack/upload";
-import editProfile from "./screens/authStack/editProfile";
-import editUserProfile from "./screens/settingStack/editUserProfile";
-import appSetting from "./screens/settingStack/appSetting";
+import Splash from "./screens/Splash";
+import Login from "./screens/authStack/Login";
+import Register from "./screens/authStack/Register";
+import Home from "./screens/mainStack/Home";
+import Search from "./screens/mainStack/Search";
+import UserProfile from "./screens/mainStack/UserProfile";
+import Notify from "./screens/mainStack/Notification";
+import Upload from "./screens/uploadStack/Upload";
+import EditProfile from "./screens/authStack/EditProfile";
+import EditUserProfile from "./screens/settingStack/EditUserProfile";
+import AppSetting from "./screens/settingStack/AppSetting";
+import DetailedPost from "./screens/mainStack/DetailedPost";
+import CustomTab from "./components/bottomTab/CustomTab";
+import EditBorderColor from "./screens/settingStack/EditBorderColor";
+
 import { useContext, useEffect, useState } from "react";
 import { StatusBar } from "react-native";
 import { store } from "./store/store";
@@ -23,17 +23,14 @@ import { LoadingContextProvider, UpdateContext } from "./context/loading";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistStore } from "redux-persist";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import CustomTab from "./components/bottomTab/customTab";
 import { EventProvider } from "react-native-outside-press";
 import { reduxLogin } from "./store/userReducer";
 import { enableScreens } from "react-native-screens";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import editBorderColor from "./screens/settingStack/editBorderColor";
 import { ThemeContext } from "./context/theme";
 import { getData, storeData } from "./config/asyncStorage";
 import useColorTheme from "./hooks/useColorTheme";
-import DetailedPost from "./screens/mainStack/detailedPost";
 
 const persistor = persistStore(store);
 enableScreens();
@@ -54,9 +51,9 @@ const FunctionStack = createNativeStackNavigator();
 const AuthStackScreen = () => {
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-      <AuthStack.Screen name="Login" component={login} />
-      <AuthStack.Screen name="Register" component={register} />
-      <AuthStack.Screen name="Edit Profile" component={editProfile} />
+      <AuthStack.Screen name="Login" component={Login} />
+      <AuthStack.Screen name="Register" component={Register} />
+      <AuthStack.Screen name="Edit Profile" component={EditProfile} />
     </AuthStack.Navigator>
   );
 };
@@ -67,8 +64,8 @@ const HomeScreen = () => {
 
   return (
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
-      <HomeStack.Screen name="Home" component={home} />
-      <HomeStack.Screen name="UserProfile" component={userProfile} />
+      <HomeStack.Screen name="Home" component={Home} />
+      <HomeStack.Screen name="UserProfile" component={UserProfile} />
       <HomeStack.Screen
         name="DetailedPost"
         component={DetailedPost}
@@ -89,8 +86,8 @@ const ExploreScreen = () => {
 
   return (
     <ExploreStack.Navigator screenOptions={{ headerShown: false }}>
-      <ExploreStack.Screen name="Search" component={search} />
-      <ExploreStack.Screen name="UserProfile" component={userProfile} />
+      <ExploreStack.Screen name="Search" component={Search} />
+      <ExploreStack.Screen name="UserProfile" component={UserProfile} />
       <ExploreStack.Screen
         name="DetailedPost"
         component={DetailedPost}
@@ -114,7 +111,7 @@ const UserProfileScreen = () => {
     <UserProfileStack.Navigator screenOptions={{ headerShown: false }}>
       <UserProfileStack.Screen
         name="UserProfile"
-        component={userProfile}
+        component={UserProfile}
         initialParams={{ targetId: userDetails.userId }}
       />
       <UserProfileStack.Screen
@@ -145,12 +142,12 @@ const SettingScreen = () => {
     >
       <SettingStack.Screen
         name="EditUserProfile"
-        component={editUserProfile}
+        component={EditUserProfile}
         options={{ title: "Edit user profile" }}
       />
       <SettingStack.Screen
         name="EditBorderColor"
-        component={editBorderColor}
+        component={EditBorderColor}
         options={{
           title: "Edit border color",
           animation: "slide_from_bottom",
@@ -158,7 +155,7 @@ const SettingScreen = () => {
       />
       <SettingStack.Screen
         name="AppSetting"
-        component={appSetting}
+        component={AppSetting}
         options={{ title: "Setting" }}
       />
     </SettingStack.Navigator>
@@ -186,7 +183,7 @@ const MainStackScreen = () => {
       />
       <Tab.Screen
         name="Notify"
-        component={notify}
+        component={Notify}
         options={{ title: "Noti" }}
       />
       <Tab.Screen
@@ -202,7 +199,7 @@ const MainStackScreen = () => {
 const FunctionScreen = () => {
   return (
     <FunctionStack.Navigator screenOptions={{ headerShown: false }}>
-      <FunctionStack.Screen name="Upload" component={upload} />
+      <FunctionStack.Screen name="Upload" component={Upload} />
     </FunctionStack.Navigator>
   );
 };

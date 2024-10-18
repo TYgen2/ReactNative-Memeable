@@ -1,7 +1,7 @@
 import { StyleSheet, View } from "react-native";
 import { screenWidth } from "../../utils/constants";
-import TabItem from "./tabItem";
-import PostButton from "./postButton";
+import TabItem from "./TabItem";
+import PostButton from "./PostButton";
 import { memo, useCallback } from "react";
 import useColorTheme from "../../hooks/useColorTheme";
 

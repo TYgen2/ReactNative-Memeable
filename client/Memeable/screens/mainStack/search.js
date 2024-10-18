@@ -6,7 +6,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import SearchedUser from "../../components/searchedUser";
+import SearchedUser from "../../components/SearchedUser";
 import { barOffset } from "../../utils/constants";
 import Icon from "react-native-vector-icons/Ionicons";
 import useSearch from "../../hooks/useSearch";

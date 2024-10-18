@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ColorPicker from "react-native-wheel-color-picker";
-import GlowingBorder from "../../components/glowingBorder";
-import UserSongCover from "../../components/userProfile/userSongCover";
+import GlowingBorder from "../../components/GlowingBorder";
+import UserSongCover from "../../components/userProfile/UserSongCover";
 import { useState } from "react";
 import { debounce } from "lodash";
 import { LogBox } from "react-native";

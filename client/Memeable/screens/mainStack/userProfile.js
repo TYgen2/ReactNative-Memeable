@@ -6,14 +6,14 @@ import {
   View,
 } from "react-native";
 import { useSelector } from "react-redux";
-import UserPostGrid from "../../components/post/userPostGrid";
+import UserPostGrid from "../../components/post/UserPostGrid";
 import { useCallback, useRef } from "react";
 import useFetchProfileInfo from "../../hooks/fetchData/useFetchProfileInfo";
 import useFetchPostsForUser from "../../hooks/fetchData/useFetchPostsForUser";
 import { useFocusEffect } from "@react-navigation/native";
 import { UserProfileModel } from "../../models/UserProfileModel";
-import UserProfileHeader from "../../components/userProfile/userProfileHeader";
-import UserProfileEmpty from "../../components/userProfile/userProfileEmpty";
+import UserProfileHeader from "../../components/userProfile/UserProfileHeader";
+import UserProfileEmpty from "../../components/userProfile/UserProfileEmpty";
 import useColorTheme from "../../hooks/useColorTheme";
 
 export default UserProfile = ({ route, navigation }) => {

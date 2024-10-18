@@ -18,8 +18,8 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import { useEditUserProfileViewModel } from "../../hooks/editUserProfile/useEditUserProfileViewModel";
 import { ActivityIndicator } from "react-native";
-import GlowingBorder from "../../components/glowingBorder";
-import UserSongCover from "../../components/userProfile/userSongCover";
+import GlowingBorder from "../../components/GlowingBorder";
+import UserSongCover from "../../components/userProfile/UserSongCover";
 import useColorTheme from "../../hooks/useColorTheme";
 
 const GLOW_BORDER_STYLE = {

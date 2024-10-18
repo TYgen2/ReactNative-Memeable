@@ -5,11 +5,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import BackButton from "../backButton";
+import BackButton from "../BackButton";
 import { getBgImageSource, getIconSource } from "../../utils/helper";
 import FastImage from "react-native-fast-image";
-import GlowingBorder from "../glowingBorder";
-import UserSongCover from "./userSongCover";
+import GlowingBorder from "../GlowingBorder";
+import UserSongCover from "./UserSongCover";
 import useColorTheme from "../../hooks/useColorTheme";
 
 const GLOW_BORDER_STYLE = {
