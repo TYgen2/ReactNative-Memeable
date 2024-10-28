@@ -9,7 +9,7 @@ import PostContent from "./PostContent";
 import PostActionBar from "./PostActionBar";
 
 // User post component
-export default MainPost = memo(({ item, navigation, colors }) => {
+const MainPost = ({ item, navigation, colors }) => {
   const { userDetails } = useSelector((state) => state.user);
   const myIcon = getIconSource(userDetails?.userIcon);
 
@@ -21,10 +21,13 @@ export default MainPost = memo(({ item, navigation, colors }) => {
     bottomSheetModalRef.current?.present();
   }, []);
 
-  const navigateAndCloseModal = (targetId) => {
-    bottomSheetModalRef.current?.close();
-    navigation.push("UserProfile", { isStack: true, targetId });
-  };
+  const navigateAndCloseModal = useCallback(
+    (targetId) => {
+      bottomSheetModalRef.current?.close();
+      navigation.push("UserProfile", { isStack: true, targetId });
+    },
+    [navigation]
+  );
 
   return (
     <View style={styles.postContainer}>
@@ -48,7 +51,7 @@ export default MainPost = memo(({ item, navigation, colors }) => {
       />
     </View>
   );
-});
+};
 
 const styles = StyleSheet.create({
   postContainer: {
@@ -60,3 +63,5 @@ const styles = StyleSheet.create({
     borderTopColor: "rgba(0,0,0,0.3)",
   },
 });
+
+export default memo(MainPost);

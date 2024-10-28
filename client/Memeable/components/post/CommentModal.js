@@ -69,6 +69,7 @@ const CommentModal = ({
     if (!isLoadingMore) return null;
     return <LOADING_INDICATOR />;
   };
+
   return (
     <BottomSheetModal
       ref={bottomSheetModalRef}

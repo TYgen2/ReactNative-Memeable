@@ -25,9 +25,20 @@ export default CommentItem = memo(
     const iconSource = getIconSource(item.user?.icon);
 
     const [isSubCommentsExpanded, setIsSubCommentsExpanded] = useState(false);
+
+    useEffect(() => {
+      if (item.lastSubCommentTimestamp) {
+        setIsSubCommentsExpanded(true);
+      }
+    }, [item.lastSubCommentTimestamp]);
+
     const handleSeeReplies = () => {
       setIsSubCommentsExpanded(!isSubCommentsExpanded);
-      if (!isSubCommentsExpanded) {
+
+      if (
+        !isSubCommentsExpanded &&
+        (!item.subComments || item.subComments.length === 0)
+      ) {
         onFetchSubComments(item._id);
       }
     };
@@ -84,12 +95,6 @@ export default CommentItem = memo(
       isSubComment,
     ]);
 
-    useEffect(() => {
-      if (item.lastSubCommentTimestamp) {
-        setIsSubCommentsExpanded(true);
-      }
-    }, [item.lastSubCommentTimestamp]);
-
     return (
       <View style={styles.container}>
         {/* icon */}
@@ -132,21 +137,23 @@ export default CommentItem = memo(
               </Pressable>
             )}
 
-            {isSubCommentsExpanded && item.subComments && (
-              <View style={styles.subCommentsContainer}>
-                {item.subComments.map((subComment) => (
-                  <CommentItem
-                    key={subComment._id}
-                    item={subComment}
-                    navigation={navigation}
-                    colors={colors}
-                    onReply={onReply}
-                    isSubComment={true}
-                    onCommentLikeUpdate={onCommentLikeUpdate}
-                  />
-                ))}
-              </View>
-            )}
+            {isSubCommentsExpanded &&
+              item.subComments &&
+              item.subComments.length > 0 && (
+                <View style={styles.subCommentsContainer}>
+                  {item.subComments.map((subComment) => (
+                    <CommentItem
+                      key={subComment._id}
+                      item={subComment}
+                      navigation={navigation}
+                      colors={colors}
+                      onReply={onReply}
+                      isSubComment={true}
+                      onCommentLikeUpdate={onCommentLikeUpdate}
+                    />
+                  ))}
+                </View>
+              )}
 
             {/* see sub comments */}
             {item.hasSubComment && (

@@ -48,26 +48,30 @@ export const useCommentViewModel = (postId) => {
       };
 
       setComments((prevComments) => {
-        const updatedComments = { ...prevComments };
         if (newComment.parentCommentId) {
-          const parentComment = updatedComments[newComment.parentCommentId];
-          if (parentComment) {
-            updatedComments[newComment.parentCommentId] = {
+          // Handle sub-comment
+          const parentComment = prevComments[newComment.parentCommentId];
+          if (!parentComment) return prevComments;
+
+          return {
+            ...prevComments,
+            [newComment.parentCommentId]: {
               ...parentComment,
               subComments: [
                 enhancedComment,
                 ...(parentComment.subComments || []),
               ],
               hasSubComment: true,
-            };
-          }
+              lastSubCommentTimestamp: new Date().toISOString(),
+            },
+          };
         } else {
+          // Handle parent comment
           return {
             [enhancedComment._id]: enhancedComment,
-            ...prevComments, // Spread the existing comments after the new one
+            ...prevComments,
           };
         }
-        return prevComments;
       });
     },
     [userDetails]

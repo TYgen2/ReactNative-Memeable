@@ -1,6 +1,8 @@
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 export default UserProfileEmpty = ({ isPostsLoading, colors }) => {
+  console.log("User profile empty re-rendered!!");
+
   return (
     <View style={[styles.container, { backgroundColor: colors.primary }]}>
       {isPostsLoading ? (

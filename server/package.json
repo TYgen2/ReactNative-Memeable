@@ -4,8 +4,8 @@
   "main": "server.mjs",
   "scripts": {
     "test": "jest",
-    "start:dev": "set \"NODE_ENV=development\" && node --watch --env-file=.env.development server.mjs",
-    "start:prod": "set \"NODE_ENV=production\" && node --watch --env-file=.env.production server.mjs"
+    "dev": "set \"NODE_ENV=development\" && node --watch --env-file=.env.development server.mjs",
+    "prod": "set \"NODE_ENV=production\" && node --watch --env-file=.env.production server.mjs"
   },
   "keywords": [],
   "author": "",

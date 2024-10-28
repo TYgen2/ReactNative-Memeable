@@ -17,6 +17,7 @@ import UserProfileEmpty from "../../components/userProfile/UserProfileEmpty";
 import useColorTheme from "../../hooks/useColorTheme";
 
 export default UserProfile = ({ route, navigation }) => {
+  console.log("UserProfile re-rendered!!");
   const { colors } = useColorTheme();
 
   const { userDetails, status } = useSelector((state) => state.user);

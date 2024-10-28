@@ -15,6 +15,7 @@ import {
 import EffectiveGIF from "../../components/EffectiveGIF";
 import { selectImageForProfile } from "../../utils/helper";
 import useEditProfile from "../../hooks/auth/useEditProfile";
+import { showGIF } from "../../utils/animation";
 
 const EditProfile = () => {
   const {

@@ -11,6 +11,7 @@ import FastImage from "react-native-fast-image";
 import GlowingBorder from "../GlowingBorder";
 import UserSongCover from "./UserSongCover";
 import useColorTheme from "../../hooks/useColorTheme";
+import { memo } from "react";
 
 const GLOW_BORDER_STYLE = {
   width: 100,
@@ -22,141 +23,149 @@ const GLOW_BORDER_STYLE = {
   top: 0,
 };
 
-export default UserProfileHeader = ({
-  userData,
-  isStack,
-  isMe,
-  navigation,
-  handlePressed,
-}) => {
-  const { colors } = useColorTheme();
+export default UserProfileHeader = memo(
+  ({ userData, isStack, isMe, navigation, handlePressed }) => {
+    const { colors } = useColorTheme();
+    console.log("User profile header re-rendered!!");
 
-  return (
-    <>
-      {isStack && <BackButton navigation={navigation} />}
-      <ImageBackground
-        source={getBgImageSource(userData.bgImageSource)}
-        style={styles.backgroundImage}
-        resizeMode="cover"
-      />
-      <View style={styles.userInfo}>
-        {/* If user have set their profile bgm, show it */}
-        {userData.song.songUri && (
-          <>
-            <GlowingBorder
-              boxStyle={GLOW_BORDER_STYLE}
-              color={userData.song.borderColor}
-            />
-            <UserSongCover
-              songImg={userData.song.imageUri}
-              imgStyle={GLOW_BORDER_STYLE}
-            />
-          </>
-        )}
+    return (
+      <>
+        {isStack && <BackButton navigation={navigation} />}
+        <ImageBackground
+          source={getBgImageSource(userData.bgImageSource)}
+          style={styles.backgroundImage}
+          resizeMode="cover"
+        />
+        <View style={styles.userInfo}>
+          {/* If user have set their profile bgm, show it */}
+          {userData.song.songUri && (
+            <>
+              <GlowingBorder
+                boxStyle={GLOW_BORDER_STYLE}
+                color={userData.song.borderColor}
+              />
+              <UserSongCover
+                songImg={userData.song.imageUri}
+                imgStyle={GLOW_BORDER_STYLE}
+              />
+            </>
+          )}
 
-        <View style={[styles.iconBorder, { backgroundColor: colors.primary }]}>
-          <FastImage
-            style={[
-              styles.icon,
-              { backgroundColor: userData.userIcon.bgColor },
-            ]}
-            source={getIconSource(userData.userIcon)}
-          />
-        </View>
-        <View style={styles.userInfoContainer}>
-          <Text style={[styles.displayName, { color: colors.text }]}>
-            {userData.displayName}
-          </Text>
-          <Text style={[styles.username, { color: colors.text }]}>
-            @{userData.username}
-          </Text>
-          <Text style={[styles.userBio, , { color: colors.text }]}>
-            {userData.userBio}
-          </Text>
-        </View>
-        <View style={styles.moreInfo}>
           <View
-            style={[
-              styles.infoBox,
-              {
-                borderRightWidth: 0.5,
-                borderRightColor: "rgba(0,0,0,0.1)",
-              },
-            ]}
+            style={[styles.iconBorder, { backgroundColor: colors.primary }]}
           >
-            <Text style={[styles.infoText, { color: colors.text }]}>
-              Followers
+            <FastImage
+              style={[
+                styles.icon,
+                { backgroundColor: userData.userIcon.bgColor },
+              ]}
+              source={getIconSource(userData.userIcon)}
+            />
+          </View>
+          <View style={styles.userInfoContainer}>
+            <Text style={[styles.displayName, { color: colors.text }]}>
+              {userData.displayName}
             </Text>
-            <Text style={[styles.infoNumber, { color: colors.text }]}>
-              {userData.followersCount}
+            <Text style={[styles.username, { color: colors.text }]}>
+              @{userData.username}
+            </Text>
+            <Text style={[styles.userBio, , { color: colors.text }]}>
+              {userData.userBio}
             </Text>
           </View>
-          <View style={styles.infoBox}>
-            <Text style={[styles.infoText, { color: colors.text }]}>
-              Following
-            </Text>
-            <Text style={[styles.infoNumber, { color: colors.text }]}>
-              {userData.followingCount}
-            </Text>
+          <View style={styles.moreInfo}>
+            <View
+              style={[
+                styles.infoBox,
+                {
+                  borderRightWidth: 0.5,
+                  borderRightColor: "rgba(0,0,0,0.1)",
+                },
+              ]}
+            >
+              <Text style={[styles.infoText, { color: colors.text }]}>
+                Followers
+              </Text>
+              <Text style={[styles.infoNumber, { color: colors.text }]}>
+                {userData.followersCount}
+              </Text>
+            </View>
+            <View style={styles.infoBox}>
+              <Text style={[styles.infoText, { color: colors.text }]}>
+                Following
+              </Text>
+              <Text style={[styles.infoNumber, { color: colors.text }]}>
+                {userData.followingCount}
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.infoBox,
+                {
+                  borderLeftWidth: 0.5,
+                  borderLeftColor: "rgba(0,0,0,0.1)",
+                },
+              ]}
+            >
+              <Text style={[styles.infoText, { color: colors.text }]}>
+                Posts
+              </Text>
+              <Text style={[styles.infoNumber, { color: colors.text }]}>
+                {userData.postsCount}
+              </Text>
+            </View>
           </View>
-          <View
-            style={[
-              styles.infoBox,
-              {
-                borderLeftWidth: 0.5,
-                borderLeftColor: "rgba(0,0,0,0.1)",
-              },
-            ]}
-          >
-            <Text style={[styles.infoText, { color: colors.text }]}>Posts</Text>
-            <Text style={[styles.infoNumber, { color: colors.text }]}>
-              {userData.postsCount}
-            </Text>
+          <View style={styles.actionContainer}>
+            <TouchableOpacity
+              style={[
+                styles.actionButton,
+                { backgroundColor: colors.secondary },
+              ]}
+              activeOpacity={0.8}
+              onPress={async () => {
+                if (isMe) {
+                  navigation.navigate("SettingStack", {
+                    screen: "EditUserProfile",
+                    params: { data: userData },
+                  });
+                } else {
+                  handlePressed();
+                }
+              }}
+            >
+              <Text style={[styles.actionText, { color: colors.invertedText }]}>
+                {isMe
+                  ? "Edit profile"
+                  : userData.isFollowing
+                  ? "Unfollow"
+                  : "Follow"}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.actionButton,
+                { backgroundColor: colors.secondary },
+              ]}
+              activeOpacity={0.8}
+              onPress={() => {
+                if (isMe) {
+                  navigation.navigate("SettingStack", {
+                    screen: "AppSetting",
+                  });
+                }
+              }}
+            >
+              <Text style={[styles.actionText, { color: colors.invertedText }]}>
+                {isMe ? "Setting" : "Message"}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.actionContainer}>
-          <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: colors.secondary }]}
-            activeOpacity={0.8}
-            onPress={async () => {
-              if (isMe) {
-                navigation.navigate("SettingStack", {
-                  screen: "EditUserProfile",
-                  params: { data: userData },
-                });
-              } else {
-                handlePressed();
-              }
-            }}
-          >
-            <Text style={[styles.actionText, { color: colors.invertedText }]}>
-              {isMe
-                ? "Edit profile"
-                : userData.isFollowing
-                ? "Unfollow"
-                : "Follow"}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: colors.secondary }]}
-            activeOpacity={0.8}
-            onPress={() => {
-              if (isMe) {
-                navigation.navigate("SettingStack", {
-                  screen: "AppSetting",
-                });
-              }
-            }}
-          >
-            <Text style={[styles.actionText, { color: colors.invertedText }]}>
-              {isMe ? "Setting" : "Message"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </>
-  );
-};
+      </>
+    );
+  }
+);
+
 const styles = StyleSheet.create({
   backgroundImage: {
     height: 250,
