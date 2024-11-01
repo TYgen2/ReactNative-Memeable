@@ -17,14 +17,13 @@ import UserProfileEmpty from "../../components/userProfile/UserProfileEmpty";
 import useColorTheme from "../../hooks/useColorTheme";
 
 export default UserProfile = ({ route, navigation }) => {
-  console.log("UserProfile re-rendered!!");
   const { colors } = useColorTheme();
 
   const { userDetails, status } = useSelector((state) => state.user);
   const { isStack, targetId } = route.params || {};
   const prevUserDetailsRef = useRef(userDetails);
 
-  const { userData, setUserData, isMe, isInfoLoading, handlePressed } =
+  const { userData, setUserData, isMe, isInfoLoading, handlePressedFollow } =
     useFetchProfileInfo(userDetails?.userId, targetId);
 
   const { userPosts, isPostsLoading, loadMorePosts, refreshPosts } =
@@ -41,7 +40,6 @@ export default UserProfile = ({ route, navigation }) => {
   useFocusEffect(
     useCallback(() => {
       if (isMe && prevUserDetailsRef.current !== userDetails) {
-        console.log("UserProfile re-rendered!!");
         setUserData(new UserProfileModel(userDetails));
         prevUserDetailsRef.current = userDetails;
       }
@@ -88,8 +86,7 @@ export default UserProfile = ({ route, navigation }) => {
           userData={userData}
           isStack={isStack}
           isMe={isMe}
-          navigation={navigation}
-          handlePressed={handlePressed}
+          handlePressedFollow={handlePressedFollow}
         />
       }
     />

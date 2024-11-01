@@ -1,22 +1,22 @@
 import { memo } from "react";
 import FastImage from "react-native-fast-image";
 import { getSongImageSource } from "../../utils/helper";
+import { StyleSheet } from "react-native";
 
-export default UserSongCover = memo(({ songImg, imgStyle }) => {
+export default UserSongCover = memo(({ songImg, width, height, opacity }) => {
   return (
     <FastImage
       source={getSongImageSource(songImg)}
-      style={{
-        width: imgStyle.width - 10,
-        height: imgStyle.height - 10,
-        marginRight: imgStyle.marginRight + 5,
-        marginTop: imgStyle.marginTop + 5,
-        position: imgStyle.position,
-        top: imgStyle.top,
-        right: imgStyle.right,
-        borderRadius: 5,
-      }}
-      resizeMode="cover"
+      style={[styles.image, { width, height, opacity }]}
+      resizeMode="contain"
     />
   );
+});
+
+const styles = StyleSheet.create({
+  image: {
+    borderRadius: 10,
+    position: "absolute",
+    backgroundColor: "black",
+  },
 });

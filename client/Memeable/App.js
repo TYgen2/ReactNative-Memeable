@@ -13,7 +13,7 @@ import EditUserProfile from "./screens/settingStack/EditUserProfile";
 import AppSetting from "./screens/settingStack/AppSetting";
 import DetailedPost from "./screens/mainStack/DetailedPost";
 import CustomTab from "./components/bottomTab/CustomTab";
-import EditBorderColor from "./screens/settingStack/EditBorderColor";
+import EditSongCover from "./screens/settingStack/EditSongCover";
 
 import { useContext, useEffect, useState } from "react";
 import { StatusBar } from "react-native";
@@ -31,6 +31,7 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { ThemeContext } from "./context/theme";
 import { getData, storeData } from "./config/asyncStorage";
 import useColorTheme from "./hooks/useColorTheme";
+import { ProfileUpdateProvider } from "./context/ProfileUpdateContext";
 
 const persistor = persistStore(store);
 enableScreens();
@@ -133,32 +134,31 @@ const SettingScreen = () => {
   const { colors } = useColorTheme();
 
   return (
-    <SettingStack.Navigator
-      screenOptions={{
-        headerShown: true,
-        headerStyle: { backgroundColor: colors.primary },
-        headerTintColor: colors.text,
-      }}
-    >
-      <SettingStack.Screen
-        name="EditUserProfile"
-        component={EditUserProfile}
-        options={{ title: "Edit user profile" }}
-      />
-      <SettingStack.Screen
-        name="EditBorderColor"
-        component={EditBorderColor}
-        options={{
-          title: "Edit border color",
-          animation: "slide_from_bottom",
+    <ProfileUpdateProvider>
+      <SettingStack.Navigator
+        screenOptions={{
+          headerShown: true,
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: colors.text,
         }}
-      />
-      <SettingStack.Screen
-        name="AppSetting"
-        component={AppSetting}
-        options={{ title: "Setting" }}
-      />
-    </SettingStack.Navigator>
+      >
+        <SettingStack.Screen
+          name="EditUserProfile"
+          component={EditUserProfile}
+          options={{ title: "Edit user profile" }}
+        />
+        <SettingStack.Screen
+          name="AppSetting"
+          component={AppSetting}
+          options={{ title: "Setting" }}
+        />
+        <SettingStack.Screen
+          name="EditSongCover"
+          component={EditSongCover}
+          options={{ title: "Edit song cover" }}
+        />
+      </SettingStack.Navigator>
+    </ProfileUpdateProvider>
   );
 };
 

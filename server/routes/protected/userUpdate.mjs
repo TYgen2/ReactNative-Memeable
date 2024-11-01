@@ -193,11 +193,6 @@ router.post(
         updates["song.songUri"] = `${CDN}` + `${songKey}`;
       }
 
-      // Include additional text fields
-      if (req.body.borderColor) {
-        updates["song.borderColor"] = req.body.borderColor;
-      }
-
       if (req.body.songName) {
         updates["song.songName"] = req.body.songName;
       }
@@ -226,6 +221,35 @@ router.post(
       return res
         .status(400)
         .send({ msg: "Something is wrong when updating song" });
+    }
+  }
+);
+
+// update gradient border color of song cover
+router.post(
+  "/api/handleUpdateGradient",
+  authenticateToken,
+  async (req, res) => {
+    const { gradientConfig } = req.body;
+
+    try {
+      // update gradient field in the database
+      const updatedGradient = await User.findByIdAndUpdate(
+        req.userId,
+        { $set: { gradientConfig } },
+        { new: true }
+      );
+
+      if (!updatedGradient) {
+        return res.status(404).send({ msg: "User not found, update failed" });
+      }
+
+      return res.status(200).send({
+        updatedGradient: updatedGradient.gradientConfig,
+        msg: "Gradient configuration updated successfully!",
+      });
+    } catch (error) {
+      return res.status(400).send({ msg: error.message, errorType: "unknown" });
     }
   }
 );

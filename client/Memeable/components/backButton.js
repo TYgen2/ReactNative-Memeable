@@ -1,10 +1,13 @@
 import { Pressable, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { barOffset } from "../utils/constants";
+import { useNavigation } from "@react-navigation/native";
 
-export default BackButton = ({ navigation }) => {
+export default BackButton = () => {
+  const navigation = useNavigation();
+
   return (
-    <Pressable style={styles.backButton} onPress={() => navigation.pop()}>
+    <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
       <Icon name="keyboard-backspace" size={30} color="white" />
     </Pressable>
   );

@@ -54,10 +54,6 @@ const UserSchema = new mongoose.Schema({
     default: null,
   },
   song: {
-    borderColor: {
-      type: mongoose.Schema.Types.String,
-      default: null,
-    },
     imageUri: {
       type: mongoose.Schema.Types.String,
       default: null,
@@ -69,6 +65,32 @@ const UserSchema = new mongoose.Schema({
     songName: {
       type: mongoose.Schema.Types.String,
       default: null,
+    },
+  },
+  gradientConfig: {
+    start: {
+      x: {
+        type: mongoose.Schema.Types.Number,
+        default: 0,
+      },
+      y: {
+        type: mongoose.Schema.Types.Number,
+        default: 0.5,
+      },
+    },
+    end: {
+      x: {
+        type: mongoose.Schema.Types.Number,
+        default: 1,
+      },
+      y: {
+        type: mongoose.Schema.Types.Number,
+        default: 0.5,
+      },
+    },
+    colors: {
+      type: [mongoose.Schema.Types.String],
+      default: ["#f300ff", "#00f3ff"],
     },
   },
   pushToken: {

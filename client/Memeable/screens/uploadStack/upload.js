@@ -1,5 +1,4 @@
 import {
-  ActivityIndicator,
   Image,
   StyleSheet,
   Text,
@@ -12,6 +11,7 @@ import { Formik } from "formik";
 import { uploadReviewSchema } from "../../utils/validationSchema";
 import Icon from "react-native-vector-icons/Ionicons";
 import useUpload from "../../hooks/useUpload";
+import LoadingOverlay from "../../components/LoadingOverlay";
 
 export default Upload = ({ route, navigation }) => {
   const { imageUri } = route.params;
@@ -19,11 +19,7 @@ export default Upload = ({ route, navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: "white" }]}>
-      {isUploading && (
-        <View style={styles.overlay}>
-          <ActivityIndicator size="large" color="#fff" />
-        </View>
-      )}
+      {isUploading && <LoadingOverlay />}
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => navigation.pop()}

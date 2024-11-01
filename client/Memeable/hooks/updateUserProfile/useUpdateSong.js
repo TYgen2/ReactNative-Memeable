@@ -9,7 +9,6 @@ export default useUpdateSong = (songData) => {
     name: songData.songName,
   });
   const [newCover, setNewCover] = useState(songData.imageUri);
-  const [newColor, setNewColor] = useState(songData.borderColor);
   const initialSongRef = useRef(songData);
   const dispatch = useDispatch();
 
@@ -24,9 +23,6 @@ export default useUpdateSong = (songData) => {
     }
     if (newSong.name !== initialSongRef.current.songName) {
       updates.songName = newSong.name;
-    }
-    if (newColor !== initialSongRef.current.borderColor) {
-      updates.borderColor = newColor;
     }
 
     if (Object.keys(updates).length > 0) {
@@ -45,8 +41,6 @@ export default useUpdateSong = (songData) => {
     setNewSong,
     newCover,
     setNewCover,
-    newColor,
-    setNewColor,
     updateSongInfo,
   };
 };

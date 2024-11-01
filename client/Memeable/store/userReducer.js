@@ -4,6 +4,7 @@ import {
   fetchUserInfo,
   handleFollow,
   handleUpdateBgImage,
+  handleUpdateGradient,
   handleUpdateIcon,
   handleUpdateSong,
   handleUpdateStrings,
@@ -117,6 +118,17 @@ export const userSlice = createSlice({
         state.userDetails.postsCount += 1;
       })
       .addCase(handleUploadPost.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(handleUpdateGradient.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(handleUpdateGradient.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.userDetails.gradientConfig = action.payload.updatedGradient;
+      })
+      .addCase(handleUpdateGradient.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

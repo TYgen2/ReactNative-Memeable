@@ -70,6 +70,23 @@ export const handleUpdateStrings = createAsyncThunk(
   }
 );
 
+// update displayName, username and userBio in user profile
+export const handleUpdateGradient = createAsyncThunk(
+  "user/handleUpdateGradient",
+  async ({ gradientConfig }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.post("/handleUpdateGradient", {
+        gradientConfig,
+      });
+
+      console.log("Updated Gradient using REDUX!!");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // update bgImage in user profile
 export const handleUpdateBgImage = createAsyncThunk(
   "user/handleUpdateBgImage",
@@ -129,7 +146,7 @@ export const handleUpdateIcon = createAsyncThunk(
 // update song in user profile
 export const handleUpdateSong = createAsyncThunk(
   "user/handleUpdateSong",
-  async ({ imageUri, songUri, songName, borderColor }, { rejectWithValue }) => {
+  async ({ imageUri, songUri, songName }, { rejectWithValue }) => {
     const formData = new FormData();
 
     if (imageUri) {
@@ -148,11 +165,6 @@ export const handleUpdateSong = createAsyncThunk(
         type: songType,
         name: "songAudio",
       });
-    }
-
-    // Append text fields
-    if (borderColor) {
-      formData.append("borderColor", borderColor);
     }
 
     if (songName) {

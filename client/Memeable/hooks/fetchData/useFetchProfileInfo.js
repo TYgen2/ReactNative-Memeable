@@ -66,7 +66,7 @@ export default useFetchProfileInfo = (userId, targetId) => {
   };
 
   // button actions for follow / unfollow in UserProfile
-  const handlePressed = () => {
+  const handlePressedFollow = () => {
     // handle follow API, also update global state
     dispatch(
       handleFollow({
@@ -85,6 +85,6 @@ export default useFetchProfileInfo = (userId, targetId) => {
     setIsInfoLoading,
     handleFollowersCount,
     isMe,
-    handlePressed,
+    handlePressedFollow,
   };
 };

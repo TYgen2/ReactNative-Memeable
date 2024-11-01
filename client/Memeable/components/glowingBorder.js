@@ -1,73 +1,70 @@
-import React, { memo, useEffect } from "react";
-import {
-  Canvas,
-  RoundedRect,
-  SweepGradient,
-  vec,
-} from "@shopify/react-native-skia";
-import {
-  Easing,
-  useDerivedValue,
-  useSharedValue,
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import LinearGradient from "react-native-linear-gradient";
+import Animated, {
+  useAnimatedStyle,
   withRepeat,
   withTiming,
+  withSequence,
+  useSharedValue,
+  withDelay,
 } from "react-native-reanimated";
 
-export default GlowingBorder = memo(({ boxStyle, color }) => {
-  const rotation = useSharedValue(0);
-  const GLOW_COLOR = color + "FF";
-  const GLOW_BG_COLOR = color + "00"; // Should be the same color as GLOW_COLOR but fully transparent
+const GlowingBorder = ({ gradientConfig, width, height }) => {
+  // Create two borders with different animation delays
+  const borders = [0, 1].map((index) => {
+    const progress = useSharedValue(0);
 
-  const centerX = boxStyle.width / 2;
-  const centerY = boxStyle.height / 2;
-  const centerVec = vec(centerX, centerY);
+    useEffect(() => {
+      progress.value = withDelay(
+        index * 500,
+        withRepeat(
+          withSequence(
+            withTiming(1, { duration: 500 }),
+            withTiming(0, { duration: 500 })
+          ),
+          -1,
+          true
+        )
+      );
+    }, []);
 
-  useEffect(() => {
-    const animation = withRepeat(
-      withTiming(4, {
-        duration: 4000,
-        easing: Easing.linear,
-      }),
-      -1,
-      false
-    );
+    const animatedStyle = useAnimatedStyle(() => {
+      return {
+        opacity: progress.value,
+        transform: [{ scale: 1 + progress.value * 0.1 }],
+      };
+    });
 
-    rotation.value = animation;
-
-    // Cleanup function to stop the animation
-    return () => {
-      rotation.value = 0; // Reset the rotation value
-    };
-  }, []);
-
-  const animatedRotation = useDerivedValue(() => {
-    return [{ rotate: Math.PI * rotation.value }];
-  }, [rotation]);
-
-  const GlowGradient = () => {
     return (
-      <RoundedRect
-        r={10}
-        x={0}
-        y={0}
-        width={boxStyle.width}
-        height={boxStyle.height}
-      >
-        <SweepGradient
-          origin={centerVec}
-          c={centerVec}
-          colors={[GLOW_BG_COLOR, GLOW_COLOR, GLOW_COLOR, GLOW_BG_COLOR]}
-          start={0}
-          end={360 * 0.7}
-          transform={animatedRotation}
+      <Animated.View key={index} style={[styles.animatedBorder, animatedStyle]}>
+        <LinearGradient
+          colors={gradientConfig.colors}
+          start={gradientConfig.start}
+          end={gradientConfig.end}
+          style={styles.gradientBorder}
         />
-      </RoundedRect>
+      </Animated.View>
     );
-  };
+  });
 
-  return (
-    <Canvas style={boxStyle}>
-      <GlowGradient />
-    </Canvas>
-  );
+  return <View style={[styles.container, { width, height }]}>{borders}</View>;
+};
+
+const styles = StyleSheet.create({
+  container: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  animatedBorder: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+  },
+  gradientBorder: {
+    flex: 1,
+    borderRadius: 12,
+  },
 });
+
+export default GlowingBorder;

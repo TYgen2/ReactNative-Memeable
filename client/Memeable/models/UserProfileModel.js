@@ -15,10 +15,14 @@ export class UserProfileModel {
       id: rawData.userIcon?.id || null,
     };
     this.song = {
-      borderColor: rawData.song?.borderColor || "#7546b3",
       imageUri: rawData.song?.imageUri || null,
       songUri: rawData.song?.songUri || null,
       songName: rawData.song?.songName || null,
+    };
+    this.gradientConfig = {
+      start: rawData.gradientConfig.start,
+      end: rawData.gradientConfig.end,
+      colors: rawData.gradientConfig.colors,
     };
   }
 }

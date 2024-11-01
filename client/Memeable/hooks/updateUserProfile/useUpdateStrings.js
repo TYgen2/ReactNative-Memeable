@@ -4,23 +4,23 @@ import { handleUpdateStrings } from "../../store/userActions";
 import { apiQueue } from "../../utils/helper";
 
 export default useUpdateStrings = (stringData) => {
-  const [displayName, setDisplayName] = useState(stringData.displayName);
-  const [username, setUsername] = useState(stringData.username);
-  const [userBio, setUserBio] = useState(stringData.userBio);
+  const [newDisplayName, setNewDisplayName] = useState(stringData.displayName);
+  const [newUsername, setNewUsername] = useState(stringData.username);
+  const [newUserBio, setNewUserBio] = useState(stringData.userBio);
   const initialStringsRef = useRef(stringData);
   const dispatch = useDispatch();
 
   const updateStringInfo = async () => {
     const updates = {};
 
-    if (displayName !== initialStringsRef.current.displayName) {
-      updates.displayName = displayName;
+    if (newDisplayName !== initialStringsRef.current.displayName) {
+      updates.displayName = newDisplayName;
     }
-    if (username !== initialStringsRef.current.username) {
-      updates.username = username;
+    if (newUsername !== initialStringsRef.current.username) {
+      updates.username = newUsername;
     }
-    if (userBio !== initialStringsRef.current.userBio) {
-      updates.userBio = userBio;
+    if (newUserBio !== initialStringsRef.current.userBio) {
+      updates.userBio = newUserBio;
     }
 
     if (Object.keys(updates).length > 0) {
@@ -37,12 +37,12 @@ export default useUpdateStrings = (stringData) => {
   };
 
   return {
-    displayName,
-    setDisplayName,
-    username,
-    setUsername,
-    userBio,
-    setUserBio,
+    newDisplayName,
+    setNewDisplayName,
+    newUsername,
+    setNewUsername,
+    newUserBio,
+    setNewUserBio,
     updateStringInfo,
   };
 };
