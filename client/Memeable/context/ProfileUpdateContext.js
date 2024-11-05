@@ -39,6 +39,8 @@ export const ProfileUpdateProvider = ({ children }) => {
       if (success) {
         navigation.goBack();
         unregisterUpdate("gradient");
+        unregisterUpdate("cover");
+        unregisterUpdate("song");
       } else {
         console.log("Some updates failed");
       }

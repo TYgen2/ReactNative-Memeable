@@ -13,9 +13,6 @@ setGlobalConfig({
   headers: true,
 });
 
-// apiClient.interceptors.request.use(requestLogger);
-// apiClient.interceptors.response.use(responseLogger);
-
 // Request interceptor
 apiClient.interceptors.request.use(
   async (config) => {
@@ -56,8 +53,26 @@ apiClient.interceptors.response.use(
     return response;
   },
   async (error) => {
-    // Both tokens are expired, return to auth page
-    if (error.response && error.response.status === 401) {
+    // Log the complete error for debugging
+    console.error("API Error:", {
+      message: error.message,
+      response: error.response,
+      request: error.request,
+      config: error.config,
+    });
+
+    // Handle cases where response doesn't exist
+    if (!error.response) {
+      console.error("Network error or no response from server");
+      return Promise.reject({
+        response: {
+          data: { msg: "Network error or no response from server" },
+        },
+      });
+    }
+
+    // Handle authentication errors
+    if (error.response.status === 401) {
       console.log("Both tokens expired!! Returning to the login page...");
       await clearTokens();
     }
@@ -65,8 +80,15 @@ apiClient.interceptors.response.use(
     if (error.response.status === 404) {
       console.log("User not found, refreshToken GGed");
     }
+
+    // Always return a properly structured error
     return Promise.reject(error);
   }
 );
+
+// Also add some configuration for file uploads
+apiClient.defaults.timeout = 30000; // 30 seconds timeout
+apiClient.defaults.maxContentLength = Infinity;
+apiClient.defaults.maxBodyLength = Infinity;
 
 export default apiClient;

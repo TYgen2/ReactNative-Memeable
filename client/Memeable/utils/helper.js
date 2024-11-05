@@ -83,21 +83,6 @@ export const selectImageForBgImage = async (setBgImage) => {
   }
 };
 
-// select song for profile song
-export const selectSongForProfile = async (setNewSong) => {
-  try {
-    const res = await DocumentPicker.getDocumentAsync({
-      type: "audio/*",
-    });
-    if (!res.canceled) {
-      const { uri, name } = res.assets[0];
-      setNewSong({ uri, name });
-    }
-  } catch (err) {
-    console.error("Error picking audio file:", err);
-  }
-};
-
 export const displayLikes = (count) => {
   if (count < 1000) {
     return count.toString();

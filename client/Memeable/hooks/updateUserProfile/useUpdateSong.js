@@ -5,42 +5,39 @@ import { handleUpdateSong } from "../../store/userActions";
 
 export default useUpdateSong = (songData) => {
   const [newSong, setNewSong] = useState({
-    uri: songData.songUri,
-    name: songData.songName,
+    songUri: songData.songUri,
+    songName: songData.songName,
   });
-  const [newCover, setNewCover] = useState(songData.imageUri);
   const initialSongRef = useRef(songData);
   const dispatch = useDispatch();
 
   const updateSongInfo = async () => {
-    const updates = {};
-
-    if (newCover !== initialSongRef.current.imageUri) {
-      updates.imageUri = newCover;
-    }
-    if (newSong.uri !== initialSongRef.current.songUri) {
-      updates.songUri = newSong.uri;
-    }
-    if (newSong.name !== initialSongRef.current.songName) {
-      updates.songName = newSong.name;
-    }
-
-    if (Object.keys(updates).length > 0) {
+    if (
+      newSong.songUri !== initialSongRef.current.songUri ||
+      newSong.songName !== initialSongRef.current.songName
+    ) {
       console.log("Proceed to update song info!!");
       try {
-        return await apiQueue.add(() => dispatch(handleUpdateSong(updates)));
+        return await apiQueue.add(() =>
+          dispatch(
+            handleUpdateSong({
+              songUri: newSong.songUri,
+              songName: newSong.songName,
+            })
+          )
+        );
       } catch (error) {
         console.error("Error when updating user profile", error.message);
+        throw error;
       }
     }
+
     return Promise.resolve();
   };
 
   return {
     newSong,
     setNewSong,
-    newCover,
-    setNewCover,
     updateSongInfo,
   };
 };

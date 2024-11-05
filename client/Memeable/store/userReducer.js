@@ -4,6 +4,7 @@ import {
   fetchUserInfo,
   handleFollow,
   handleUpdateBgImage,
+  handleUpdateCover,
   handleUpdateGradient,
   handleUpdateIcon,
   handleUpdateSong,
@@ -104,7 +105,9 @@ export const userSlice = createSlice({
       })
       .addCase(handleUpdateSong.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.userDetails.song = action.payload.updatedSong;
+        console.log(action.payload);
+        state.userDetails.song.songUri = action.payload.updatedSongUri;
+        state.userDetails.song.songName = action.payload.updatedSongName;
       })
       .addCase(handleUpdateSong.rejected, (state, action) => {
         state.status = "failed";
@@ -129,6 +132,17 @@ export const userSlice = createSlice({
         state.userDetails.gradientConfig = action.payload.updatedGradient;
       })
       .addCase(handleUpdateGradient.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(handleUpdateCover.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(handleUpdateCover.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.userDetails.song.imageUri = action.payload.updatedCover;
+      })
+      .addCase(handleUpdateCover.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

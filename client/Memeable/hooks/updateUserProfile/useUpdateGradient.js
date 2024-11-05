@@ -18,7 +18,14 @@ export const useUpdateGradient = (gradientData) => {
   const dispatch = useDispatch();
 
   const updateGradientInfo = async () => {
-    if (gradientConfig !== initialGradientRef.current) {
+    // use stringify here to compare actual value,
+    // since here has a useEffect hook that set the gradient
+    // at least once, it will be considered as different value
+    // even though user just click in here once and didn't modify
+    if (
+      JSON.stringify(gradientConfig) !==
+      JSON.stringify(initialGradientRef.current)
+    ) {
       console.log("Proceed to update gradient info!!");
       try {
         return await apiQueue.add(() =>

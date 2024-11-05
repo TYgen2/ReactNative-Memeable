@@ -20,11 +20,23 @@ export default EditUserProfile = ({ route }) => {
     userDetails.gradientConfig
   );
 
+  const [previewCover, setPreviewCover] = useState(userDetails.song.imageUri);
+  const [previewSong, setPreviewSong] = useState(userDetails.song);
+
   useEffect(() => {
-    if (route.params?.updatedGradient) {
-      setPreviewGradient(route.params.updatedGradient.gradient);
+    if (route.params?.updatedPreview) {
+      if (route.params.updatedPreview.gradient) {
+        setPreviewGradient(route.params.updatedPreview.gradient);
+      }
+      if (route.params.updatedPreview.cover) {
+        setPreviewCover(route.params.updatedPreview.cover);
+      }
+      if (route.params.updatedPreview.song) {
+        console.log("Updated song!!");
+        setPreviewSong(route.params.updatedPreview.song);
+      }
     }
-  }, [route.params?.updatedGradient]);
+  }, [route.params?.updatedPreview]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.primary }]}>
@@ -39,9 +51,8 @@ export default EditUserProfile = ({ route }) => {
       />
       <EditProfileBGM
         gradientData={previewGradient}
-        imageUri={userDetails.song.imageUri}
-        songUri={userDetails.song.songUri}
-        songName={userDetails.song.songName}
+        imageUri={previewCover}
+        songData={previewSong}
       />
     </View>
   );

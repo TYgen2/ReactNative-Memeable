@@ -10,16 +10,9 @@ import PlaybackButton from "./PlaybackButton";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 
-const EditProfileBGM = ({ gradientData, imageUri, songUri, songName }) => {
+const EditProfileBGM = ({ gradientData, imageUri, songData }) => {
   const { colors } = useColorTheme();
   const navigation = useNavigation();
-
-  const { newSong, setNewSong, newCover, setNewCover, updateSongInfo } =
-    useUpdateSong({
-      imageUri,
-      songUri,
-      songName,
-    });
 
   const goToEditCoverPage = () => {
     navigation.navigate("EditSongCover", {
@@ -35,14 +28,8 @@ const EditProfileBGM = ({ gradientData, imageUri, songUri, songName }) => {
       </Text>
 
       <View style={styles.configContainer}>
-        <PickSongButton newSong={newSong} setNewSong={setNewSong} />
-        {/* <TouchableOpacity
-            style={styles.configButton}
-            activeOpacity={0.7}
-            onPress={() => selectImageForProfile(setNewCover, false)}
-          >
-            <Text style={styles.configText}>Cover</Text>
-          </TouchableOpacity> */}
+        <PickSongButton songData={songData} />
+
         <TouchableOpacity
           style={styles.imageContainer}
           activeOpacity={0.8}
@@ -60,12 +47,13 @@ const EditProfileBGM = ({ gradientData, imageUri, songUri, songName }) => {
             height={125}
           />
           <UserSongCover
-            songImg={newCover}
+            songImg={imageUri}
             width={120}
             height={120}
             opacity={0.7}
           />
         </TouchableOpacity>
+
         <PlaybackButton />
       </View>
     </View>

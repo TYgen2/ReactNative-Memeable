@@ -6,6 +6,8 @@ import { useUpdateGradient } from "../../hooks/updateUserProfile/useUpdateGradie
 import GradientColorPicker from "../../components/editProfile/config/GradientColorPicker";
 import GradientSlider from "../../components/editProfile/config/GradientSlider";
 import { useProfileUpdates } from "../../context/ProfileUpdateContext";
+import useUpdateCover from "../../hooks/updateUserProfile/useUpdateCover";
+import { selectImageForProfile } from "../../utils/helper";
 
 const EditSongCover = ({ route, navigation }) => {
   const { gradient, image } = route.params;
@@ -22,19 +24,23 @@ const EditSongCover = ({ route, navigation }) => {
     updateGradientInfo,
   } = useUpdateGradient(gradient);
 
+  const { newCover, setNewCover, updateCoverInfo } = useUpdateCover(image);
+
   const { registerUpdate } = useProfileUpdates();
 
   useEffect(() => {
     registerUpdate("gradient", updateGradientInfo);
-  }, [updateGradientInfo]);
+    registerUpdate("cover", updateCoverInfo);
+  }, [updateGradientInfo, updateCoverInfo]);
 
   const handleApplyChanges = () => {
-    const updatedGradient = {
+    const updatedPreview = {
       gradient: gradientConfig,
+      cover: newCover,
     };
 
     navigation.navigate("EditUserProfile", {
-      updatedGradient,
+      updatedPreview,
     });
   };
 
@@ -46,7 +52,12 @@ const EditSongCover = ({ route, navigation }) => {
           width={250}
           height={250}
         />
-        <UserSongCover songImg={image} width={245} height={245} />
+        <TouchableOpacity
+          style={styles.configCover}
+          onPress={() => selectImageForProfile(setNewCover, false)}
+        >
+          <UserSongCover songImg={newCover} width={245} height={245} />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.colorPickerContainer}>
@@ -86,6 +97,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingTop: 30,
+  },
+  configCover: {
+    position: "absolute",
+    width: 245,
+    height: 245,
+    opacity: 0.8,
   },
   previewContainer: {
     flex: 2,

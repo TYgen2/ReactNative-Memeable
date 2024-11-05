@@ -146,30 +146,21 @@ export const handleUpdateIcon = createAsyncThunk(
 // update song in user profile
 export const handleUpdateSong = createAsyncThunk(
   "user/handleUpdateSong",
-  async ({ imageUri, songUri, songName }, { rejectWithValue }) => {
+  async ({ songUri, songName }, { rejectWithValue }) => {
     const formData = new FormData();
+    const songType = songUri.endsWith(".mp3") ? "audio/mpeg" : "audio/wav";
 
-    if (imageUri) {
-      const imageType = imageUri.endsWith(".png") ? "image/png" : "image/jpeg";
-      formData.append("albumImage", {
-        uri: imageUri,
-        type: imageType,
-        name: "albumImage",
-      });
-    }
+    const finalUri = songUri.startsWith("file://")
+      ? songUri
+      : `file://${songUri}`;
 
-    if (songUri) {
-      const songType = songUri.endsWith(".mp3") ? "audio/mpeg" : "audio/wav";
-      formData.append("songAudio", {
-        uri: songUri,
-        type: songType,
-        name: "songAudio",
-      });
-    }
+    formData.append("songAudio", {
+      uri: finalUri,
+      type: songType,
+      name: "songAudio",
+    });
 
-    if (songName) {
-      formData.append("songName", songName);
-    }
+    formData.append("songName", songName);
 
     try {
       const response = await apiClient.post("/handleUpdateSong", formData, {
@@ -179,6 +170,34 @@ export const handleUpdateSong = createAsyncThunk(
       });
 
       console.log("Updated song using REDUX!!");
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+
+// update icon in user profile
+export const handleUpdateCover = createAsyncThunk(
+  "user/handleUpdateCover",
+  async ({ cover }, { rejectWithValue }) => {
+    const formData = new FormData();
+    const fileType = cover.endsWith(".png") ? "image/png" : "image/jpeg";
+    formData.append("file", {
+      uri: cover,
+      type: fileType,
+      name: "image",
+    });
+
+    try {
+      const response = await apiClient.post("/handleUpdateCover", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Updated cover using REDUX!!");
       return response.data;
     } catch (error) {
       console.log(error);

@@ -32,9 +32,14 @@ import { ThemeContext } from "./context/theme";
 import { getData, storeData } from "./config/asyncStorage";
 import useColorTheme from "./hooks/useColorTheme";
 import { ProfileUpdateProvider } from "./context/ProfileUpdateContext";
+import EditSongAudio from "./screens/settingStack/EditSongAudio";
+import { setupPlayer } from "./utils/audioTrimmer/audioHelpers";
+import TrackPlayer from "react-native-track-player";
 
 const persistor = persistStore(store);
 enableScreens();
+
+TrackPlayer.registerPlaybackService(() => require("./service"));
 
 // Bottom tab navigation
 const Tab = createBottomTabNavigator();
@@ -157,6 +162,11 @@ const SettingScreen = () => {
           component={EditSongCover}
           options={{ title: "Edit song cover" }}
         />
+        <SettingStack.Screen
+          name="EditSongAudio"
+          component={EditSongAudio}
+          options={{ title: "Trim song audio" }}
+        />
       </SettingStack.Navigator>
     </ProfileUpdateProvider>
   );
@@ -220,9 +230,39 @@ const App = () => {
 
   const { isLoading } = useContext(UpdateContext);
   const [isUserInfoReady, setIsUserInfoReady] = useState(false);
+  const [isPlayerReady, setIsPlayerReady] = useState(false);
   const { loginStatus, userDetails } = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    let mounted = true;
+
+    const initializePlayer = async () => {
+      try {
+        if (mounted) {
+          await setupPlayer();
+          setIsPlayerReady(true);
+        }
+      } catch (error) {
+        console.error("Error initializing player:", error);
+      }
+    };
+
+    initializePlayer();
+
+    // Cleanup function
+    return () => {
+      mounted = false;
+      // Only destroy when the app is actually closing
+      if (!__DEV__) {
+        // Check if not in development mode
+        TrackPlayer.destroy().catch(() => {
+          // Ignore destroy errors during cleanup
+        });
+      }
+    };
+  }, []);
 
   // when user info is ready, login user
   useEffect(() => {
@@ -232,7 +272,7 @@ const App = () => {
     }
   }, [userDetails, dispatch]);
 
-  if (isLoading) {
+  if (isLoading || !isPlayerReady) {
     return <Splash />;
   }
 

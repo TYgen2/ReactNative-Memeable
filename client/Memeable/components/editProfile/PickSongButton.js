@@ -1,24 +1,34 @@
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React from "react";
-import { selectSongForProfile } from "../../utils/helper";
+import { pickAudio } from "../../utils/audioTrimmer/audioHelpers";
+import { useNavigation } from "@react-navigation/native";
 
-const PickSongButton = ({ newSong, setNewSong }) => {
+const PickSongButton = ({ songData }) => {
+  const navigation = useNavigation();
+
   return (
-    <TouchableOpacity
-      style={styles.configButton}
-      activeOpacity={0.7}
-      onPress={async () => selectSongForProfile(setNewSong)}
-    >
-      <Text style={styles.configText}>
-        {newSong.name !== null ? newSong.name : "Song"}
+    <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.configButton}
+        activeOpacity={0.7}
+        onPress={() => pickAudio(navigation, songData)}
+      >
+        <Text style={styles.configText}>Select</Text>
+      </TouchableOpacity>
+      <Text style={styles.songName}>
+        {songData.songName ? songData.songName : "no song yet"}
       </Text>
-    </TouchableOpacity>
+    </View>
   );
 };
 
 export default PickSongButton;
 
 const styles = StyleSheet.create({
+  container: {
+    alignItems: "center",
+    gap: 10,
+  },
   configButton: {
     width: 70,
     height: 70,
@@ -29,5 +39,10 @@ const styles = StyleSheet.create({
   },
   configText: {
     fontWeight: "bold",
+  },
+  songName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "white",
   },
 });
