@@ -8,6 +8,7 @@ const CommentInput = memo(
   ({
     postId,
     userIcon,
+    userIconBgColor,
     onCommentPosted,
     colors,
     replyInfo,
@@ -48,12 +49,17 @@ const CommentInput = memo(
     return (
       <View style={styles.commentInputContainer}>
         <View style={styles.userIconContainer}>
-          <FastImage source={userIcon} style={styles.userIcon} />
+          <FastImage
+            source={userIcon}
+            style={[styles.userIcon, { backgroundColor: userIconBgColor }]}
+          />
         </View>
         <BottomSheetTextInput
           style={[styles.commentInputField, { color: colors.text }]}
           placeholder="Add a comment..."
           placeholderTextColor="grey"
+          autoCorrect={false}
+          autoCapitalize="none"
           value={comment}
           onChangeText={(text) => setComment(text)}
           onFocus={() => setIsFocused(true)}

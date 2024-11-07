@@ -2,22 +2,24 @@ import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React from "react";
 import { pickAudio } from "../../utils/audioTrimmer/audioHelpers";
 import { useNavigation } from "@react-navigation/native";
+import useColorTheme from "../../hooks/useColorTheme";
 
 const PickSongButton = ({ songData }) => {
+  const { colors } = useColorTheme();
   const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={styles.configButton}
+        style={[styles.configButton, { backgroundColor: colors.secondary }]}
         activeOpacity={0.7}
         onPress={() => pickAudio(navigation, songData)}
       >
-        <Text style={styles.configText}>
+        <Text style={[styles.configText, { color: colors.primary }]}>
           {songData.songName ? "Edit" : "Select"}
         </Text>
       </TouchableOpacity>
-      <Text style={styles.songName}>
+      <Text style={[styles.songName, { color: colors.text }]}>
         {songData.songName ? songData.songName : "no song yet"}
       </Text>
     </View>

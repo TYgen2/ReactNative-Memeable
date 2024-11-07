@@ -24,6 +24,7 @@ const CommentModal = ({
   colors,
   postId,
   userIcon,
+  userIconBgColor,
   navigateAndCloseModal,
   navigation,
 }) => {
@@ -98,6 +99,7 @@ const CommentModal = ({
           <CommentInput
             postId={postId}
             userIcon={userIcon}
+            userIconBgColor={userIconBgColor}
             onCommentPosted={handleNewComment}
             colors={colors}
             replyInfo={replyInfo}

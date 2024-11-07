@@ -12,6 +12,7 @@ import PostActionBar from "./PostActionBar";
 const MainPost = ({ item, navigation, colors }) => {
   const { userDetails } = useSelector((state) => state.user);
   const myIcon = getIconSource(userDetails?.userIcon);
+  const myIconBgColor = userDetails?.userIcon.bgColor || "transparent";
 
   const { post, postState, toggleLike, toggleSave } = usePostViewModel(item);
   const commentViewModel = useCommentViewModel(item._id);
@@ -46,6 +47,7 @@ const MainPost = ({ item, navigation, colors }) => {
         colors={colors}
         postId={item._id}
         userIcon={myIcon}
+        userIconBgColor={myIconBgColor}
         navigateAndCloseModal={navigateAndCloseModal}
         navigation={navigation}
       />

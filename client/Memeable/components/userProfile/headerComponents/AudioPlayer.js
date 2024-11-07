@@ -7,8 +7,10 @@ import PlaybackButton from "../../PlaybackButton";
 import { useAutoplayBGM } from "../../../hooks/useAutoPlayBGM";
 import usePlaybackPreview from "../../../hooks/usePlaybackPreview";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import useColorTheme from "../../../hooks/useColorTheme";
 
 const AudioPlayer = ({ userData }) => {
+  const { colors } = useColorTheme();
   const navigation = useNavigation();
 
   const { isPlaying, togglePlayback, resetPlayer, cleanup } =
@@ -37,7 +39,7 @@ const AudioPlayer = ({ userData }) => {
   return (
     <View style={styles.container}>
       <View style={styles.songInfoContainer}>
-        <Text style={styles.songName}>
+        <Text style={[styles.songName, { color: colors.text }]}>
           {formatSongName(userData.song.songName)}
         </Text>
 
@@ -83,7 +85,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   songName: {
-    color: "white",
     fontSize: 16,
     fontWeight: "bold",
     paddingBottom: 10,
