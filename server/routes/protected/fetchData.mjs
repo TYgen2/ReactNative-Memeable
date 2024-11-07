@@ -83,6 +83,7 @@ router.get("/api/fetchUserProfile", authenticateToken, async (req, res) => {
       userBio: user.bio,
       bgImage: user.bgImage,
       song: user.song,
+      gradientConfig: user.gradientConfig,
       followersCount,
       followingCount,
       postsCount,

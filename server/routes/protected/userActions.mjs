@@ -17,6 +17,7 @@ import { Follow } from "../../mongoose/schemas/follow.mjs";
 import { Comment } from "../../mongoose/schemas/comment.mjs";
 import { SavedPost } from "../../mongoose/schemas/savedPost.mjs";
 import { CommentLike } from "../../mongoose/schemas/commentLike.mjs";
+import { User } from "../../mongoose/schemas/user.mjs";
 dotenv.config();
 
 const router = Router();
@@ -101,11 +102,21 @@ router.post("/api/handleLike", authenticateToken, async (req, res) => {
       await Like.create({ userId, postId });
       await Post.findByIdAndUpdate(postId, { $inc: { likes: 1 } });
 
-      // working!!! temp token
-      // await sendPushNotification(
-      //   "WTF MAN",
-      //   "foH2m8oxSNmOJfaDws2yR4:APA91bEdR8ID0YaqxOEMXfxUafn2YLO0iUQ2nwj3DkcuD2ZzajbaRCHajwza1V3Hdm62MhUhgK4nZZl7fvElliq7h9eOMvr7G6CIXBcuiSQ4sj37lYBl487pTq6tBWSixjVCIIdWm8J3"
-      // );
+      // Get post owner's info for notification
+      const post = await Post.findById(postId);
+      if (post) {
+        const postOwner = await User.findById(post.userId);
+        if (
+          postOwner &&
+          postOwner.pushToken &&
+          postOwner._id.toString() !== userId
+        ) {
+          // Don't send notification if user likes their own post
+          const liker = await User.findById(userId);
+          const notificationBody = `${liker.displayName} liked your post`;
+          await sendPushNotification(notificationBody, postOwner.pushToken);
+        }
+      }
 
       return res.status(200).send({ msg: "Liked the post!" });
     } else if (action === "unlike") {
@@ -128,6 +139,15 @@ router.post("/api/handleFollow", authenticateToken, async (req, res) => {
   try {
     if (action === "follow") {
       await Follow.create({ userId: targetId, followerId: req.userId });
+
+      // Get target user's info for notification
+      const targetUser = await User.findById(targetId);
+      if (targetUser && targetUser.pushToken) {
+        const follower = await User.findById(req.userId);
+        const notificationBody = `${follower.displayName} started following you`;
+        await sendPushNotification(notificationBody, targetUser.pushToken);
+      }
+
       return res.status(200).send({ msg: "Followed successfully!" });
     } else if (action === "unfollow") {
       await Follow.deleteOne({ userId: targetId, followerId: req.userId });
@@ -154,9 +174,24 @@ router.post("/api/handleComment", authenticateToken, async (req, res) => {
 
     await newComment.save();
 
+    // Get post owner's info for notification
+    const post = await Post.findById(postId);
+    if (post) {
+      const postOwner = await User.findById(post.userId);
+      if (
+        postOwner &&
+        postOwner.pushToken &&
+        postOwner._id.toString() !== req.userId
+      ) {
+        const commenter = await User.findById(req.userId);
+        const notificationBody = `${commenter.displayName} commented on your post: "${content}"`;
+        await sendPushNotification(notificationBody, postOwner.pushToken);
+      }
+    }
+
     const commentData = newComment.toObject();
     commentData.timeAgo = getTimeDifference(commentData.createDate);
-    commentData.hasLiked = false; // Set initial hasLiked status
+    commentData.hasLiked = false;
 
     res.status(201).send({
       msg: "Comment created successfully",
@@ -177,6 +212,22 @@ router.post("/api/handleCommentLike", authenticateToken, async (req, res) => {
     if (action === "like") {
       await CommentLike.create({ userId, commentId });
       await Comment.findByIdAndUpdate(commentId, { $inc: { likes: 1 } });
+
+      // Get comment owner's info for notification
+      const comment = await Comment.findById(commentId);
+      if (comment) {
+        const commentOwner = await User.findById(comment.userId);
+        if (
+          commentOwner &&
+          commentOwner.pushToken &&
+          commentOwner._id.toString() !== userId
+        ) {
+          const liker = await User.findById(userId);
+          const notificationBody = `${liker.displayName} liked your comment`;
+          await sendPushNotification(notificationBody, commentOwner.pushToken);
+        }
+      }
+
       return res.status(200).send({ msg: "Liked the comment!" });
     } else if (action === "unlike") {
       await CommentLike.deleteOne({ userId, commentId });

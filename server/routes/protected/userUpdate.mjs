@@ -159,48 +159,27 @@ router.post(
 router.post(
   "/api/handleUpdateSong",
   upload.fields([
-    { name: "albumImage", maxCount: 1 },
     { name: "songAudio", maxCount: 1 },
+    { name: "songName", maxCount: 1 },
   ]),
   authenticateToken,
   async (req, res) => {
     try {
-      const updates = {};
+      const songBuffer = req.files.songAudio[0].buffer;
+      const songKey = `userInfo/${req.userId}/song/audio/${randomImageName()}`;
+      const songType = req.files.songAudio[0].mimetype;
 
-      // update song cover image if exist
-      if (req.files.albumImage) {
-        const imageBuffer = await sharp(req.files.albumImage[0].buffer)
-          .jpeg({ quality: 80 })
-          .toBuffer();
-        const imageKey = `userInfo/${
-          req.userId
-        }/song/coverImage/${randomImageName()}`;
-        const imageType = req.files.albumImage[0].mimetype;
-
-        await uploadToS3(imageBuffer, imageKey, imageType);
-        updates["song.imageUri"] = `${CDN}` + `${imageKey}`;
-      }
-
-      // update song audio if exist
-      if (req.files.songAudio) {
-        const songBuffer = req.files.songAudio[0].buffer;
-        const songKey = `userInfo/${
-          req.userId
-        }/song/audio/${randomImageName()}`;
-        const songType = req.files.songAudio[0].mimetype;
-
-        await uploadToS3(songBuffer, songKey, songType);
-        updates["song.songUri"] = `${CDN}` + `${songKey}`;
-      }
-
-      if (req.body.songName) {
-        updates["song.songName"] = req.body.songName;
-      }
+      await uploadToS3(songBuffer, songKey, songType);
 
       // update song field in the database
       const updatedSong = await User.findByIdAndUpdate(
         req.userId,
-        { $set: updates },
+        {
+          $set: {
+            "song.songUri": `${CDN}` + `${songKey}`,
+            "song.songName": req.body.songName,
+          },
+        },
         { new: true }
       );
 
@@ -211,7 +190,8 @@ router.post(
       }
 
       const response = {
-        updatedSong: updatedSong.song,
+        updatedSongUri: updatedSong.song.songUri,
+        updatedSongName: updatedSong.song.songName,
         msg: "Song info updated to database and uploaded to S3!!",
       };
 
@@ -221,6 +201,55 @@ router.post(
       return res
         .status(400)
         .send({ msg: "Something is wrong when updating song" });
+    }
+  }
+);
+
+// update bgm cover in user profile
+router.post(
+  "/api/handleUpdateCover",
+  upload.single("file"),
+  authenticateToken,
+  async (req, res) => {
+    try {
+      // image compress
+      const buffer = await sharp(req.file.buffer)
+        .jpeg({ quality: 80 })
+        .toBuffer();
+      const imageKey = `userInfo/${
+        req.userId
+      }/song/coverImage/${randomImageName()}`;
+      const fileType = req.file.mimetype;
+
+      await uploadToS3(buffer, imageKey, fileType);
+
+      // update cover field in database
+      const updatedCover = await User.findByIdAndUpdate(
+        req.userId,
+        {
+          $set: {
+            "song.imageUri": `${CDN}` + `${imageKey}`,
+          },
+        },
+        { new: true }
+      );
+      if (!updatedCover) {
+        return res
+          .status(404)
+          .send({ msg: "User not found when updating cover" });
+      }
+
+      const response = {
+        updatedCover: updatedCover.song.imageUri,
+        msg: "Cover updated to database and uploaded to S3!!",
+      };
+
+      return res.status(200).send(response);
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(400)
+        .send({ msg: "Something is wrong when updating cover" });
     }
   }
 );
