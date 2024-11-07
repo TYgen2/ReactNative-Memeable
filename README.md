@@ -1,12 +1,21 @@
-# 😎Memeable (React Native, Express, MongoDB, AWS)
-A social-media-like mobile app for posting and viewing images. Unlike the
-previous project using Firebase service as the backend, I'm using Express
-to build some API for handling all the request, hosted on AWS EC2.
+# 😎Memeable (React Native, Express, MongoDB, AWS, Firebase)
+This project is a media-sharing platform (Just like Instagram) with the following features:
 
-The authentication uses the JWT-based method to handle login and register.
-Local login using Email&Password, Google and Facebook login is supported. If user is
-authenticated, they will receive a JWT token from the server for subsequent
-actions. Refresh token mechanism is also implenmented to keep user logged in.
+-	<b>🔑JWT-Token-Based Authentication:</b> Implemented a secure authentication system using Express,
+  supporting local, Google, and Facebook login/register functionalities. User credentials are
+ 	securely stored in MongoDB, with a refresh token mechanism to keep user logged in.
+-	<b>👥Interactive Features:</b> The app supports essential social media functionalities such as liking
+  posts, commenting, and adding sub-comments.
+- <b>🔔Push notification:</b> Integrated Firebase Cloud Messaging (FCM) to send real-time notifications
+  for user interactions, such as likes on posts, comments, likes on comments, and new followers.
+-	<b>👤User Profiles:</b> Users can create and customize their profiles, including editing display
+  names, bios, background images, and profile icons. A unique feature allows users to set a background
+ 	music (BGM) track for their profile, which can be played when others visit their user profile.
+-	<b>🔉Audio Trimming Tool:</b> Developed an audio trimmer using Android native modules to enable users
+  to customize their profile BGM, including audio waveform display and trimming capabilities.
+
+API development using Express. For production mode, it can be hosted on AWS EC2☁<br />
+For the audio trimming tool, currently only supported in Android. IOS will be implemented later🍎
 
 Still under development.
 
