@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from "react";
+import React, { memo, useCallback, useEffect } from "react";
 import { useTrimControls } from "../../hooks/audioTrimmer/useTrimControls";
 import { useAudioState } from "../../hooks/audioTrimmer/useAudioState";
 import { useZoom } from "../../hooks/audioTrimmer/useZoom";
@@ -27,6 +27,12 @@ const AudioTrimmer = memo(({ uri, duration, onTrimsChange }) => {
     },
     [playPreview, stopPreview]
   );
+
+  useEffect(() => {
+    return () => {
+      stopPreview();
+    };
+  }, [stopPreview]);
 
   return (
     <View style={styles.container}>

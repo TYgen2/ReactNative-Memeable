@@ -13,7 +13,9 @@ const PickSongButton = ({ songData }) => {
         activeOpacity={0.7}
         onPress={() => pickAudio(navigation, songData)}
       >
-        <Text style={styles.configText}>Select</Text>
+        <Text style={styles.configText}>
+          {songData.songName ? "Edit" : "Select"}
+        </Text>
       </TouchableOpacity>
       <Text style={styles.songName}>
         {songData.songName ? songData.songName : "no song yet"}

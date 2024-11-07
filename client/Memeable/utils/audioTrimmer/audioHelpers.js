@@ -46,6 +46,7 @@ export const pickAudio = async (navigation, songData) => {
       const { fileCopyUri, name } = result[0];
 
       try {
+        await TrackPlayer.reset();
         await TrackPlayer.add({
           url: fileCopyUri,
           title: name,

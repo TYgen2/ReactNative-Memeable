@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import React, { memo, useCallback, useEffect, useState } from "react";
 import RNFS from "react-native-fs";
 import { useTrimControls } from "../../hooks/audioTrimmer/useTrimControls";
@@ -6,6 +6,8 @@ import { trimAudio } from "../../utils/audioTrimmer/ffmpegAudioTrimmer";
 import AudioTrimmer from "../../components/AudioTrimmer";
 import useUpdateSong from "../../hooks/updateUserProfile/useUpdateSong";
 import { useProfileUpdates } from "../../context/ProfileUpdateContext";
+import TrimButton from "../../components/AudioTrimmer/TrimButton";
+import ApplyButton from "../../components/AudioTrimmer/ApplyButton";
 
 const EditSongAudio = ({ route, navigation }) => {
   const { songData, audioPath, duration, audioName } = route.params;
@@ -54,7 +56,7 @@ const EditSongAudio = ({ route, navigation }) => {
     }
   }, [leftTrim, rightTrim, trimmedAudioPath, navigation]);
 
-  const handleApplyChanges = () => {
+  const handleApplyChanges = async () => {
     const updatedPreview = {
       song: newSong,
     };
@@ -86,23 +88,12 @@ const EditSongAudio = ({ route, navigation }) => {
         duration={duration}
         onTrimsChange={onTrimChange}
       />
-      <TouchableOpacity
-        onPress={handleTrim}
-        style={[styles.trimButton, isLoading && styles.trimButtonDisabled]}
-        disabled={isLoading}
-      >
-        <Text style={styles.trimButtonText}>
-          {isLoading ? "Trimming..." : "Trim"}
-        </Text>
-      </TouchableOpacity>
-      {isTrimmed && (
-        <TouchableOpacity
-          onPress={handleApplyChanges}
-          style={styles.applyButton}
-        >
-          <Text style={styles.applyButtonText}>Apply Changes</Text>
-        </TouchableOpacity>
-      )}
+      <TrimButton
+        handleTrim={handleTrim}
+        isLoading={isLoading}
+        isTrimmed={isTrimmed}
+      />
+      {isTrimmed && <ApplyButton handleApplyChanges={handleApplyChanges} />}
     </View>
   );
 };
@@ -141,35 +132,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
-  },
-  trimButton: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 8,
-    marginTop: 20,
-    minWidth: 120,
-    alignItems: "center",
-  },
-  trimButtonDisabled: {
-    backgroundColor: "#99CCFF",
-  },
-  trimButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  applyButton: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 8,
-    marginTop: 20,
-    minWidth: 120,
-    alignItems: "center",
-  },
-  applyButtonText: {
-    color: "black",
-    fontSize: 16,
-    fontWeight: "bold",
   },
 });
 

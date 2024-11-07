@@ -53,7 +53,13 @@ const EditBasicInfo = ({ displayName, username, userBio }) => {
           value={newUserBio}
           onChangeText={setNewUserBio}
           autoCapitalize="none"
-          style={{ color: colors.text }}
+          style={{
+            color: colors.text,
+            maxHeight: 90,
+            paddingBottom: 4,
+          }}
+          multiline={true}
+          textAlignVertical="top"
         />
       </View>
     </View>

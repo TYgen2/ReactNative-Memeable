@@ -1,18 +1,19 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import useColorTheme from "../../hooks/useColorTheme";
-import useUpdateSong from "../../hooks/updateUserProfile/useUpdateSong";
-import { selectSongForProfile } from "../../utils/helper";
 import UserSongCover from "../userProfile/UserSongCover";
 import GlowingBorder from "../../components/GlowingBorder";
 import PickSongButton from "./PickSongButton";
-import PlaybackButton from "./PlaybackButton";
+import PlaybackButton from "../PlaybackButton";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
+import usePlaybackPreview from "../../hooks/usePlaybackPreview";
 
 const EditProfileBGM = ({ gradientData, imageUri, songData }) => {
   const { colors } = useColorTheme();
   const navigation = useNavigation();
+  const { isPlaying, togglePlayback, resetPlayer, cleanup } =
+    usePlaybackPreview(songData.songUri);
 
   const goToEditCoverPage = () => {
     navigation.navigate("EditSongCover", {
@@ -20,6 +21,13 @@ const EditProfileBGM = ({ gradientData, imageUri, songData }) => {
       image: imageUri,
     });
   };
+
+  useEffect(() => {
+    resetPlayer();
+    return () => {
+      cleanup();
+    };
+  }, [songData]);
 
   return (
     <View style={styles.songContainer}>
@@ -54,7 +62,13 @@ const EditProfileBGM = ({ gradientData, imageUri, songData }) => {
           />
         </TouchableOpacity>
 
-        <PlaybackButton />
+        <PlaybackButton
+          width={70}
+          height={70}
+          iconSize={24}
+          togglePlayback={togglePlayback}
+          isPlaying={isPlaying}
+        />
       </View>
     </View>
   );

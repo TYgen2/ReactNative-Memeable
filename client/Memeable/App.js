@@ -251,16 +251,9 @@ const App = () => {
 
     initializePlayer();
 
-    // Cleanup function
     return () => {
       mounted = false;
-      // Only destroy when the app is actually closing
-      if (!__DEV__) {
-        // Check if not in development mode
-        TrackPlayer.destroy().catch(() => {
-          // Ignore destroy errors during cleanup
-        });
-      }
+      TrackPlayer.reset().catch(() => {});
     };
   }, []);
 

@@ -100,19 +100,6 @@ export const userSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       })
-      .addCase(handleUpdateSong.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(handleUpdateSong.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        console.log(action.payload);
-        state.userDetails.song.songUri = action.payload.updatedSongUri;
-        state.userDetails.song.songName = action.payload.updatedSongName;
-      })
-      .addCase(handleUpdateSong.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
-      })
       .addCase(handleUploadPost.pending, (state) => {
         state.status = "loading";
       })
@@ -121,6 +108,18 @@ export const userSlice = createSlice({
         state.userDetails.postsCount += 1;
       })
       .addCase(handleUploadPost.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(handleUpdateSong.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(handleUpdateSong.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.userDetails.song.songUri = action.payload.updatedSongUri;
+        state.userDetails.song.songName = action.payload.updatedSongName;
+      })
+      .addCase(handleUpdateSong.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       })

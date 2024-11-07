@@ -5,13 +5,16 @@ import ProfileIcon from "./headerComponents/ProfileIcon";
 import BasicInfo from "./headerComponents/BasicInfo";
 import MoreInfo from "./headerComponents/MoreInfo";
 import ButtonActions from "./headerComponents/ButtonActions";
+import AudioPlayer from "./headerComponents/AudioPlayer";
 
 export default UserProfileHeader = memo(
   ({ userData, isStack, isMe, handlePressedFollow }) => {
+    const hasBGM = userData.song.songUri ? true : false;
+
     return (
       <>
         <Banner isStack={isStack} userData={userData} />
-        <View style={styles.userInfo}>
+        <View style={styles.userInfoContainer}>
           <ProfileIcon userData={userData} />
           <BasicInfo userData={userData} />
           <MoreInfo userData={userData} />
@@ -20,6 +23,7 @@ export default UserProfileHeader = memo(
             isMe={isMe}
             handlePressedFollow={handlePressedFollow}
           />
+          {hasBGM && <AudioPlayer userData={userData} />}
         </View>
       </>
     );
@@ -27,10 +31,11 @@ export default UserProfileHeader = memo(
 );
 
 const styles = StyleSheet.create({
-  userInfo: {
+  userInfoContainer: {
     height: 300,
     width: "100%",
     alignItems: "flex-start",
     justifyContent: "center",
+    position: "relative",
   },
 });

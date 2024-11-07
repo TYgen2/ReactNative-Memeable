@@ -141,3 +141,7 @@ export const navigateToUserProfile = (navigation, targetId) => {
 };
 
 export const apiQueue = new PQueue({ concurrency: 1, interval: 1000 });
+
+export const formatSongName = (songName) => {
+  return songName.replace(".mp3", "").replace(".wav", "");
+};
