@@ -8,7 +8,8 @@ import SaveButton from "../../components/editProfile/SaveButton";
 import EditProfileBGM from "../../components/editProfile/EditProfileBGM";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import HintModal from "../../components/editProfile/HintModal";
 
 export default EditUserProfile = ({ route }) => {
   const { colors } = useColorTheme();
@@ -19,9 +20,14 @@ export default EditUserProfile = ({ route }) => {
   const [previewGradient, setPreviewGradient] = useState(
     userDetails.gradientConfig
   );
-
   const [previewCover, setPreviewCover] = useState(userDetails.song.imageUri);
   const [previewSong, setPreviewSong] = useState(userDetails.song);
+
+  const hintModalRef = useRef(null);
+
+  const handleHintModalPress = useCallback(() => {
+    hintModalRef.current?.present();
+  }, []);
 
   useEffect(() => {
     if (route.params?.updatedPreview) {
@@ -53,7 +59,9 @@ export default EditUserProfile = ({ route }) => {
         gradientData={previewGradient}
         imageUri={previewCover}
         songData={previewSong}
+        handleHintModalPress={handleHintModalPress}
       />
+      <HintModal hintModalRef={hintModalRef} />
     </View>
   );
 };

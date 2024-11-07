@@ -9,7 +9,12 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import usePlaybackPreview from "../../hooks/usePlaybackPreview";
 
-const EditProfileBGM = ({ gradientData, imageUri, songData }) => {
+const EditProfileBGM = ({
+  gradientData,
+  imageUri,
+  songData,
+  handleHintModalPress,
+}) => {
   const { colors } = useColorTheme();
   const navigation = useNavigation();
   const { isPlaying, togglePlayback, resetPlayer, cleanup } =
@@ -31,9 +36,17 @@ const EditProfileBGM = ({ gradientData, imageUri, songData }) => {
 
   return (
     <View style={styles.songContainer}>
-      <Text style={[styles.profileBGM, { color: colors.text }]}>
-        🎵Profile BGM🎵
-      </Text>
+      <View style={styles.titleContainer}>
+        <Text style={[styles.profileBGM, { color: colors.text }]}>
+          🎵Profile BGM🎵
+        </Text>
+        <Icon
+          name="help-circle-outline"
+          size={32}
+          color="grey"
+          onPress={handleHintModalPress}
+        />
+      </View>
 
       <View style={styles.configContainer}>
         <PickSongButton songData={songData} />
@@ -85,6 +98,12 @@ const styles = StyleSheet.create({
   },
   songContainer: {
     height: 200,
+  },
+  titleContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
   },
   configContainer: {
     flex: 1,
