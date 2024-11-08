@@ -6,7 +6,7 @@ import useFetchPosts from "../../hooks/fetchData/useFetchPosts";
 import { useCallback } from "react";
 import useColorTheme from "../../hooks/useColorTheme";
 
-export default Home = ({ navigation }) => {
+const Home = ({ navigation }) => {
   const { colors } = useColorTheme();
 
   const { allPosts } = useSelector((state) => state.post);
@@ -62,6 +62,7 @@ export default Home = ({ navigation }) => {
   );
 };
 
+export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,

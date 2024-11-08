@@ -13,7 +13,7 @@ import useSearch from "../../hooks/useSearch";
 import { useCallback } from "react";
 import useColorTheme from "../../hooks/useColorTheme";
 
-export default Search = ({ navigation }) => {
+const Search = ({ navigation }) => {
   const { colors } = useColorTheme();
   const { query, setQuery, results, setResults, isSearching } = useSearch();
 
@@ -61,6 +61,8 @@ export default Search = ({ navigation }) => {
     </View>
   );
 };
+
+export default Search;
 
 const styles = StyleSheet.create({
   container: {

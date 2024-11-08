@@ -1,100 +1,13 @@
 import { Router } from "express";
-import dotenv from "dotenv";
-import { Post } from "../../mongoose/schemas/post.mjs";
-import { getFollowingIds, getTimeDifference } from "../../utils/helpers.mjs";
-import { User } from "../../mongoose/schemas/user.mjs";
-import { authenticateToken } from "../../utils/middleware.mjs";
-import { Follow } from "../../mongoose/schemas/follow.mjs";
 import mongoose from "mongoose";
-import { Comment } from "../../mongoose/schemas/comment.mjs";
-import { SavedPost } from "../../mongoose/schemas/savedPost.mjs";
-dotenv.config();
+import { User } from "../../../mongoose/schemas/user.mjs";
+import { Post } from "../../../mongoose/schemas/post.mjs";
+import { Comment } from "../../../mongoose/schemas/comment.mjs";
+import { authenticateToken } from "../../../utils/middleware.mjs";
+import { getFollowingIds, getTimeDifference } from "../../../utils/helpers.mjs";
+import { SavedPost } from "../../../mongoose/schemas/savedPost.mjs";
 
 const router = Router();
-
-// fetch local user info when login, store in Redux
-router.get("/api/fetchUserInfo", authenticateToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.userId).lean();
-    if (!user) {
-      return res.status(404).send({ msg: "User not found" });
-    }
-
-    const userId = req.userId;
-
-    const [followersCount, followingCount, postsCount] = await Promise.all([
-      Follow.countDocuments({ userId }),
-      Follow.countDocuments({
-        followerId: userId,
-      }),
-      Post.countDocuments({ userId }),
-      Post.find({ userId }).sort({ createDate: -1 }).limit(9).exec(),
-    ]);
-
-    return res.status(200).send({
-      userId,
-      displayName: user.displayName,
-      username: user.username,
-      userIcon: user.icon,
-      userBio: user.bio,
-      bgImage: user.bgImage,
-      song: user.song,
-      gradientConfig: user.gradientConfig,
-      followersCount,
-      followingCount,
-      postsCount,
-      isFollowing: false,
-    });
-  } catch (error) {
-    return res
-      .status(500)
-      .send({ msg: "Internal server error (/api/fetchUserInfo)" });
-  }
-});
-
-// fetch User profile info
-router.get("/api/fetchUserProfile", authenticateToken, async (req, res) => {
-  const { targetId } = req.query;
-
-  try {
-    const user = await User.findById(targetId).lean();
-    if (!user) {
-      return res.status(400).send({ msg: "User not found" });
-    }
-
-    const [followersCount, followingCount, postsCount, isFollowing] =
-      await Promise.all([
-        Follow.countDocuments({ userId: targetId }),
-        Follow.countDocuments({
-          followerId: targetId,
-        }),
-        Post.countDocuments({ userId: targetId }),
-        Follow.exists({
-          followerId: req.userId,
-          userId: targetId,
-        }),
-      ]);
-
-    return res.status(200).send({
-      userId: targetId,
-      displayName: user.displayName,
-      username: user.username,
-      userIcon: user.icon,
-      userBio: user.bio,
-      bgImage: user.bgImage,
-      song: user.song,
-      gradientConfig: user.gradientConfig,
-      followersCount,
-      followingCount,
-      postsCount,
-      isFollowing: Boolean(isFollowing),
-    });
-  } catch (error) {
-    return res
-      .status(500)
-      .send({ msg: "Internal server error (/api/fetchUserProfile)" });
-  }
-});
 
 // fetch all posts in home page
 router.get("/api/fetchAllPosts", authenticateToken, async (req, res) => {

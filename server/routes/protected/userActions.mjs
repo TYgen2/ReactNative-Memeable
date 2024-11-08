@@ -18,6 +18,7 @@ import { Comment } from "../../mongoose/schemas/comment.mjs";
 import { SavedPost } from "../../mongoose/schemas/savedPost.mjs";
 import { CommentLike } from "../../mongoose/schemas/commentLike.mjs";
 import { User } from "../../mongoose/schemas/user.mjs";
+import { Notification } from "../../mongoose/schemas/notification.mjs";
 dotenv.config();
 
 const router = Router();
@@ -106,12 +107,29 @@ router.post("/api/handleLike", authenticateToken, async (req, res) => {
       const post = await Post.findById(postId);
       if (post) {
         const postOwner = await User.findById(post.userId);
+
         if (
           postOwner &&
           postOwner.pushToken &&
           postOwner._id.toString() !== userId
         ) {
-          // Don't send notification if user likes their own post
+          // Find existing notification or create new one
+          await Notification.findOneAndUpdate(
+            {
+              recipientId: postOwner._id,
+              senderId: userId,
+              type: "like_post",
+              postId: postId,
+            },
+            {
+              $set: {
+                createDate: new Date(), // Update timestamp
+                read: false, // Mark as unread again
+              },
+            },
+            { upsert: true } // Create if doesn't exist
+          );
+
           const liker = await User.findById(userId);
           const notificationBody = `${liker.displayName} liked your post`;
           await sendPushNotification(notificationBody, postOwner.pushToken);

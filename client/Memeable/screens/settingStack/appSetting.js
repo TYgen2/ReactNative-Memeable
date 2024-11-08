@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { StyleSheet, Switch, Text, View } from "react-native";
 import useColorTheme from "../../hooks/useColorTheme";
 import { getData, storeData } from "../../config/asyncStorage";
+import LogoutButton from "../../components/LogoutButton";
 
-export default AppSetting = () => {
+const AppSetting = () => {
   const { colors, mode, updateTheme } = useColorTheme();
 
   const [isDark, setIsDark] = useState(mode === "dark");
@@ -57,9 +58,13 @@ export default AppSetting = () => {
           value={autoplayBGM}
         />
       </View>
+
+      <LogoutButton />
     </View>
   );
 };
+
+export default AppSetting;
 
 const styles = StyleSheet.create({
   container: {

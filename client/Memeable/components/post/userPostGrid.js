@@ -3,7 +3,7 @@ import { screenWidth } from "../../utils/constants";
 import FastImage from "react-native-fast-image";
 import { memo } from "react";
 
-export default UserPostGrid = memo(({ item, navigation }) => {
+const UserPostGrid = memo(({ item, navigation }) => {
   return (
     <TouchableOpacity
       style={styles.imageContainer}
@@ -16,6 +16,8 @@ export default UserPostGrid = memo(({ item, navigation }) => {
     </TouchableOpacity>
   );
 });
+
+export default UserPostGrid;
 
 const styles = StyleSheet.create({
   imageContainer: { margin: 1 },

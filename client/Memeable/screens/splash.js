@@ -13,7 +13,7 @@ import { reduxLogout } from "../store/userReducer";
 import { clearPosts } from "../store/postReducer";
 import { clearTokens } from "../utils/tokenActions";
 
-export default Splash = () => {
+const Splash = () => {
   const { setIsLoading } = useContext(UpdateContext);
   const dispatch = useDispatch();
 
@@ -62,6 +62,8 @@ export default Splash = () => {
     </View>
   );
 };
+
+export default Splash;
 
 const styles = StyleSheet.create({
   container: {

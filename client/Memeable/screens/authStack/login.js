@@ -15,7 +15,7 @@ import { screenWidth } from "../../utils/constants";
 import { loginReviewSchema } from "../../utils/validationSchema";
 import useLogin from "../../hooks/auth/useLogin";
 
-export default Login = ({ navigation }) => {
+const Login = ({ navigation }) => {
   const { isLoading, handleLogin, promptAsync, handleFacebook } = useLogin();
 
   return (
@@ -138,6 +138,8 @@ export default Login = ({ navigation }) => {
     </View>
   );
 };
+
+export default Login;
 
 const styles = StyleSheet.create({
   container: {

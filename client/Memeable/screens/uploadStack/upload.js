@@ -13,7 +13,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import useUpload from "../../hooks/useUpload";
 import LoadingOverlay from "../../components/LoadingOverlay";
 
-export default Upload = ({ route, navigation }) => {
+const Upload = ({ route, navigation }) => {
   const { imageUri } = route.params;
   const { isUploading, uploadPost } = useUpload(imageUri);
 
@@ -116,6 +116,8 @@ export default Upload = ({ route, navigation }) => {
     </View>
   );
 };
+
+export default Upload;
 
 const styles = StyleSheet.create({
   container: {

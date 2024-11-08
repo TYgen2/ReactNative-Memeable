@@ -33,6 +33,26 @@ export const fetchComments = async (page, limit, postId, parentCommentId) => {
 
     return response.data;
   } catch (error) {
-    return { message: error.response.data.msg };
+    return { message: error.response?.data?.msg || "Error fetching comments" };
+  }
+};
+
+// fetch notifications with abort controller support
+export const fetchNotifications = async ({ page, limit, signal }) => {
+  try {
+    const response = await apiClient.get("/fetchNotifications", {
+      params: { page, limit },
+      signal: signal,
+    });
+
+    return response.data;
+  } catch (error) {
+    if (axios.isCancel(error)) {
+      console.log("Request cancelled:", error.message);
+      return { cancelled: true };
+    }
+    return {
+      message: error.response?.data?.msg || "Error fetching notifications",
+    };
   }
 };

@@ -16,7 +16,7 @@ import UserProfileHeader from "../../components/userProfile/UserProfileHeader";
 import UserProfileEmpty from "../../components/userProfile/UserProfileEmpty";
 import useColorTheme from "../../hooks/useColorTheme";
 
-export default UserProfile = ({ route, navigation }) => {
+const UserProfile = ({ route, navigation }) => {
   const { colors } = useColorTheme();
 
   const { userDetails, status } = useSelector((state) => state.user);
@@ -92,6 +92,8 @@ export default UserProfile = ({ route, navigation }) => {
     />
   );
 };
+
+export default UserProfile;
 
 const styles = StyleSheet.create({
   container: {

@@ -14,7 +14,7 @@ import { registerReviewSchema } from "../../utils/validationSchema";
 import FastImage from "react-native-fast-image";
 import useRegister from "../../hooks/auth/useRegister";
 
-export default Register = ({ navigation }) => {
+const Register = ({ navigation }) => {
   const { isLoading, handleRegister } = useRegister();
 
   return (
@@ -149,6 +149,8 @@ export default Register = ({ navigation }) => {
     </View>
   );
 };
+
+export default Register;
 
 const styles = StyleSheet.create({
   container: {

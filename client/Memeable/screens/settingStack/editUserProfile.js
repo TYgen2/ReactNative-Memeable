@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 import { useCallback, useEffect, useRef, useState } from "react";
 import HintModal from "../../components/editProfile/HintModal";
 
-export default EditUserProfile = ({ route }) => {
+const EditUserProfile = ({ route }) => {
   const { colors } = useColorTheme();
 
   const { userDetails } = useSelector((state) => state.user);
@@ -65,6 +65,8 @@ export default EditUserProfile = ({ route }) => {
     </View>
   );
 };
+
+export default EditUserProfile;
 
 const styles = StyleSheet.create({
   container: {
