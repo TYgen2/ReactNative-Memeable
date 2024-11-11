@@ -1,20 +1,26 @@
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Image } from "react-native";
+import { memo } from "react";
+import { LOADING_INDICATOR } from "../../utils/constants";
 
-export default UserProfileEmpty = ({ isPostsLoading, colors }) => {
+const UserProfileEmpty = ({ isPostsLoading, colors }) => {
   return (
     <View style={[styles.container, { backgroundColor: colors.primary }]}>
       {isPostsLoading ? (
-        <ActivityIndicator
-          size={30}
-          style={[styles.loading, { backgroundColor: colors.primary }]}
-          color="grey"
-        />
+        <LOADING_INDICATOR bgColor={colors.primary} />
       ) : (
-        <Text style={styles.text}>This user has no posts</Text>
+        <>
+          <Image
+            source={require("../../assets/empty_icon/acheron.png")}
+            style={styles.icon}
+          />
+          <Text style={styles.text}>This user has no posts</Text>
+        </>
       )}
     </View>
   );
 };
+
+export default memo(UserProfileEmpty);
 
 const styles = StyleSheet.create({
   container: {
@@ -31,5 +37,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: "grey",
     paddingBottom: 100,
+  },
+  icon: {
+    width: 80,
+    height: 80,
+    opacity: 0.4,
   },
 });

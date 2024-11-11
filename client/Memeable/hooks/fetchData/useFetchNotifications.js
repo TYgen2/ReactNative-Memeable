@@ -9,7 +9,7 @@ const useFetchNotifications = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [states, setStates] = useState({
-    isLoading: false,
+    isLoading: true,
     isLoadingMore: false,
     isRefreshing: false,
   });
@@ -40,7 +40,6 @@ const useFetchNotifications = () => {
       });
 
       const newNotifications = response.notificationData;
-      console.log(newNotifications[0]);
       setNotifications((prev) =>
         reset ? newNotifications : [...prev, ...newNotifications]
       );

@@ -6,7 +6,7 @@ import Register from "./screens/authStack/Register";
 import Home from "./screens/mainStack/Home";
 import Search from "./screens/mainStack/Search";
 import UserProfile from "./screens/mainStack/UserProfile";
-import Notify from "./screens/mainStack/Notification";
+import Notification from "./screens/mainStack/Notification";
 import Upload from "./screens/uploadStack/Upload";
 import EditProfile from "./screens/authStack/EditProfile";
 import EditUserProfile from "./screens/settingStack/EditUserProfile";
@@ -48,6 +48,7 @@ const AuthStack = createNativeStackNavigator();
 const HomeStack = createNativeStackNavigator();
 const ExploreStack = createNativeStackNavigator();
 const UserProfileStack = createNativeStackNavigator();
+const NotificationStack = createNativeStackNavigator();
 const SettingStack = createNativeStackNavigator();
 
 const MainStack = createNativeStackNavigator();
@@ -134,6 +135,28 @@ const UserProfileScreen = () => {
   );
 };
 
+// Notification tab
+const NotificationScreen = () => {
+  const { colors } = useColorTheme();
+
+  return (
+    <NotificationStack.Navigator screenOptions={{ headerShown: false }}>
+      <NotificationStack.Screen name="Notification" component={Notification} />
+      <NotificationStack.Screen name="UserProfile" component={UserProfile} />
+      <NotificationStack.Screen
+        name="DetailedPost"
+        component={DetailedPost}
+        options={{
+          headerShown: true,
+          title: "Posts",
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: colors.text,
+        }}
+      />
+    </NotificationStack.Navigator>
+  );
+};
+
 // Setting tab
 const SettingScreen = () => {
   const { colors } = useColorTheme();
@@ -192,9 +215,9 @@ const MainStackScreen = () => {
         options={{ title: "Explore" }}
       />
       <Tab.Screen
-        name="Notify"
-        component={Notify}
-        options={{ title: "Noti" }}
+        name="NotificationStack"
+        component={NotificationScreen}
+        options={{ title: "Notify" }}
       />
       <Tab.Screen
         name="UserProfileStack"

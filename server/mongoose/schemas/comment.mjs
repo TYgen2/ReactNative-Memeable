@@ -30,6 +30,7 @@ const CommentSchema = new mongoose.Schema({
   },
 });
 
+CommentSchema.index({ postId: 1 });
 CommentSchema.index({ postId: 1, createDate: -1 });
 CommentSchema.index({ parentCommentId: 1 });
 

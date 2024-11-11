@@ -116,6 +116,27 @@ router.get("/api/fetchNotifications", authenticateToken, async (req, res) => {
         },
       },
       { $unwind: "$sender" },
+      // First lookup comments for like_comment notifications
+      {
+        $lookup: {
+          from: "comments",
+          localField: "commentId",
+          foreignField: "_id",
+          as: "comment",
+        },
+      },
+      // Add postId from comment if notification type is like_comment
+      {
+        $addFields: {
+          postId: {
+            $cond: {
+              if: { $eq: ["$type", "like_comment"] },
+              then: { $arrayElemAt: ["$comment.postId", 0] },
+              else: "$postId",
+            },
+          },
+        },
+      },
       {
         $lookup: {
           from: "posts",
@@ -125,8 +146,50 @@ router.get("/api/fetchNotifications", authenticateToken, async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: "likes",
+          let: { postId: "$postId" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$postId", "$$postId"] },
+                    {
+                      $eq: ["$userId", new mongoose.Types.ObjectId(req.userId)],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "likeDocs",
+        },
+      },
+      {
+        $lookup: {
+          from: "comments",
+          let: { postId: "$postId" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$postId", "$$postId"] },
+              },
+            },
+            {
+              $count: "total",
+            },
+          ],
+          as: "commentCount",
+        },
+      },
+      {
         $addFields: {
-          post: { $arrayElemAt: ["$post", 0] }, // This will keep null if post doesn't exist
+          post: { $arrayElemAt: ["$post", 0] },
+          hasLiked: { $gt: [{ $size: "$likeDocs" }, 0] },
+          commentCount: {
+            $ifNull: [{ $arrayElemAt: ["$commentCount.total", 0] }, 0],
+          },
         },
       },
       {
@@ -142,8 +205,35 @@ router.get("/api/fetchNotifications", authenticateToken, async (req, res) => {
             icon: "$sender.icon",
           },
           post: {
-            _id: "$post._id",
-            imageUri: "$post.imageUri",
+            $cond: {
+              if: { $eq: ["$type", "follow"] },
+              then: "$$REMOVE", // Remove post field for follow notifications
+              else: {
+                $cond: {
+                  if: { $ne: ["$post", null] },
+                  then: {
+                    _id: "$post._id",
+                    userId: {
+                      _id: "$sender._id",
+                      displayName: "$sender.displayName",
+                      icon: "$sender.icon",
+                    },
+                    imageUri: "$post.imageUri",
+                    width: "$post.width",
+                    height: "$post.height",
+                    title: "$post.title",
+                    description: "$post.description",
+                    hashtag: "$post.hashtag",
+                    createDate: "$post.createDate",
+                    likes: "$post.likes",
+                    hasLiked: "$hasLiked",
+                    commentCount: "$commentCount",
+                    timeAgo: { $literal: "" },
+                  },
+                  else: null,
+                },
+              },
+            },
           },
         },
       },

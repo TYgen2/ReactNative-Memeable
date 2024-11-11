@@ -7,28 +7,33 @@ import MoreInfo from "./headerComponents/MoreInfo";
 import ButtonActions from "./headerComponents/ButtonActions";
 import AudioPlayer from "./headerComponents/AudioPlayer";
 
-export default UserProfileHeader = memo(
-  ({ userData, isStack, isMe, handlePressedFollow }) => {
-    const hasBGM = userData.song.songUri ? true : false;
+const UserProfileHeader = ({
+  userData,
+  isStack,
+  isMe,
+  handlePressedFollow,
+}) => {
+  const hasBGM = userData.song.songUri ? true : false;
 
-    return (
-      <>
-        <Banner isStack={isStack} userData={userData} />
-        <View style={styles.userInfoContainer}>
-          <ProfileIcon userData={userData} />
-          <BasicInfo userData={userData} />
-          <MoreInfo userData={userData} />
-          <ButtonActions
-            userData={userData}
-            isMe={isMe}
-            handlePressedFollow={handlePressedFollow}
-          />
-          {hasBGM && <AudioPlayer userData={userData} />}
-        </View>
-      </>
-    );
-  }
-);
+  return (
+    <>
+      <Banner isStack={isStack} userData={userData} />
+      <View style={styles.userInfoContainer}>
+        <ProfileIcon userData={userData} />
+        <BasicInfo userData={userData} />
+        <MoreInfo userData={userData} />
+        <ButtonActions
+          userData={userData}
+          isMe={isMe}
+          handlePressedFollow={handlePressedFollow}
+        />
+        {hasBGM && <AudioPlayer userData={userData} />}
+      </View>
+    </>
+  );
+};
+
+export default memo(UserProfileHeader);
 
 const styles = StyleSheet.create({
   userInfoContainer: {

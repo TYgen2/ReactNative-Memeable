@@ -161,6 +161,22 @@ router.post("/api/handleFollow", authenticateToken, async (req, res) => {
       // Get target user's info for notification
       const targetUser = await User.findById(targetId);
       if (targetUser && targetUser.pushToken) {
+        // Find existing notification or create new one
+        await Notification.findOneAndUpdate(
+          {
+            recipientId: targetId,
+            senderId: req.userId,
+            type: "follow",
+          },
+          {
+            $set: {
+              createDate: new Date(),
+              read: false,
+            },
+          },
+          { upsert: true }
+        );
+
         const follower = await User.findById(req.userId);
         const notificationBody = `${follower.displayName} started following you`;
         await sendPushNotification(notificationBody, targetUser.pushToken);
@@ -201,6 +217,24 @@ router.post("/api/handleComment", authenticateToken, async (req, res) => {
         postOwner.pushToken &&
         postOwner._id.toString() !== req.userId
       ) {
+        // Find existing notification or create new one
+        await Notification.findOneAndUpdate(
+          {
+            recipientId: postOwner._id,
+            senderId: req.userId,
+            type: "comment",
+            postId: postId,
+          },
+          {
+            $set: {
+              createDate: new Date(),
+              read: false,
+              content: content, // Store comment content for reference
+            },
+          },
+          { upsert: true }
+        );
+
         const commenter = await User.findById(req.userId);
         const notificationBody = `${commenter.displayName} commented on your post: "${content}"`;
         await sendPushNotification(notificationBody, postOwner.pushToken);
@@ -240,6 +274,22 @@ router.post("/api/handleCommentLike", authenticateToken, async (req, res) => {
           commentOwner.pushToken &&
           commentOwner._id.toString() !== userId
         ) {
+          // Find existing notification or create new one
+          await Notification.findOneAndUpdate(
+            {
+              recipientId: commentOwner._id,
+              senderId: userId,
+              type: "like_comment",
+              commentId: commentId,
+            },
+            {
+              $set: {
+                createDate: new Date(),
+                read: false,
+              },
+            },
+            { upsert: true }
+          );
           const liker = await User.findById(userId);
           const notificationBody = `${liker.displayName} liked your comment`;
           await sendPushNotification(notificationBody, commentOwner.pushToken);

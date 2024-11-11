@@ -23,7 +23,9 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
   const icon = {
     HomeStack: (props) => <MCIcon name="home" size={25} {...props} />,
     SearchStack: (props) => <IonIcon name="search" size={25} {...props} />,
-    Notify: (props) => <IonIcon name="notifications" size={25} {...props} />,
+    NotificationStack: (props) => (
+      <IonIcon name="notifications" size={25} {...props} />
+    ),
   };
 
   useEffect(() => {
@@ -56,7 +58,7 @@ export default TabItem = ({ onPress, isFocused, routeName, label }) => {
         styles.tabContainer,
         {
           marginRight: routeName == "SearchStack" ? 40 : 0,
-          marginLeft: routeName == "Notify" ? 40 : 0,
+          marginLeft: routeName == "NotificationStack" ? 40 : 0,
         },
       ]}
       onPress={onPress}

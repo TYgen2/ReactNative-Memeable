@@ -1,26 +1,20 @@
-import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import SearchedUser from "../../components/SearchedUser";
-import { barOffset } from "../../utils/constants";
-import Icon from "react-native-vector-icons/Ionicons";
-import useSearch from "../../hooks/useSearch";
+import { FlatList, StyleSheet, View } from "react-native";
+import { barOffset, LOADING_INDICATOR } from "../../utils/constants";
 import { useCallback } from "react";
+import useSearch from "../../hooks/useSearch";
 import useColorTheme from "../../hooks/useColorTheme";
+import SearchEmpty from "../../components/search/SearchEmpty";
+import SearchBox from "../../components/search/SearchBox";
+import SearchedItem from "../../components/search/SearchedItem";
 
 const Search = ({ navigation }) => {
   const { colors } = useColorTheme();
-  const { query, setQuery, results, setResults, isSearching } = useSearch();
+  const { query, setQuery, results, isSearching } = useSearch();
 
   const renderItem = useCallback(
     ({ item }) => {
       return (
-        <SearchedUser item={item} navigation={navigation} colors={colors} />
+        <SearchedItem item={item} navigation={navigation} colors={colors} />
       );
     },
     [navigation, colors]
@@ -28,34 +22,15 @@ const Search = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.primary }]}>
-      <View style={[styles.searchBox, { backgroundColor: colors.searchBar }]}>
-        <Icon name="search" size={24} color="grey" />
-        <TextInput
-          style={[styles.textInput, { color: colors.text }]}
-          placeholder="Search here"
-          placeholderTextColor="grey"
-          value={query}
-          onChangeText={setQuery}
-        />
-      </View>
+      <SearchBox colors={colors} query={query} setQuery={setQuery} />
       {isSearching ? (
-        <ActivityIndicator
-          size={30}
-          color="grey"
-          style={{ flex: 1, paddingBottom: barOffset + 10 }}
-        />
+        <LOADING_INDICATOR bgColor={colors.primary} />
       ) : (
         <FlatList
           data={results}
           renderItem={renderItem}
-          contentContainerStyle={{
-            flexGrow: 1,
-            justifyContent: results.length > 0 ? "flex-start" : "center",
-            paddingBottom: barOffset + 10,
-          }}
-          ListEmptyComponent={
-            <Text style={styles.noMatch}>No matched result</Text>
-          }
+          contentContainerStyle={styles.contentContainer}
+          ListEmptyComponent={<SearchEmpty />}
         />
       )}
     </View>
@@ -69,26 +44,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "white",
+    paddingBottom: 70,
   },
-  searchBox: {
-    flexDirection: "row",
-    marginTop: barOffset + 10,
+  contentContainer: {
+    flexGrow: 1,
     justifyContent: "flex-start",
-    alignItems: "center",
-    width: "95%",
-    borderRadius: 10,
-    paddingLeft: 10,
-  },
-  noMatch: {
-    fontWeight: "bold",
-    fontSize: 24,
-    color: "grey",
-  },
-  textInput: {
-    width: "80%",
-    height: 50,
-    borderRadius: 10,
-    paddingLeft: 10,
+    paddingBottom: barOffset + 10,
   },
 });

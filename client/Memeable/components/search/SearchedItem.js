@@ -1,20 +1,21 @@
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { screenWidth } from "../utils/constants";
-import { getIconSource, navigateToUserProfile } from "../utils/helper";
+import { View, StyleSheet, Text, Pressable } from "react-native";
+import { screenWidth } from "../../utils/constants";
+import { getIconSource, navigateToUserProfile } from "../../utils/helper";
 import FastImage from "react-native-fast-image";
 import { memo } from "react";
 import Icon from "react-native-vector-icons/Ionicons";
 
-export default SearchedUser = memo(({ item, navigation, colors }) => {
+const SearchedItem = ({ item, navigation, colors }) => {
+  const targetId = item._id;
   const iconBgColor = item.icon?.bgColor || "transparent";
   const iconSource = getIconSource(item?.icon);
   const hasSong = item.song?.songUri ? true : false;
 
   return (
-    <TouchableOpacity
+    <Pressable
       style={styles.container}
       activeOpacity={0.5}
-      onPress={() => navigateToUserProfile(navigation, item._id)}
+      onPress={() => navigateToUserProfile(navigation, targetId)}
     >
       <FastImage
         source={iconSource}
@@ -37,9 +38,11 @@ export default SearchedUser = memo(({ item, navigation, colors }) => {
           style={styles.hasSongIcon}
         />
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
-});
+};
+
+export default memo(SearchedItem);
 
 const styles = StyleSheet.create({
   container: {

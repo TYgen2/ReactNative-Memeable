@@ -1,10 +1,4 @@
-import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import { useSelector } from "react-redux";
 import UserPostGrid from "../../components/post/UserPostGrid";
 import { useCallback, useRef } from "react";
@@ -15,6 +9,7 @@ import { UserProfileModel } from "../../models/UserProfileModel";
 import UserProfileHeader from "../../components/userProfile/UserProfileHeader";
 import UserProfileEmpty from "../../components/userProfile/UserProfileEmpty";
 import useColorTheme from "../../hooks/useColorTheme";
+import { LOADING_INDICATOR } from "../../utils/constants";
 
 const UserProfile = ({ route, navigation }) => {
   const { colors } = useColorTheme();
@@ -48,13 +43,7 @@ const UserProfile = ({ route, navigation }) => {
 
   // handle first mount by local loading state
   if (isInfoLoading || status === "loading") {
-    return (
-      <ActivityIndicator
-        size={30}
-        style={[styles.loading, { backgroundColor: colors.primary }]}
-        color="grey"
-      />
-    );
+    return <LOADING_INDICATOR bgColor={colors.primary} />;
   }
 
   if (!userData) {

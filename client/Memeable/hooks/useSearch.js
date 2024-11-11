@@ -13,14 +13,6 @@ export default useSearch = (initialQuery = "") => {
     setIsSearching(false);
   }, [query]);
 
-  const updateFollowStatus = (userId, isFollowing) => {
-    setResults((prev) =>
-      prev.map((user) => {
-        user._id === userId ? { ...user, isFollowing } : user;
-      })
-    );
-  };
-
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       search();
@@ -33,8 +25,6 @@ export default useSearch = (initialQuery = "") => {
     query,
     setQuery,
     results,
-    setResults,
     isSearching,
-    updateFollowStatus,
   };
 };

@@ -61,9 +61,9 @@ export const DEFAULT_BGIMAGE = require("../assets/default_bgImage.jpg");
 
 export const DEFAULT_SONGIMAGE = require("../assets/default_songImg.jpg");
 
-export const LOADING_INDICATOR = () => {
+export const LOADING_INDICATOR = ({ bgColor }) => {
   return (
-    <View style={styles.center}>
+    <View style={[styles.center, { backgroundColor: bgColor }]}>
       <ActivityIndicator size={24} color={"grey"} />
     </View>
   );
