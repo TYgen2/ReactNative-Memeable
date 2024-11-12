@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { Alert } from "react-native";
 import {
   fetchUserInfo,
+  handleDeletePost,
   handleFollow,
   handleUpdateBgImage,
   handleUpdateCover,
@@ -142,6 +143,17 @@ export const userSlice = createSlice({
         state.userDetails.song.imageUri = action.payload.updatedCover;
       })
       .addCase(handleUpdateCover.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(handleDeletePost.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(handleDeletePost.fulfilled, (state) => {
+        state.status = "succeeded";
+        state.userDetails.postsCount -= 1;
+      })
+      .addCase(handleDeletePost.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

@@ -8,7 +8,7 @@ import {
 } from "../../utils/helpers.mjs";
 import sharp from "sharp";
 import { Post } from "../../mongoose/schemas/post.mjs";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { s3 } from "../../utils/config.mjs";
 import { checkSchema, validationResult } from "express-validator";
 import { createPostValidationSchema } from "../../validationSchemas.mjs";
@@ -281,6 +281,7 @@ router.post("/api/handleCommentLike", authenticateToken, async (req, res) => {
               senderId: userId,
               type: "like_comment",
               commentId: commentId,
+              postId: comment.postId,
             },
             {
               $set: {
@@ -330,6 +331,57 @@ router.post("/api/handleSavePost", authenticateToken, async (req, res) => {
     }
   } catch (error) {
     res.status(400).send({ msg: "Error when handling save/unsave" });
+  }
+});
+
+// delete a post
+router.delete("/api/handleDeletePost", authenticateToken, async (req, res) => {
+  const { postId } = req.body;
+  const userId = req.userId;
+
+  try {
+    // First, get the post to check ownership and get the image key
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).send({ msg: "Post not found" });
+    }
+
+    // Verify the user owns this post
+    if (post.userId.toString() !== userId) {
+      return res.status(403).send({ msg: "Unauthorized to delete this post" });
+    }
+
+    // Extract the image key from the CDN URL
+    const imageUri = post.imageUri;
+    const imageKey = imageUri.replace(CDN, "");
+
+    // Delete image from S3
+    const deleteParams = {
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: imageKey,
+    };
+    const command = new DeleteObjectCommand(deleteParams);
+    await s3.send(command);
+
+    // Delete the post and all related data
+    await Promise.all([
+      // Delete the post
+      Post.findByIdAndDelete(postId),
+      // Delete all likes associated with the post
+      Like.deleteMany({ postId }),
+      // Delete all comments associated with the post
+      Comment.deleteMany({ postId }),
+      // Delete all saved posts references
+      SavedPost.deleteMany({ postId }),
+      // Delete all notifications related to this post
+      Notification.deleteMany({ postId }),
+    ]);
+
+    return res.status(200).send({ msg: "Post deleted successfully" });
+  } catch (error) {
+    console.error("Error in handleDeletePost:", error);
+    return res.status(400).send({ msg: "Error when deleting post" });
   }
 });
 

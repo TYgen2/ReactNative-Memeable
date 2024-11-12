@@ -9,7 +9,7 @@ const UserPostGrid = memo(({ item, navigation }) => {
       style={styles.imageContainer}
       activeOpacity={0.8}
       onPress={() => {
-        navigation.push("DetailedPost", { item });
+        navigation.push("DetailedPost", { item, fromProfile: true });
       }}
     >
       <FastImage source={{ uri: item.imageUri }} style={styles.image} />

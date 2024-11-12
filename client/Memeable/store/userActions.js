@@ -239,3 +239,20 @@ export const handleUploadPost = createAsyncThunk(
     }
   }
 );
+
+// handling delete post action
+export const handleDeletePost = createAsyncThunk(
+  "user/handleDeletePost",
+  async ({ postId }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.delete("/handleDeletePost", {
+        data: { postId },
+      });
+
+      console.log("Post deleted using REDUX!!");
+      return { msg: response.data.msg };
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);

@@ -10,7 +10,13 @@ const HomeEmpty = ({ isLoading }) => {
           style={styles.loadingIcon}
         />
       ) : (
-        <Text style={styles.emptyPost}>Zzz...</Text>
+        <>
+          <Image
+            source={require("../../assets/empty_icon/sushang.png")}
+            style={styles.icon}
+          />
+          <Text style={styles.emptyPost}>No post yet...Zzz</Text>
+        </>
       )}
     </View>
   );
@@ -24,6 +30,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingBottom: 100,
+  },
+  icon: {
+    width: 100,
+    height: 100,
+    opacity: 0.4,
   },
   loadingIcon: {
     width: 150,

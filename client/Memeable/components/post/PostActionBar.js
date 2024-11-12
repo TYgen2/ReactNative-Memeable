@@ -2,6 +2,7 @@ import { memo } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { displayLikes } from "../../utils/helper";
+import PostDeleteButton from "./PostDeleteButton";
 
 const PostActionBar = ({
   postState,
@@ -10,6 +11,10 @@ const PostActionBar = ({
   openCommentModal,
   commentCount,
   colors,
+  fromProfile,
+  isOwnPost,
+  postId,
+  onDeleteSuccess,
 }) => {
   return (
     <View style={styles.rightsideBar}>
@@ -21,6 +26,12 @@ const PostActionBar = ({
           color={colors.inactiveIcon}
         />
       </TouchableOpacity>
+
+      {/* Only show delete button if viewing from profile and it's user's own post */}
+      {fromProfile && isOwnPost && (
+        <PostDeleteButton postId={postId} onDeleteSuccess={onDeleteSuccess} />
+      )}
+
       {/* like, comment */}
       <View style={styles.actionsContainer}>
         {/* like button */}
@@ -60,6 +71,8 @@ const PostActionBar = ({
   );
 };
 
+export default memo(PostActionBar);
+
 const styles = StyleSheet.create({
   rightsideBar: {
     flex: 2,
@@ -84,5 +97,3 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.02)",
   },
 });
-
-export default memo(PostActionBar);

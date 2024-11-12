@@ -9,8 +9,16 @@ import PostContent from "./PostContent";
 import PostActionBar from "./PostActionBar";
 
 // User post component
-const MainPost = ({ item, navigation, colors }) => {
+const MainPost = ({
+  item,
+  navigation,
+  colors,
+  fromProfile,
+  onDeleteSuccess,
+}) => {
   const { userDetails } = useSelector((state) => state.user);
+  const isOwnPost = userDetails?.userId === item.userId._id;
+
   const myIcon = getIconSource(userDetails?.userIcon);
   const myIconBgColor = userDetails?.userIcon.bgColor || "transparent";
 
@@ -40,6 +48,10 @@ const MainPost = ({ item, navigation, colors }) => {
         openCommentModal={openCommentModal}
         commentCount={post.commentCount}
         colors={colors}
+        fromProfile={fromProfile}
+        isOwnPost={isOwnPost}
+        postId={item._id}
+        onDeleteSuccess={onDeleteSuccess}
       />
       <CommentModal
         bottomSheetModalRef={bottomSheetModalRef}
@@ -55,6 +67,8 @@ const MainPost = ({ item, navigation, colors }) => {
   );
 };
 
+export default memo(MainPost);
+
 const styles = StyleSheet.create({
   postContainer: {
     flex: 1,
@@ -65,5 +79,3 @@ const styles = StyleSheet.create({
     borderTopColor: "rgba(0,0,0,0.3)",
   },
 });
-
-export default memo(MainPost);
