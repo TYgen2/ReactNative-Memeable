@@ -32,16 +32,31 @@ const PostContent = ({ post, navigation, colors }) => {
         </View>
         <Text style={styles.timeAgo}>{post.timeAgo}</Text>
       </View>
-      <FastImage
-        source={{ uri: post.imageUri }}
-        resizeMode={FastImage.resizeMode.cover}
+      <Pressable
+        onPress={() =>
+          navigation.navigate("FunctionStack", {
+            screen: "FullscreenImage",
+            params: { imageUri: post.imageUri },
+          })
+        }
         style={[
           styles.image,
           {
             height: post.imageHeight,
           },
         ]}
-      />
+      >
+        <FastImage
+          source={{ uri: post.imageUri }}
+          resizeMode={FastImage.resizeMode.cover}
+          style={[
+            styles.image,
+            {
+              height: post.imageHeight,
+            },
+          ]}
+        />
+      </Pressable>
       {post.description == "" ? (
         <></>
       ) : (

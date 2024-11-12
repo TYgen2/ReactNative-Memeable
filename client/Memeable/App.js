@@ -35,6 +35,7 @@ import { ProfileUpdateProvider } from "./context/ProfileUpdateContext";
 import EditSongAudio from "./screens/settingStack/EditSongAudio";
 import { setupPlayer } from "./utils/audioTrimmer/audioHelpers";
 import TrackPlayer from "react-native-track-player";
+import FullscreenImage from "./screens/mainStack/FullscreenImage";
 
 const persistor = persistStore(store);
 enableScreens();
@@ -233,6 +234,10 @@ const FunctionScreen = () => {
   return (
     <FunctionStack.Navigator screenOptions={{ headerShown: false }}>
       <FunctionStack.Screen name="Upload" component={Upload} />
+      <FunctionStack.Screen
+        name="FullscreenImage"
+        component={FullscreenImage}
+      />
     </FunctionStack.Navigator>
   );
 };
@@ -240,9 +245,20 @@ const FunctionScreen = () => {
 // Wrapper of authenticated users' screen
 const MainStackNavigator = () => {
   return (
-    <MainStack.Navigator screenOptions={{ headerShown: false }}>
+    <MainStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        presentation: "modal",
+      }}
+    >
       <MainStack.Screen name="MainStack" component={MainStackScreen} />
-      <MainStack.Screen name="FunctionStack" component={FunctionScreen} />
+      <MainStack.Screen
+        name="FunctionStack"
+        component={FunctionScreen}
+        options={{
+          animation: "none",
+        }}
+      />
       <MainStack.Screen name="SettingStack" component={SettingScreen} />
     </MainStack.Navigator>
   );
