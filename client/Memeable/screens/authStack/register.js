@@ -1,5 +1,4 @@
 import { StyleSheet, View } from "react-native";
-
 import useRegister from "../../hooks/auth/useRegister";
 import HeaderIcon from "../../components/auth/register/HeaderIcon";
 import BackButton from "../../components/BackButton";

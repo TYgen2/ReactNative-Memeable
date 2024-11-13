@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import apiClient from "../utils/axiosHelper";
+import apiClient from "../../utils/axiosHelper";
 
 // fetch local user info and store in Redux
 export const fetchUserInfo = createAsyncThunk(

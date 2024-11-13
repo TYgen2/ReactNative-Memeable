@@ -1,5 +1,13 @@
+import { useContext, useEffect, useState } from "react";
+import { StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { EventProvider } from "react-native-outside-press";
+import { enableScreens } from "react-native-screens";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
+// screens import
 import Splash from "./screens/Splash";
 import Login from "./screens/authStack/Login";
 import Register from "./screens/authStack/Register";
@@ -14,28 +22,29 @@ import AppSetting from "./screens/settingStack/AppSetting";
 import DetailedPost from "./screens/mainStack/DetailedPost";
 import CustomTab from "./components/bottomTab/CustomTab";
 import EditSongCover from "./screens/settingStack/EditSongCover";
+import EditSongAudio from "./screens/settingStack/EditSongAudio";
+import FullscreenImage from "./screens/mainStack/FullscreenImage";
 
-import { useContext, useEffect, useState } from "react";
-import { StatusBar } from "react-native";
+// Redux related imports
 import { store } from "./store/store";
 import { Provider, useDispatch, useSelector } from "react-redux";
-import { LoadingContextProvider, UpdateContext } from "./context/loading";
+import { reduxLogin } from "./store/features/user/userSlice";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistStore } from "redux-persist";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { EventProvider } from "react-native-outside-press";
-import { reduxLogin } from "./store/userReducer";
-import { enableScreens } from "react-native-screens";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+
+// third party imports
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import { ThemeContext } from "./context/theme";
-import { getData, storeData } from "./config/asyncStorage";
-import useColorTheme from "./hooks/useColorTheme";
-import { ProfileUpdateProvider } from "./context/ProfileUpdateContext";
-import EditSongAudio from "./screens/settingStack/EditSongAudio";
-import { setupPlayer } from "./utils/audioTrimmer/audioHelpers";
 import TrackPlayer from "react-native-track-player";
-import FullscreenImage from "./screens/mainStack/FullscreenImage";
+
+// context imports
+import { LoadingContextProvider, UpdateContext } from "./context/loading";
+import { ProfileUpdateProvider } from "./context/ProfileUpdateContext";
+import { ThemeContext } from "./context/theme";
+import useColorTheme from "./hooks/useColorTheme";
+
+// other imports
+import { getData, storeData } from "./config/asyncStorage";
+import { setupPlayer } from "./utils/audioTrimmer/audioHelpers";
 
 const persistor = persistStore(store);
 enableScreens();

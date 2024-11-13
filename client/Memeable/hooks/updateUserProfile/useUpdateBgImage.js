@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { handleUpdateBgImage } from "../../store/userActions";
+import { handleUpdateBgImage } from "../../store/actions/userActions";
 import { apiQueue } from "../../utils/helper";
 
 export default useUpdateBgImage = (bgImageData) => {

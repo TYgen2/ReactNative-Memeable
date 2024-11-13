@@ -9,8 +9,8 @@ import Animated, {
 import { UpdateContext } from "../context/loading";
 import { validateTokens } from "../handleAPIs/auth";
 import { useDispatch } from "react-redux";
-import { reduxLogout } from "../store/userReducer";
-import { clearPosts } from "../store/postReducer";
+import { reduxLogout } from "../store/features/user/userSlice";
+import { clearPosts } from "../store/features/post/postSlice";
 import { clearTokens } from "../utils/tokenActions";
 
 const Splash = () => {

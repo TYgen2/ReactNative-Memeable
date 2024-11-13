@@ -4,7 +4,7 @@ import { Animated } from "react-native";
 import { hideGIF } from "../../utils/animation";
 import { useDispatch } from "react-redux";
 import { handleIconUpload } from "../../handleAPIs/userActions";
-import { fetchUserInfo } from "../../store/userActions";
+import { fetchUserInfo } from "../../store/actions/userActions";
 
 const useEditProfile = () => {
   const dispatch = useDispatch();

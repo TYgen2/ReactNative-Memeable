@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { apiQueue } from "../../utils/helper";
-import { handleUpdateCover } from "../../store/userActions";
+import { handleUpdateCover } from "../../store/actions/userActions";
 
 export default useUpdateCover = (coverData) => {
   const [newCover, setNewCover] = useState(coverData);

@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { handleUpdateStrings } from "../../store/userActions";
+import { handleUpdateStrings } from "../../store/actions/userActions";
 import { apiQueue } from "../../utils/helper";
 
 export default useUpdateStrings = (stringData) => {

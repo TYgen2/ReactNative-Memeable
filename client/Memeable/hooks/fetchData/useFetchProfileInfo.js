@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProfile } from "../../handleAPIs/fetchData";
-import { handleFollow } from "../../store/userActions";
+import { handleFollow } from "../../store/actions/userActions";
 import { UserProfileModel } from "../../models/UserProfileModel";
 import { apiQueue } from "../../utils/helper";
 

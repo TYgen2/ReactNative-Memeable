@@ -1,5 +1,6 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import userReducer from "./userReducer";
+import userReducer from "./features/user/userSlice";
+import postReducer from "./features/post/postSlice";
 import storage from "@react-native-async-storage/async-storage";
 import {
   persistReducer,
@@ -10,7 +11,6 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
-import postReducer from "./postReducer";
 
 const persisConfig = {
   key: "root",
