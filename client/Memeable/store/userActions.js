@@ -56,7 +56,7 @@ export const handleUpdateStrings = createAsyncThunk(
   "user/handleUpdateStrings",
   async ({ displayName, username, userBio }, { rejectWithValue }) => {
     try {
-      const response = await apiClient.post("/handleUpdateStrings", {
+      const response = await apiClient.patch("/handleUpdateStrings", {
         displayName,
         username,
         userBio,
@@ -75,7 +75,7 @@ export const handleUpdateGradient = createAsyncThunk(
   "user/handleUpdateGradient",
   async ({ gradientConfig }, { rejectWithValue }) => {
     try {
-      const response = await apiClient.post("/handleUpdateGradient", {
+      const response = await apiClient.patch("/handleUpdateGradient", {
         gradientConfig,
       });
 
@@ -100,7 +100,7 @@ export const handleUpdateBgImage = createAsyncThunk(
     });
 
     try {
-      const response = await apiClient.post("/handleUpdateBgImage", formData, {
+      const response = await apiClient.put("/handleUpdateBgImage", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -128,7 +128,7 @@ export const handleUpdateIcon = createAsyncThunk(
     });
 
     try {
-      const response = await apiClient.post("/handleUpdateIcon", formData, {
+      const response = await apiClient.put("/handleUpdateIcon", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -163,7 +163,7 @@ export const handleUpdateSong = createAsyncThunk(
     formData.append("songName", songName);
 
     try {
-      const response = await apiClient.post("/handleUpdateSong", formData, {
+      const response = await apiClient.put("/handleUpdateSong", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -191,7 +191,7 @@ export const handleUpdateCover = createAsyncThunk(
     });
 
     try {
-      const response = await apiClient.post("/handleUpdateCover", formData, {
+      const response = await apiClient.put("/handleUpdateCover", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

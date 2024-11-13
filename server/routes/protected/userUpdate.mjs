@@ -13,7 +13,7 @@ const router = Router();
 const CDN = process.env.AWS_CLOUDFRONT_CDN;
 
 // update username, displayName and userBio in user profile
-router.post(
+router.patch(
   "/api/handleUpdateStrings",
   authenticateToken,
   checkSchema(updateProfileValidationSchema),
@@ -65,7 +65,7 @@ router.post(
 );
 
 // update bgImage in user profile
-router.post(
+router.put(
   "/api/handleUpdateBgImage",
   upload.single("file"),
   authenticateToken,
@@ -107,7 +107,7 @@ router.post(
 );
 
 // update icon in user profile
-router.post(
+router.put(
   "/api/handleUpdateIcon",
   upload.single("file"),
   authenticateToken,
@@ -156,7 +156,7 @@ router.post(
 );
 
 // update song in user profile
-router.post(
+router.put(
   "/api/handleUpdateSong",
   upload.fields([
     { name: "songAudio", maxCount: 1 },
@@ -206,7 +206,7 @@ router.post(
 );
 
 // update bgm cover in user profile
-router.post(
+router.put(
   "/api/handleUpdateCover",
   upload.single("file"),
   authenticateToken,
@@ -255,7 +255,7 @@ router.post(
 );
 
 // update gradient border color of song cover
-router.post(
+router.patch(
   "/api/handleUpdateGradient",
   authenticateToken,
   async (req, res) => {
@@ -284,7 +284,7 @@ router.post(
 );
 
 // update pushToken in database
-router.post(
+router.put(
   "/api/handleUpdatePushToken",
   authenticateToken,
   async (req, res) => {

@@ -12,7 +12,7 @@ export const getPushToken = async () => {
 
 export const sendPushTokenToServer = async (pushToken) => {
   try {
-    const res = await apiClient.post("/handleUpdatePushToken", { pushToken });
+    const res = await apiClient.put("/handleUpdatePushToken", { pushToken });
     const { msg } = res.data;
 
     console.log("push token sent to database successfully!");
