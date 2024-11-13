@@ -90,7 +90,21 @@ export const validateTokens = async () => {
 // logout
 export const userLogout = async () => {
   try {
-    await apiClient.post("/auth/logout");
+    const pushToken = await getPushToken();
+    if (!pushToken) {
+      throw new Error("Push token not available");
+    }
+
+    await apiClient.post(
+      "/auth/logout",
+      {},
+      {
+        headers: {
+          "x-push-token": pushToken,
+        },
+      }
+    );
+
     await clearTokens();
 
     console.log("User logged out successfully!");

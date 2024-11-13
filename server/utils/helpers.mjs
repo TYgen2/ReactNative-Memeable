@@ -164,18 +164,28 @@ export const handleTokens = async (user) => {
   };
 };
 
-export const sendPushNotification = async (body, token) => {
+export const sendPushNotification = async (body, user) => {
   const message = {
     notification: {
       title: "Memeable",
       body,
     },
-    token,
   };
 
   try {
-    const response = await admin.messaging().send(message);
-    console.log("Notification sent successfully:", response);
+    // Filter active devices and send notifications only to them
+    const activeDevices = user.devices.filter((device) => device.isActive);
+
+    // Send to all active devices
+    const notifications = activeDevices.map((device) => {
+      return admin.messaging().send({
+        ...message,
+        token: device.pushToken,
+      });
+    });
+
+    await Promise.all(notifications);
+    console.log("Notifications sent successfully");
   } catch (error) {
     console.error("Error sending notification:", error);
   }

@@ -7,6 +7,19 @@ import { EventProvider } from "react-native-outside-press";
 import { enableScreens } from "react-native-screens";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+// Redux related imports
+import { store } from "./store/store";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import { reduxLogin } from "./store/features/user/userSlice";
+import { PersistGate } from "redux-persist/integration/react";
+import { persistStore } from "redux-persist";
+
+// context imports
+import { LoadingContextProvider, UpdateContext } from "./context/loading";
+import { ProfileUpdateProvider } from "./context/ProfileUpdateContext";
+import { ThemeContext } from "./context/theme";
+import useColorTheme from "./hooks/useColorTheme";
+
 // screens import
 import Splash from "./screens/Splash";
 import Login from "./screens/authStack/Login";
@@ -25,22 +38,9 @@ import EditSongCover from "./screens/settingStack/EditSongCover";
 import EditSongAudio from "./screens/settingStack/EditSongAudio";
 import FullscreenImage from "./screens/mainStack/FullscreenImage";
 
-// Redux related imports
-import { store } from "./store/store";
-import { Provider, useDispatch, useSelector } from "react-redux";
-import { reduxLogin } from "./store/features/user/userSlice";
-import { PersistGate } from "redux-persist/integration/react";
-import { persistStore } from "redux-persist";
-
 // third party imports
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import TrackPlayer from "react-native-track-player";
-
-// context imports
-import { LoadingContextProvider, UpdateContext } from "./context/loading";
-import { ProfileUpdateProvider } from "./context/ProfileUpdateContext";
-import { ThemeContext } from "./context/theme";
-import useColorTheme from "./hooks/useColorTheme";
 
 // other imports
 import { getData, storeData } from "./config/asyncStorage";

@@ -237,13 +237,44 @@ router.post("/api/auth/token-validation", async (req, res) => {
 // logout
 router.post("/api/auth/logout", authenticateToken, async (req, res) => {
   try {
+    const pushToken = req.headers["x-push-token"];
+    if (!pushToken) {
+      return res.status(400).send({ msg: "Push token is required" });
+    }
+
     await redisClient
       .del(`user:${req.userId}:refreshToken`)
       .catch(console.error);
-    await User.findByIdAndUpdate(req.userId, {
-      refreshToken: null,
-      pushToken: null,
-    });
+
+    // Update the specific device's status to inactive
+    const result = await User.findOneAndUpdate(
+      {
+        _id: req.userId,
+        "devices.pushToken": pushToken,
+      },
+      {
+        $set: {
+          "devices.$.isActive": false,
+          "devices.$.lastActive": new Date(),
+          refreshToken: null,
+        },
+      }
+    );
+
+    if (!result) {
+      // If no user was found with this device, add it as an inactive device
+      await User.findByIdAndUpdate(req.userId, {
+        $push: {
+          devices: {
+            pushToken: pushToken,
+            isActive: false,
+            lastActive: new Date(),
+          },
+        },
+        $set: { refreshToken: null },
+      });
+    }
+
     res.status(200).send({ msg: "Logged out successfully" });
   } catch (error) {
     res.status(500).send({ msg: "Error during logout" });
