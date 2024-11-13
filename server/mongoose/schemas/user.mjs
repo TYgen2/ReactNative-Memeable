@@ -97,10 +97,22 @@ const UserSchema = new mongoose.Schema({
       default: 0,
     },
   },
-  pushToken: {
-    type: mongoose.Schema.Types.String,
-    default: null,
-  },
+  devices: [
+    {
+      pushToken: {
+        type: mongoose.Schema.Types.String,
+        default: null,
+      },
+      isActive: {
+        type: mongoose.Schema.Types.Boolean,
+        default: false,
+      },
+      lastActive: {
+        type: mongoose.Schema.Types.Date,
+        default: null,
+      },
+    },
+  ],
 });
 
 export const User = mongoose.model("User", UserSchema);

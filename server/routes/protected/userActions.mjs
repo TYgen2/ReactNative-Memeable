@@ -110,7 +110,7 @@ router.post("/api/handleLike", authenticateToken, async (req, res) => {
 
         if (
           postOwner &&
-          postOwner.pushToken &&
+          postOwner.devices?.length > 0 &&
           postOwner._id.toString() !== userId
         ) {
           // Find existing notification or create new one
@@ -132,7 +132,7 @@ router.post("/api/handleLike", authenticateToken, async (req, res) => {
 
           const liker = await User.findById(userId);
           const notificationBody = `${liker.displayName} liked your post`;
-          await sendPushNotification(notificationBody, postOwner.pushToken);
+          await sendPushNotification(notificationBody, postOwner);
         }
       }
 
@@ -160,7 +160,7 @@ router.post("/api/handleFollow", authenticateToken, async (req, res) => {
 
       // Get target user's info for notification
       const targetUser = await User.findById(targetId);
-      if (targetUser && targetUser.pushToken) {
+      if (targetUser && targetUser.devices?.length > 0) {
         // Find existing notification or create new one
         await Notification.findOneAndUpdate(
           {
@@ -179,7 +179,7 @@ router.post("/api/handleFollow", authenticateToken, async (req, res) => {
 
         const follower = await User.findById(req.userId);
         const notificationBody = `${follower.displayName} started following you`;
-        await sendPushNotification(notificationBody, targetUser.pushToken);
+        await sendPushNotification(notificationBody, targetUser);
       }
 
       return res.status(200).send({ msg: "Followed successfully!" });
@@ -214,7 +214,7 @@ router.post("/api/handleComment", authenticateToken, async (req, res) => {
       const postOwner = await User.findById(post.userId);
       if (
         postOwner &&
-        postOwner.pushToken &&
+        postOwner.devices?.length > 0 &&
         postOwner._id.toString() !== req.userId
       ) {
         // Find existing notification or create new one
@@ -237,7 +237,7 @@ router.post("/api/handleComment", authenticateToken, async (req, res) => {
 
         const commenter = await User.findById(req.userId);
         const notificationBody = `${commenter.displayName} commented on your post: "${content}"`;
-        await sendPushNotification(notificationBody, postOwner.pushToken);
+        await sendPushNotification(notificationBody, postOwner);
       }
     }
 
@@ -271,7 +271,7 @@ router.post("/api/handleCommentLike", authenticateToken, async (req, res) => {
         const commentOwner = await User.findById(comment.userId);
         if (
           commentOwner &&
-          commentOwner.pushToken &&
+          commentOwner.devices?.length > 0 &&
           commentOwner._id.toString() !== userId
         ) {
           // Find existing notification or create new one
@@ -293,7 +293,7 @@ router.post("/api/handleCommentLike", authenticateToken, async (req, res) => {
           );
           const liker = await User.findById(userId);
           const notificationBody = `${liker.displayName} liked your comment`;
-          await sendPushNotification(notificationBody, commentOwner.pushToken);
+          await sendPushNotification(notificationBody, commentOwner);
         }
       }
 

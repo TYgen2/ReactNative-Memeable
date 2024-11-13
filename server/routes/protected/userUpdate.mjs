@@ -291,15 +291,33 @@ router.put(
     const { pushToken } = req.body;
 
     try {
-      await User.findByIdAndUpdate(
-        req.userId,
+      const result = await User.findOneAndUpdate(
+        {
+          _id: req.userId,
+          "devices.pushToken": pushToken,
+        },
         {
           $set: {
-            pushToken,
+            "devices.$.isActive": true,
+            "devices.$.lastActive": new Date(),
           },
-        },
-        { new: true }
+        }
       );
+
+      // If no existing device found, add new one
+      if (!result) {
+        await User.findByIdAndUpdate(req.userId, {
+          $addToSet: {
+            // Changed from $push to $addToSet to prevent duplicates
+            devices: {
+              pushToken,
+              isActive: true,
+              lastActive: new Date(),
+            },
+          },
+        });
+      }
+
       return res.status(200).send({ msg: "pushToken updated successfully!" });
     } catch (error) {
       console.log(error);
