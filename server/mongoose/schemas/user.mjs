@@ -92,6 +92,10 @@ const UserSchema = new mongoose.Schema({
       type: [mongoose.Schema.Types.String],
       default: ["#f300ff", "#00f3ff"],
     },
+    sliderValue: {
+      type: mongoose.Schema.Types.Number,
+      default: 0,
+    },
   },
   pushToken: {
     type: mongoose.Schema.Types.String,

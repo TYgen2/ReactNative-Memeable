@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { apiQueue } from "../../utils/helper";
-import { handleUpdateSong } from "../../store/userActions";
+import { handleUpdateSong } from "../../store/actions/userActions";
 
 export default useUpdateSong = (songData) => {
   const [newSong, setNewSong] = useState({

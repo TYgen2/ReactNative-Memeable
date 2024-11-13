@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { handleUploadPost } from "../store/userActions";
+import { handleUploadPost } from "../store/actions/userActions";
 
 export default useUpload = (imageUri) => {
   const [isUploading, setIsUploading] = useState(false);

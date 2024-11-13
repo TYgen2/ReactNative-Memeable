@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { apiQueue } from "../../utils/helper";
-import { handleUpdateGradient } from "../../store/userActions";
+import { handleUpdateGradient } from "../../store/actions/userActions";
 
 export const useUpdateGradient = (gradientData) => {
-  const [sliderValue, setSliderValue] = useState(0);
+  const [sliderValue, setSliderValue] = useState(gradientData.sliderValue);
   const [startColor, setStartColor] = useState(gradientData.colors[0]);
   const [endColor, setEndColor] = useState(gradientData.colors[1]);
 
@@ -12,6 +12,7 @@ export const useUpdateGradient = (gradientData) => {
     start: gradientData.start,
     end: gradientData.end,
     colors: [startColor, endColor],
+    sliderValue: gradientData.sliderValue,
   });
 
   const initialGradientRef = useRef(gradientData);
@@ -57,6 +58,7 @@ export const useUpdateGradient = (gradientData) => {
       start,
       end,
       colors: [startColor, endColor],
+      sliderValue,
     });
   }, [sliderValue, startColor, endColor]);
 

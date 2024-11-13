@@ -1,8 +1,8 @@
 import { Alert, StyleSheet, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { reduxLogout } from "../store/userReducer";
-import { clearPosts } from "../store/postReducer";
+import { reduxLogout } from "../store/features/user/userSlice";
+import { clearPosts } from "../store/features/post/postSlice";
 import { userLogout } from "../handleAPIs/auth";
 
 const LogoutButton = () => {

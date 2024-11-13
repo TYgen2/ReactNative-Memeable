@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllPosts } from "../../store/userActions";
+import { fetchAllPosts } from "../../store/actions/userActions";
 import { debounce } from "lodash";
 import { apiQueue } from "../../utils/helper";
 

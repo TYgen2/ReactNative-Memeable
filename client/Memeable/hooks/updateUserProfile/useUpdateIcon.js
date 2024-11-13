@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { handleUpdateIcon } from "../../store/userActions";
+import { handleUpdateIcon } from "../../store/actions/userActions";
 import { apiQueue } from "../../utils/helper";
 
 export default useUpdateIcon = (iconData) => {

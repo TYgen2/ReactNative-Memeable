@@ -8,7 +8,7 @@ import { Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { LoginManager, AccessToken } from "react-native-fbsdk-next";
-import { fetchUserInfo } from "../../store/userActions";
+import { fetchUserInfo } from "../../store/actions/userActions";
 
 WebBrowser.maybeCompleteAuthSession();
 
