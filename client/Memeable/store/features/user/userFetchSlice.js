@@ -8,9 +8,5 @@ export const userFetchReducer = (builder) => {
     .addCase(fetchUserInfo.fulfilled, (state, action) => {
       state.status = "succeeded";
       state.userDetails = action.payload;
-    })
-    .addCase(fetchUserInfo.rejected, (state, action) => {
-      state.status = "failed";
-      state.error = action.payload;
     });
 };

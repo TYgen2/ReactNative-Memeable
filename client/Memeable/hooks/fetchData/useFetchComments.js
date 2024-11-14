@@ -6,7 +6,7 @@ const useFetchComments = (postId) => {
   const [comments, setComments] = useState({});
   const commentsRef = useRef(comments);
 
-  const [isCommentLoading, setIsCommentLoading] = useState(false);
+  const [isCommentLoading, setIsCommentLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);

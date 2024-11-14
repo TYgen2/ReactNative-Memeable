@@ -7,8 +7,8 @@ import CommentInput from "./CommentInput";
 import { StyleSheet, View } from "react-native";
 import { useCallback } from "react";
 import CommentItem from "./CommentItem";
-import { LOADING_INDICATOR } from "../../utils/constants";
-import { handleDeleteComment } from "../../handleAPIs/userActions";
+import { LOADING_INDICATOR } from "../../../utils/constants";
+import CommentEmpty from "./CommentEmpty";
 
 const CommentModal = ({
   bottomSheetModalRef,
@@ -64,11 +64,6 @@ const CommentModal = ({
     [comments, navigation, colors, setReplyInfo]
   );
 
-  const renderEmpty = () => {
-    if (!isCommentLoading) return null;
-    return <LOADING_INDICATOR />;
-  };
-
   const renderFooter = () => {
     if (!isLoadingMore) return null;
     return <LOADING_INDICATOR />;
@@ -95,7 +90,9 @@ const CommentModal = ({
           refreshing={isCommentLoading}
           onEndReached={loadMoreComments}
           contentContainerStyle={styles.commentList}
-          ListEmptyComponent={renderEmpty}
+          ListEmptyComponent={
+            <CommentEmpty isCommentLoading={isCommentLoading} />
+          }
           ListFooterComponent={renderFooter}
         />
         <View style={styles.inputContainer}>

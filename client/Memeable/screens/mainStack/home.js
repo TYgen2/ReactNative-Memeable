@@ -1,4 +1,4 @@
-import { FlatList, Image, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
 import { barOffset, screenWidth } from "../../utils/constants";
 import MainPost from "../../components/post/MainPost";
 import { useSelector } from "react-redux";

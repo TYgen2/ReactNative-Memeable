@@ -78,7 +78,6 @@ router.post(
 
       const postData = populatedPost.toObject();
       delete postData.__v;
-      postData.timeAgo = getTimeDifference(postData.createDate);
       postData.hasLiked = false;
 
       const response = { msg: "Image uploaded to S3 successfully!!", postData };
@@ -242,7 +241,6 @@ router.post("/api/handleComment", authenticateToken, async (req, res) => {
     }
 
     const commentData = newComment.toObject();
-    commentData.timeAgo = getTimeDifference(commentData.createDate);
     commentData.hasLiked = false;
 
     res.status(201).send({
