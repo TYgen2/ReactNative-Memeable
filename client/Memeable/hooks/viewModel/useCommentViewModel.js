@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import useFetchComments from "../fetchData/useFetchComments";
 import { useSelector } from "react-redux";
+import { handleCommentDelete } from "../../handleAPIs/userActions";
 
 export const useCommentViewModel = (postId) => {
   const { userDetails } = useSelector((state) => state.user);
@@ -113,6 +114,35 @@ export const useCommentViewModel = (postId) => {
     []
   );
 
+  const handleDeleteComment = useCallback(
+    async (commentId, parentCommentId) => {
+      try {
+        await handleCommentDelete(commentId, parentCommentId);
+
+        // Update local state
+        const updatedComments = { ...comments };
+        if (parentCommentId) {
+          // Handle sub-comment deletion
+          const parentComment = updatedComments[parentCommentId];
+          if (parentComment) {
+            parentComment.subComments = parentComment.subComments.filter(
+              (comment) => comment._id !== commentId
+            );
+            // Update hasSubComment based on remaining subComments
+            parentComment.hasSubComment = parentComment.subComments.length > 0;
+          }
+        } else {
+          // Handle main comment deletion
+          delete updatedComments[commentId];
+        }
+        setComments(updatedComments);
+      } catch (error) {
+        console.error("Error deleting comment:", error);
+      }
+    },
+    [comments]
+  );
+
   return {
     comments,
     isCommentLoading,
@@ -124,5 +154,6 @@ export const useCommentViewModel = (postId) => {
     onCommentLikeUpdate,
     replyInfo,
     setReplyInfo,
+    handleDeleteComment,
   };
 };

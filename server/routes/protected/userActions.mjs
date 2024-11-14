@@ -385,4 +385,65 @@ router.delete("/api/handleDeletePost", authenticateToken, async (req, res) => {
   }
 });
 
+// delete a comment
+router.delete(
+  "/api/handleCommentDelete",
+  authenticateToken,
+  async (req, res) => {
+    const { commentId, parentCommentId } = req.body;
+    const userId = req.userId;
+
+    try {
+      // First, get the comment to check ownership
+      const comment = await Comment.findById(commentId);
+
+      if (!comment) {
+        return res.status(404).send({ msg: "Comment not found" });
+      }
+
+      // Verify the user owns this comment
+      if (comment.userId.toString() !== userId) {
+        return res
+          .status(403)
+          .send({ msg: "Unauthorized to delete this comment" });
+      }
+
+      // Delete the comment and all related data
+      await Promise.all([
+        // Delete the comment
+        Comment.findByIdAndDelete(commentId),
+        // Delete all likes associated with the comment
+        CommentLike.deleteMany({ commentId }),
+        // Delete all notifications related to this comment
+        Notification.deleteMany({ commentId }),
+        // If it's a main comment, delete all sub-comments and their associated data
+        ...(parentCommentId
+          ? []
+          : [
+              Comment.deleteMany({ parentCommentId: commentId }),
+              CommentLike.deleteMany({
+                commentId: {
+                  $in: (
+                    await Comment.find({ parentCommentId: commentId })
+                  ).map((c) => c._id),
+                },
+              }),
+              Notification.deleteMany({
+                commentId: {
+                  $in: (
+                    await Comment.find({ parentCommentId: commentId })
+                  ).map((c) => c._id),
+                },
+              }),
+            ]),
+      ]);
+
+      return res.status(200).send({ msg: "Comment deleted successfully" });
+    } catch (error) {
+      console.error("Error in handleDeleteComment:", error);
+      return res.status(400).send({ msg: "Error when deleting comment" });
+    }
+  }
+);
+
 export default router;
