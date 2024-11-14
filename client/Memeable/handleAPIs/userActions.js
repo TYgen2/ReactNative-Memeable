@@ -117,3 +117,20 @@ export const handleCommentLike = async (commentId, action) => {
     return { msg: error.response.data.msg };
   }
 };
+
+export const handleCommentDelete = async (
+  commentId,
+  parentCommentId = null
+) => {
+  try {
+    const res = await apiClient.delete("/handleCommentDelete", {
+      data: { commentId, parentCommentId },
+    });
+
+    console.log("Comment deleted successfully!");
+    return { msg: res.data.msg };
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    return { msg: error.response?.data?.msg || "Error deleting comment" };
+  }
+};

@@ -5,11 +5,13 @@ import {
   Text,
   TouchableOpacity,
   Pressable,
+  Alert,
 } from "react-native";
 import { getIconSource } from "../../utils/helper";
 import { memo, useCallback, useEffect, useState } from "react";
 import Icon from "react-native-vector-icons/Ionicons";
 import { handleCommentLike } from "../../handleAPIs/userActions";
+import { useSelector } from "react-redux";
 
 const CommentItem = ({
   item,
@@ -19,7 +21,11 @@ const CommentItem = ({
   onFetchSubComments,
   isSubComment,
   onCommentLikeUpdate,
+  onDeleteComment,
 }) => {
+  const { userDetails } = useSelector((state) => state.user);
+  const isOwnComment = userDetails?.userId === item?.userId;
+
   const iconBgColor = item.user?.icon.bgColor || "transparent";
   const iconSource = getIconSource(item.user?.icon);
 
@@ -94,6 +100,36 @@ const CommentItem = ({
     isSubComment,
   ]);
 
+  const handleLongPress = useCallback(() => {
+    if (!isOwnComment) return;
+
+    Alert.alert(
+      "Delete Comment",
+      "Are you sure you want to delete this comment?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () =>
+            onDeleteComment(
+              item._id,
+              isSubComment ? item.parentCommentId : null
+            ),
+        },
+      ]
+    );
+  }, [
+    isOwnComment,
+    item._id,
+    item.parentCommentId,
+    isSubComment,
+    onDeleteComment,
+  ]);
+
   return (
     <View style={styles.container}>
       {/* icon */}
@@ -107,7 +143,11 @@ const CommentItem = ({
         />
       </Pressable>
 
-      <View style={styles.contentWrapper}>
+      <Pressable
+        style={styles.contentWrapper}
+        onLongPress={handleLongPress}
+        onPress={() => console.log("opn9")}
+      >
         {/* text info */}
         <View style={styles.textInfo}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -147,6 +187,7 @@ const CommentItem = ({
                     onReply={onReply}
                     isSubComment={true}
                     onCommentLikeUpdate={onCommentLikeUpdate}
+                    onDeleteComment={onDeleteComment}
                   />
                 ))}
               </View>
@@ -173,7 +214,7 @@ const CommentItem = ({
             />
           </TouchableOpacity>
         </View>
-      </View>
+      </Pressable>
     </View>
   );
 };

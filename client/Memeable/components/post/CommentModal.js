@@ -8,6 +8,7 @@ import { StyleSheet, View } from "react-native";
 import { useCallback } from "react";
 import CommentItem from "./CommentItem";
 import { LOADING_INDICATOR } from "../../utils/constants";
+import { handleDeleteComment } from "../../handleAPIs/userActions";
 
 const CommentModal = ({
   bottomSheetModalRef,
@@ -19,6 +20,7 @@ const CommentModal = ({
   handleNewComment,
   fetchSubComments,
   onCommentLikeUpdate,
+  handleDeleteComment,
   replyInfo,
   setReplyInfo,
   colors,
@@ -55,6 +57,7 @@ const CommentModal = ({
           }}
           onFetchSubComments={fetchSubComments}
           onCommentLikeUpdate={onCommentLikeUpdate}
+          onDeleteComment={handleDeleteComment}
         />
       );
     },
