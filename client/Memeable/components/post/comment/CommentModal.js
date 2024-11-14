@@ -3,11 +3,12 @@ import {
   BottomSheetFlatList,
   BottomSheetModal,
 } from "@gorhom/bottom-sheet";
-import CommentInput from "./comment/CommentInput";
-import { Image, StyleSheet, Text, View } from "react-native";
-import { useCallback, useEffect } from "react";
-import CommentItem from "./comment/CommentItem";
-import { LOADING_INDICATOR } from "../../utils/constants";
+import CommentInput from "./CommentInput";
+import { StyleSheet, View } from "react-native";
+import { useCallback } from "react";
+import CommentItem from "./CommentItem";
+import { LOADING_INDICATOR } from "../../../utils/constants";
+import CommentEmpty from "./CommentEmpty";
 
 const CommentModal = ({
   bottomSheetModalRef,
@@ -63,19 +64,6 @@ const CommentModal = ({
     [comments, navigation, colors, setReplyInfo]
   );
 
-  const renderEmpty = () => {
-    if (isCommentLoading) return <LOADING_INDICATOR />;
-    return (
-      <View style={styles.emptyComment}>
-        <Image
-          source={require("../../assets/empty_icon/xueyi.png")}
-          style={{ width: 100, height: 100, opacity: 0.4 }}
-        />
-        <Text style={styles.emptyText}>No comment yet...Zzz</Text>
-      </View>
-    );
-  };
-
   const renderFooter = () => {
     if (!isLoadingMore) return null;
     return <LOADING_INDICATOR />;
@@ -102,7 +90,9 @@ const CommentModal = ({
           refreshing={isCommentLoading}
           onEndReached={loadMoreComments}
           contentContainerStyle={styles.commentList}
-          ListEmptyComponent={renderEmpty}
+          ListEmptyComponent={
+            <CommentEmpty isCommentLoading={isCommentLoading} />
+          }
           ListFooterComponent={renderFooter}
         />
         <View style={styles.inputContainer}>
@@ -130,12 +120,6 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   commentList: { flexGrow: 1 },
-  emptyComment: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  emptyText: { fontWeight: "bold", fontSize: 24, color: "grey" },
 });
 
 export default CommentModal;

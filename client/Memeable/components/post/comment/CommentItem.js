@@ -7,10 +7,10 @@ import {
   Pressable,
   Alert,
 } from "react-native";
-import { getIconSource } from "../../utils/helper";
+import { getIconSource } from "../../../utils/helper";
 import { memo, useCallback, useEffect, useState } from "react";
 import Icon from "react-native-vector-icons/Ionicons";
-import { handleCommentLike } from "../../handleAPIs/userActions";
+import { handleCommentLike } from "../../../handleAPIs/userActions";
 import { useSelector } from "react-redux";
 
 const CommentItem = ({

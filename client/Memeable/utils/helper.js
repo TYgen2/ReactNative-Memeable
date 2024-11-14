@@ -6,7 +6,6 @@ import {
   screenWidth,
 } from "../utils/constants";
 import PQueue from "p-queue/dist";
-import * as DocumentPicker from "expo-document-picker";
 
 // select image for posting
 export const selectImageForUpload = async (setImageUri, navigation) => {
@@ -144,4 +143,31 @@ export const apiQueue = new PQueue({ concurrency: 1, interval: 1000 });
 
 export const formatSongName = (songName) => {
   return songName.replace(".mp3", "").replace(".wav", "");
+};
+
+export const getTimeDifference = (date) => {
+  const now = new Date();
+  const diff = now - new Date(date);
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (seconds < 10) {
+    return "Just now";
+  } else if (seconds < 60) {
+    return `${seconds}s`;
+  }
+
+  if (days > 7) {
+    return new Date(date).toLocaleDateString();
+  } else if (days > 0) {
+    return `${days}d`;
+  } else if (hours > 0) {
+    return `${hours}h`;
+  } else if (minutes > 0) {
+    return `${minutes}m`;
+  } else {
+    return `${seconds}s`;
+  }
 };

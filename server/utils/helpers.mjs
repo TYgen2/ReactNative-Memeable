@@ -49,7 +49,7 @@ export const getTimeDifference = (date) => {
     return `${diffInSeconds}s`;
   } else if (diffInSeconds < 3600) {
     const minutes = Math.floor(diffInSeconds / 60);
-    return `${minutes}min`;
+    return `${minutes}m`;
   } else if (diffInSeconds < 86400) {
     const hours = Math.floor(diffInSeconds / 3600);
     return `${hours}h`;

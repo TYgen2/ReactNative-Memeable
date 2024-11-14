@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import useFetchComments from "../fetchData/useFetchComments";
 import { useSelector } from "react-redux";
 import { handleCommentDelete } from "../../handleAPIs/userActions";
+import { getTimeDifference } from "../../utils/helper";
 
 export const useCommentViewModel = (postId) => {
   const { userDetails } = useSelector((state) => state.user);
@@ -46,6 +47,7 @@ export const useCommentViewModel = (postId) => {
         },
         hasLiked: false,
         subComments: [],
+        timeAgo: "Just now",
       };
 
       setComments((prevComments) => {
@@ -142,6 +144,27 @@ export const useCommentViewModel = (postId) => {
     },
     [comments]
   );
+
+  const updateTimeAgo = useCallback(() => {
+    setComments((prevComments) => {
+      const updatedComments = { ...prevComments };
+      Object.values(updatedComments).forEach((comment) => {
+        comment.timeAgo = getTimeDifference(comment.createDate);
+        if (comment.subComments) {
+          comment.subComments.forEach((subComment) => {
+            subComment.timeAgo = getTimeDifference(subComment.createDate);
+          });
+        }
+      });
+      return updatedComments;
+    });
+  }, []);
+
+  // Set up an interval to update timeAgo
+  useEffect(() => {
+    const intervalId = setInterval(updateTimeAgo, 30000); // Update every 30s
+    return () => clearInterval(intervalId);
+  }, [updateTimeAgo]);
 
   return {
     comments,
