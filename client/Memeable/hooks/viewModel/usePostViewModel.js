@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { handleLike, handleSavePost } from "../../handleAPIs/userActions";
 import { PostModel } from "../../models/PostModel";
-import { getTimeDifference } from "../../utils/helper";
 
 export const usePostViewModel = (initialPostData) => {
-  const [postModel, setPostModel] = useState(() =>
-    new PostModel(initialPostData).toJSON()
+  const postModel = useMemo(
+    () => new PostModel(initialPostData).toJSON(),
+    [initialPostData]
   );
 
   const [postState, setPostState] = useState({
@@ -13,19 +13,6 @@ export const usePostViewModel = (initialPostData) => {
     liked: postModel.hasLiked,
     saved: false,
   });
-
-  // Update timeAgo periodically
-  useEffect(() => {
-    const updateTimeAgo = () => {
-      setPostModel((prevPost) => ({
-        ...prevPost,
-        timeAgo: getTimeDifference(prevPost.createDate),
-      }));
-    };
-
-    const intervalId = setInterval(updateTimeAgo, 60000); // Update every minute
-    return () => clearInterval(intervalId);
-  }, []);
 
   // update local like status and like count
   const toggleLike = useCallback(async () => {
