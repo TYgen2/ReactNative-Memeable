@@ -1,10 +1,25 @@
 import axios from "axios";
-import { setGlobalConfig, requestLogger, responseLogger } from "axios-logger";
+import axiosRetry from "axios-retry";
+import { setGlobalConfig } from "axios-logger";
 import { clearTokens, getTokens, storeTokens } from "./tokenActions";
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const apiClient = axios.create({
   baseURL: `${BACKEND_URL}/api`,
+});
+
+axiosRetry(apiClient, {
+  retries: 3,
+  retryDelay: (retryCount) => {
+    return retryCount * 1000; // Wait 1s, 2s, 3s between retries
+  },
+  retryCondition: (error) => {
+    // Retry on network errors or 5xx server errors
+    return (
+      axiosRetry.isNetworkOrIdempotentRequestError(error) ||
+      error.response?.status >= 500
+    );
+  },
 });
 
 setGlobalConfig({

@@ -311,27 +311,6 @@ router.post("/api/handleCommentLike", authenticateToken, async (req, res) => {
   }
 });
 
-// save a post
-router.post("/api/handleSavePost", authenticateToken, async (req, res) => {
-  const { postId, action } = req.body;
-  const userId = req.userId;
-
-  try {
-    if (action === "save") {
-      const savedPost = new SavedPost({ userId, postId });
-      await savedPost.save();
-      return res.status(200).send({ msg: "saved successfully!" });
-    } else if (action === "unsave") {
-      await SavedPost.deleteOne({ userId, postId });
-      return res.status(200).send({ msg: "unsaved successfully!" });
-    } else {
-      return res.status(400).send({ msg: "Invalid action" });
-    }
-  } catch (error) {
-    res.status(400).send({ msg: "Error when handling save/unsave" });
-  }
-});
-
 // delete a post
 router.delete("/api/handleDeletePost", authenticateToken, async (req, res) => {
   const { postId } = req.body;
@@ -443,5 +422,26 @@ router.delete(
     }
   }
 );
+
+// save a post
+router.post("/api/handleSavePost", authenticateToken, async (req, res) => {
+  const { postId, action } = req.body;
+  const userId = req.userId;
+
+  try {
+    if (action === "save") {
+      const savedPost = new SavedPost({ userId, postId });
+      await savedPost.save();
+      return res.status(200).send({ msg: "saved successfully!" });
+    } else if (action === "unsave") {
+      await SavedPost.deleteOne({ userId, postId });
+      return res.status(200).send({ msg: "unsaved successfully!" });
+    } else {
+      return res.status(400).send({ msg: "Invalid action" });
+    }
+  } catch (error) {
+    res.status(400).send({ msg: "Error when handling save/unsave" });
+  }
+});
 
 export default router;

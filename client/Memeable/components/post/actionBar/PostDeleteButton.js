@@ -1,7 +1,7 @@
 import { TouchableOpacity, Alert, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useDispatch } from "react-redux";
-import { handleDeletePost } from "../../store/actions/userActions";
+import { handleDeletePost } from "../../../store/actions/userActions";
 import { useCallback, memo } from "react";
 
 const PostDeleteButton = ({ postId, onDeleteSuccess }) => {
