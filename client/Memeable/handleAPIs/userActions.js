@@ -66,28 +66,6 @@ export const handleSearch = async (query) => {
   }
 };
 
-export const handleLike = async (postId, action) => {
-  try {
-    const res = await apiClient.post("/handleLike", { postId, action });
-
-    console.log("Like updated locally!");
-    return { msg: res.data.msg };
-  } catch (error) {
-    return { msg: error.response.data.msg };
-  }
-};
-
-export const handleSavePost = async (postId, action) => {
-  try {
-    const res = await apiClient.post("/handleSavePost", { postId, action });
-
-    console.log("Post saved/unsaved!");
-    return { msg: res.data.msg };
-  } catch (error) {
-    return { msg: error.response.data.msg };
-  }
-};
-
 export const handleComment = async (postId, parentCommentId, content) => {
   try {
     const res = await apiClient.post("/handleComment", {

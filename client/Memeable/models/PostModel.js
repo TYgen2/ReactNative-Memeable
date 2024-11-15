@@ -17,6 +17,7 @@ export class PostModel {
     );
     this.likes = rawPostData.likes;
     this.hasLiked = rawPostData.hasLiked;
+    this.isSaved = rawPostData.isSaved;
     this.timeAgo = rawPostData.timeAgo;
     this.commentCount = rawPostData.commentCount;
     this.createDate = rawPostData.createDate;
@@ -43,6 +44,7 @@ export class PostModel {
       imageHeight: this.imageHeight,
       likes: this.likes,
       hasLiked: this.hasLiked,
+      isSaved: this.isSaved,
       timeAgo: this.timeAgo,
       commentCount: this.commentCount,
       createDate: this.createDate,

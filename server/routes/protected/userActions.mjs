@@ -93,7 +93,7 @@ router.post(
 );
 
 // user like / unlike posts
-router.post("/api/handleLike", authenticateToken, async (req, res) => {
+router.post("/api/handleLikePost", authenticateToken, async (req, res) => {
   const { postId, action } = req.body;
   const userId = req.userId;
 

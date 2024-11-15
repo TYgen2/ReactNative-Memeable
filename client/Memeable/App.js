@@ -45,6 +45,7 @@ import TrackPlayer from "react-native-track-player";
 // other imports
 import { getData, storeData } from "./config/asyncStorage";
 import { setupPlayer } from "./utils/audioTrimmer/audioHelpers";
+import SavedPost from "./screens/mainStack/SavedPost";
 
 const persistor = persistStore(store);
 enableScreens();
@@ -89,6 +90,16 @@ const HomeScreen = () => {
         options={{
           headerShown: true,
           title: "Posts",
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: colors.text,
+        }}
+      />
+      <HomeStack.Screen
+        name="SavedPost"
+        component={SavedPost}
+        options={{
+          headerShown: true,
+          title: "Saved posts",
           headerStyle: { backgroundColor: colors.primary },
           headerTintColor: colors.text,
         }}

@@ -56,3 +56,16 @@ export const fetchNotifications = async ({ page, limit, signal }) => {
     };
   }
 };
+
+// fetch user saved posts
+export const fetchSavedPosts = async (page, limit) => {
+  try {
+    const response = await apiClient.get("/fetchSavedPosts", {
+      params: { page, limit },
+    });
+
+    return response.data;
+  } catch (error) {
+    return { message: error.response.data.msg };
+  }
+};

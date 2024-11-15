@@ -108,6 +108,32 @@ router.get("/api/fetchAllPosts", authenticateToken, async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: "savedposts",
+          let: { postId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$postId", "$$postId"] },
+                    {
+                      $eq: ["$userId", new mongoose.Types.ObjectId(req.userId)],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "savedDocs",
+        },
+      },
+      {
+        $addFields: {
+          isSaved: { $gt: [{ $size: "$savedDocs" }, 0] },
+        },
+      },
+      {
         $project: {
           _id: 1,
           userId: {
@@ -125,6 +151,7 @@ router.get("/api/fetchAllPosts", authenticateToken, async (req, res) => {
           likes: 1, // Keep the original likes field
           hasLiked: 1,
           commentCount: 1,
+          isSaved: 1,
           timeAgo: { $literal: "" }, // Placeholder for timeAgo, to be calculated in application code
         },
       },
@@ -229,6 +256,32 @@ router.get("/api/fetchUserPosts", authenticateToken, async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: "savedposts",
+          let: { postId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$postId", "$$postId"] },
+                    {
+                      $eq: ["$userId", new mongoose.Types.ObjectId(req.userId)],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "savedDocs",
+        },
+      },
+      {
+        $addFields: {
+          isSaved: { $gt: [{ $size: "$savedDocs" }, 0] },
+        },
+      },
+      {
         $project: {
           _id: 1,
           userId: {
@@ -246,6 +299,7 @@ router.get("/api/fetchUserPosts", authenticateToken, async (req, res) => {
           likes: 1, // Keep the original likes field
           hasLiked: 1,
           commentCount: 1,
+          isSaved: 1,
           timeAgo: { $literal: "" }, // Placeholder for timeAgo, to be calculated in application code
         },
       },
@@ -385,6 +439,32 @@ router.get("/api/fetchSavedPosts", authenticateToken, async (req, res) => {
       },
       { $unwind: "$user" },
       {
+        $lookup: {
+          from: "likes",
+          let: { postId: "$post._id" }, // Adjust this based on your saved posts structure
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$postId", "$$postId"] },
+                    {
+                      $eq: ["$userId", new mongoose.Types.ObjectId(req.userId)],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "likeDocs",
+        },
+      },
+      {
+        $addFields: {
+          hasLiked: { $gt: [{ $size: "$likeDocs" }, 0] },
+        },
+      },
+      {
         $project: {
           _id: "$post._id",
           userId: {
@@ -399,6 +479,7 @@ router.get("/api/fetchSavedPosts", authenticateToken, async (req, res) => {
           description: "$post.description",
           hashtag: "$post.hashtag",
           createDate: "$post.createDate",
+          hasLiked: 1,
           likes: "$post.likes",
           isSaved: { $literal: true },
           timeAgo: { $literal: "" },
