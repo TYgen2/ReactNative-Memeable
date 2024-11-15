@@ -1,7 +1,8 @@
 import { StyleSheet, Text, View, Image } from "react-native";
 import React, { memo } from "react";
+import ViewSavedButton from "./ViewSavedButton";
 
-const HomeHeader = ({ colors }) => {
+const HomeHeader = ({ colors, navigation }) => {
   return (
     <View
       style={[styles.appName, { borderBottomColor: colors.titleBottomBar }]}
@@ -11,6 +12,8 @@ const HomeHeader = ({ colors }) => {
         style={styles.titleIcon}
       />
       <Text style={[styles.title, { color: colors.text }]}>Memeable</Text>
+
+      <ViewSavedButton navigation={navigation} colors={colors} />
     </View>
   );
 };

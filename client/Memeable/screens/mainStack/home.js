@@ -16,14 +16,22 @@ const Home = ({ navigation }) => {
 
   const renderPost = useCallback(
     ({ item }) => {
-      return <MainPost item={item} navigation={navigation} colors={colors} />;
+      return (
+        <MainPost
+          item={item}
+          navigation={navigation}
+          colors={colors}
+          // helps to re-render the post when the save/like status changes
+          key={`${item._id}-${item.isSaved}-${item.hasLiked}`}
+        />
+      );
     },
     [navigation, colors]
   );
 
   return (
     <View style={[styles.container, { backgroundColor: colors.primary }]}>
-      <HomeHeader colors={colors} />
+      <HomeHeader colors={colors} navigation={navigation} />
       <FlatList
         data={allPosts}
         refreshing={isLoading}

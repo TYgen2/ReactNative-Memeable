@@ -193,6 +193,32 @@ router.get("/api/fetchNotifications", authenticateToken, async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: "savedposts",
+          let: { postId: "$postId" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$postId", "$$postId"] },
+                    {
+                      $eq: ["$userId", new mongoose.Types.ObjectId(req.userId)],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "savedDocs",
+        },
+      },
+      {
+        $addFields: {
+          isSaved: { $gt: [{ $size: "$savedDocs" }, 0] },
+        },
+      },
+      {
         $project: {
           _id: 1,
           type: 1,
@@ -227,6 +253,7 @@ router.get("/api/fetchNotifications", authenticateToken, async (req, res) => {
                     createDate: "$post.createDate",
                     likes: "$post.likes",
                     hasLiked: "$hasLiked",
+                    isSaved: "$isSaved",
                     commentCount: "$commentCount",
                     timeAgo: { $literal: "" },
                   },

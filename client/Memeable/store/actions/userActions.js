@@ -256,3 +256,37 @@ export const handleDeletePost = createAsyncThunk(
     }
   }
 );
+
+export const handleSavePost = createAsyncThunk(
+  "post/handleSavePost",
+  async ({ postId, action }, { rejectWithValue }) => {
+    try {
+      await apiClient.post("/handleSavePost", {
+        postId,
+        action,
+      });
+
+      console.log("Post saved/unsaved using REDUX!!");
+      return { postId, saveAction: action };
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const handleLikePost = createAsyncThunk(
+  "post/handleLikePost",
+  async ({ postId, action }, { rejectWithValue }) => {
+    try {
+      await apiClient.post("/handleLikePost", {
+        postId,
+        action,
+      });
+
+      console.log("Post liked/unliked using REDUX!!");
+      return { postId, likeAction: action };
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);

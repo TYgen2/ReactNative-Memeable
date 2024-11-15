@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { fetchUserPosts } from "../../handleAPIs/fetchData";
 import { apiQueue } from "../../utils/helper";
 
@@ -10,7 +10,6 @@ export default useFetchPostsForUser = (targetId) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isPostsLoading, setIsPostsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(false);
-  const dispatch = useDispatch();
 
   const fetchPosts = useCallback(
     async (page, reset = false) => {
@@ -36,7 +35,7 @@ export default useFetchPostsForUser = (targetId) => {
         setIsPostsLoading(false);
       }
     },
-    [dispatch, isPostsLoading, hasMore]
+    [isPostsLoading, hasMore]
   );
 
   const loadMorePosts = useCallback(async () => {
