@@ -5,8 +5,8 @@ import { useSelector } from "react-redux";
 import { usePostViewModel } from "../../hooks/viewModel/usePostViewModel";
 import { useCommentViewModel } from "../../hooks/viewModel/useCommentViewModel";
 import CommentModal from "./comment/CommentModal";
-import PostContent from "./PostContent";
-import PostActionBar from "./PostActionBar";
+import PostContent from "./mainContent";
+import PostActionBar from "./actionBar";
 
 // User post component
 const MainPost = ({
