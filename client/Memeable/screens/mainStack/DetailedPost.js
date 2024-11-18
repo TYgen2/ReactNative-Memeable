@@ -13,6 +13,11 @@ const DetailedPost = ({ route, navigation }) => {
     (state) => state.post.allPosts.find((p) => p._id === item._id) || item
   );
 
+  // Get interaction state for this post
+  const interaction = useSelector(
+    (state) => state.interaction.interactions[item._id]
+  );
+
   const handleDeleteSuccess = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
@@ -26,8 +31,8 @@ const DetailedPost = ({ route, navigation }) => {
     >
       <View style={{ alignItems: "center" }}>
         <MainPost
-          key={`${updatedPost._id}-${updatedPost.isSaved}-${updatedPost.hasLiked}`}
-          item={item}
+          key={`${updatedPost._id}-${interaction?.isSaved}-${interaction?.hasLiked}`}
+          item={updatedPost}
           navigation={navigation}
           colors={colors}
           fromProfile={fromProfile}

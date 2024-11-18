@@ -6,6 +6,7 @@ import { Comment } from "../../../mongoose/schemas/comment.mjs";
 import { authenticateToken } from "../../../utils/middleware.mjs";
 import { getFollowingIds, getTimeDifference } from "../../../utils/helpers.mjs";
 import { SavedPost } from "../../../mongoose/schemas/savedPost.mjs";
+import { Like } from "../../../mongoose/schemas/like.mjs";
 
 const router = Router();
 
@@ -34,44 +35,6 @@ router.get("/api/fetchAllPosts", authenticateToken, async (req, res) => {
       { $sort: { createDate: -1 } },
       { $skip: (page - 1) * limit },
       { $limit: Number(limit) + 1 },
-      {
-        // from the Like collection,
-        $lookup: {
-          from: "likes",
-          // define a postId variable, where value = _id field.
-          // Dollar sign means the _id field is in the current doc.
-          let: { postId: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                // allows the use of aggregation expressions
-                $expr: {
-                  $and: [
-                    // double dollar sign used for access variables
-                    // defined in the let clause (i.e. postId = "$_id")
-
-                    // compare $postId in Like and $$postId in Post
-                    { $eq: ["$postId", "$$postId"] },
-                    {
-                      $eq: [
-                        "$userId",
-                        new mongoose.Types.ObjectId(`${req.userId}`),
-                      ],
-                    },
-                  ],
-                },
-              },
-            },
-            { $project: { _id: 1 } },
-          ],
-          as: "likeDocs",
-        },
-      },
-      {
-        $addFields: {
-          hasLiked: { $gt: [{ $size: "$likeDocs" }, 0] },
-        },
-      },
       {
         $lookup: {
           from: "users",
@@ -108,32 +71,6 @@ router.get("/api/fetchAllPosts", authenticateToken, async (req, res) => {
         },
       },
       {
-        $lookup: {
-          from: "savedposts",
-          let: { postId: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$postId", "$$postId"] },
-                    {
-                      $eq: ["$userId", new mongoose.Types.ObjectId(req.userId)],
-                    },
-                  ],
-                },
-              },
-            },
-          ],
-          as: "savedDocs",
-        },
-      },
-      {
-        $addFields: {
-          isSaved: { $gt: [{ $size: "$savedDocs" }, 0] },
-        },
-      },
-      {
         $project: {
           _id: 1,
           userId: {
@@ -148,10 +85,8 @@ router.get("/api/fetchAllPosts", authenticateToken, async (req, res) => {
           description: 1,
           hashtag: 1,
           createDate: 1,
-          likes: 1, // Keep the original likes field
-          hasLiked: 1,
+          likes: 1,
           commentCount: 1,
-          isSaved: 1,
           timeAgo: { $literal: "" }, // Placeholder for timeAgo, to be calculated in application code
         },
       },
@@ -186,41 +121,6 @@ router.get("/api/fetchUserPosts", authenticateToken, async (req, res) => {
       { $skip: (page - 1) * limit },
       { $limit: Number(limit) + 1 },
       {
-        // from the Like collection,
-        $lookup: {
-          from: "likes",
-          // define a postId variable, where value = _id field.
-          // Dollar sign means the _id field is in the current doc.
-          let: { postId: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                // allows the use of aggregation expressions
-                $expr: {
-                  $and: [
-                    // double dollar sign used for access variables
-                    // defined in the let clause (i.e. postId = "$_id")
-
-                    // compare $postId in Like and $$postId in Post
-                    { $eq: ["$postId", "$$postId"] },
-                    {
-                      $eq: ["$userId", new mongoose.Types.ObjectId(targetId)],
-                    },
-                  ],
-                },
-              },
-            },
-            { $project: { _id: 1 } },
-          ],
-          as: "likeDocs",
-        },
-      },
-      {
-        $addFields: {
-          hasLiked: { $gt: [{ $size: "$likeDocs" }, 0] },
-        },
-      },
-      {
         $lookup: {
           from: "users",
           // field in Post
@@ -256,32 +156,6 @@ router.get("/api/fetchUserPosts", authenticateToken, async (req, res) => {
         },
       },
       {
-        $lookup: {
-          from: "savedposts",
-          let: { postId: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$postId", "$$postId"] },
-                    {
-                      $eq: ["$userId", new mongoose.Types.ObjectId(req.userId)],
-                    },
-                  ],
-                },
-              },
-            },
-          ],
-          as: "savedDocs",
-        },
-      },
-      {
-        $addFields: {
-          isSaved: { $gt: [{ $size: "$savedDocs" }, 0] },
-        },
-      },
-      {
         $project: {
           _id: 1,
           userId: {
@@ -296,10 +170,8 @@ router.get("/api/fetchUserPosts", authenticateToken, async (req, res) => {
           description: 1,
           hashtag: 1,
           createDate: 1,
-          likes: 1, // Keep the original likes field
-          hasLiked: 1,
+          likes: 1,
           commentCount: 1,
-          isSaved: 1,
           timeAgo: { $literal: "" }, // Placeholder for timeAgo, to be calculated in application code
         },
       },
@@ -440,28 +312,26 @@ router.get("/api/fetchSavedPosts", authenticateToken, async (req, res) => {
       { $unwind: "$user" },
       {
         $lookup: {
-          from: "likes",
-          let: { postId: "$post._id" }, // Adjust this based on your saved posts structure
+          from: "comments",
+          let: { postId: "$post._id" },
           pipeline: [
             {
               $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$postId", "$$postId"] },
-                    {
-                      $eq: ["$userId", new mongoose.Types.ObjectId(req.userId)],
-                    },
-                  ],
-                },
+                $expr: { $eq: ["$postId", "$$postId"] },
               },
             },
+            {
+              $count: "total",
+            },
           ],
-          as: "likeDocs",
+          as: "commentCount",
         },
       },
       {
         $addFields: {
-          hasLiked: { $gt: [{ $size: "$likeDocs" }, 0] },
+          commentCount: {
+            $ifNull: [{ $arrayElemAt: ["$commentCount.total", 0] }, 0],
+          },
         },
       },
       {
@@ -479,8 +349,8 @@ router.get("/api/fetchSavedPosts", authenticateToken, async (req, res) => {
           description: "$post.description",
           hashtag: "$post.hashtag",
           createDate: "$post.createDate",
-          hasLiked: 1,
           likes: "$post.likes",
+          commentCount: 1,
           isSaved: { $literal: true },
           timeAgo: { $literal: "" },
         },
@@ -499,5 +369,29 @@ router.get("/api/fetchSavedPosts", authenticateToken, async (req, res) => {
     return res.status(400).send({ msg: "Error when fetching saved posts" });
   }
 });
+
+router.get(
+  "/api/fetchPostStatus/:postId",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const postId = req.params.postId;
+      const userId = req.userId;
+
+      const [likeDoc, saveDoc] = await Promise.all([
+        Like.findOne({ postId, userId }),
+        SavedPost.findOne({ postId, userId }),
+      ]);
+
+      return res.status(200).send({
+        hasLiked: !!likeDoc,
+        isSaved: !!saveDoc,
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      return res.status(400).send({ msg: "Error fetching post status" });
+    }
+  }
+);
 
 export default router;

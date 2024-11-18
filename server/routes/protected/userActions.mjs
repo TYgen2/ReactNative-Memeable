@@ -135,11 +135,23 @@ router.post("/api/handleLikePost", authenticateToken, async (req, res) => {
         }
       }
 
-      return res.status(200).send({ msg: "Liked the post!" });
+      // Get updated likes count
+      const updatedPost = await Post.findById(postId);
+
+      return res.status(200).send({
+        msg: "Post like updated successfully",
+        likes: updatedPost.likes,
+      });
     } else if (action === "unlike") {
       await Like.deleteOne({ userId, postId });
       await Post.findByIdAndUpdate(postId, { $inc: { likes: -1 } });
-      return res.status(200).send({ msg: "Unliked the post!" });
+
+      // Get updated likes count
+      const updatedPost = await Post.findById(postId);
+
+      return res
+        .status(200)
+        .send({ msg: "Unliked the post!", likes: updatedPost.likes });
     } else {
       return res.status(400).send({ msg: "Invalid action" });
     }

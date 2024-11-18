@@ -69,3 +69,13 @@ export const fetchSavedPosts = async (page, limit) => {
     return { message: error.response.data.msg };
   }
 };
+
+// fetch post status
+export const fetchPostStatus = async (postId) => {
+  try {
+    const response = await apiClient.get(`/fetchPostStatus/${postId}`);
+    return response.data;
+  } catch (error) {
+    return { message: error.response.data.msg };
+  }
+};

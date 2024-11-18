@@ -147,27 +147,6 @@ router.get("/api/fetchNotifications", authenticateToken, async (req, res) => {
       },
       {
         $lookup: {
-          from: "likes",
-          let: { postId: "$postId" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$postId", "$$postId"] },
-                    {
-                      $eq: ["$userId", new mongoose.Types.ObjectId(req.userId)],
-                    },
-                  ],
-                },
-              },
-            },
-          ],
-          as: "likeDocs",
-        },
-      },
-      {
-        $lookup: {
           from: "comments",
           let: { postId: "$postId" },
           pipeline: [
@@ -186,36 +165,9 @@ router.get("/api/fetchNotifications", authenticateToken, async (req, res) => {
       {
         $addFields: {
           post: { $arrayElemAt: ["$post", 0] },
-          hasLiked: { $gt: [{ $size: "$likeDocs" }, 0] },
           commentCount: {
             $ifNull: [{ $arrayElemAt: ["$commentCount.total", 0] }, 0],
           },
-        },
-      },
-      {
-        $lookup: {
-          from: "savedposts",
-          let: { postId: "$postId" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$postId", "$$postId"] },
-                    {
-                      $eq: ["$userId", new mongoose.Types.ObjectId(req.userId)],
-                    },
-                  ],
-                },
-              },
-            },
-          ],
-          as: "savedDocs",
-        },
-      },
-      {
-        $addFields: {
-          isSaved: { $gt: [{ $size: "$savedDocs" }, 0] },
         },
       },
       {
@@ -252,8 +204,6 @@ router.get("/api/fetchNotifications", authenticateToken, async (req, res) => {
                     hashtag: "$post.hashtag",
                     createDate: "$post.createDate",
                     likes: "$post.likes",
-                    hasLiked: "$hasLiked",
-                    isSaved: "$isSaved",
                     commentCount: "$commentCount",
                     timeAgo: { $literal: "" },
                   },
