@@ -5,6 +5,7 @@ import {
   handleLikePost,
   handleSavePost,
 } from "../../store/actions/userActions";
+import { usePostInteractions } from "../fetchData/usePostInteractions";
 
 export const usePostViewModel = (initialPostData) => {
   const postModel = useMemo(
@@ -14,14 +15,18 @@ export const usePostViewModel = (initialPostData) => {
 
   const dispatch = useDispatch();
 
+  const interactions = usePostInteractions(postModel.id);
+
+  // Initialize state with interactions data if available
   const [postState, setPostState] = useState({
-    likes: postModel.likes,
-    liked: postModel.hasLiked,
-    saved: postModel.isSaved,
+    likes: interactions?.likes ?? 0,
+    liked: interactions?.hasLiked ?? false,
+    saved: interactions?.isSaved ?? false,
   });
 
   const toggleLike = useCallback(async () => {
     const action = postState.liked ? "unlike" : "like";
+
     setPostState((prevState) => ({
       ...prevState,
       liked: !prevState.liked,
@@ -42,6 +47,7 @@ export const usePostViewModel = (initialPostData) => {
         liked: !prevState.liked,
         likes: prevState.liked ? prevState.likes - 1 : prevState.likes + 1,
       }));
+      console.error("Error toggling like:", error);
     }
   }, [postModel.id, postState.liked, dispatch]);
 
@@ -65,6 +71,7 @@ export const usePostViewModel = (initialPostData) => {
         ...prevState,
         saved: !prevState.saved,
       }));
+      console.error("Error toggling save:", error);
     }
   }, [postModel.id, postState.saved, dispatch]);
 

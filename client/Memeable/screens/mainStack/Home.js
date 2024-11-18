@@ -10,23 +10,26 @@ import HomeEmpty from "../../components/home/HomeEmpty";
 
 const Home = ({ navigation }) => {
   const { colors } = useColorTheme();
-
   const { allPosts } = useSelector((state) => state.post);
+  const interactions = useSelector((state) => state.interaction.interactions);
+
   const { isLoading, loadMorePosts, refreshPosts } = useFetchPosts();
 
   const renderPost = useCallback(
     ({ item }) => {
+      // Get interaction state for this post
+      const postInteraction = interactions[item._id];
+
       return (
         <MainPost
           item={item}
           navigation={navigation}
           colors={colors}
-          // helps to re-render the post when the save/like status changes
-          key={`${item._id}-${item.isSaved}-${item.hasLiked}`}
+          key={`${item._id}-${postInteraction?.isSaved}-${postInteraction?.hasLiked}`}
         />
       );
     },
-    [navigation, colors]
+    [navigation, colors, interactions]
   );
 
   return (

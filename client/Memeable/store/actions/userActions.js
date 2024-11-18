@@ -278,13 +278,17 @@ export const handleLikePost = createAsyncThunk(
   "post/handleLikePost",
   async ({ postId, action }, { rejectWithValue }) => {
     try {
-      await apiClient.post("/handleLikePost", {
+      const response = await apiClient.post("/handleLikePost", {
         postId,
         action,
       });
 
       console.log("Post liked/unliked using REDUX!!");
-      return { postId, likeAction: action };
+      return {
+        postId,
+        likeAction: action,
+        likes: response.data.likes,
+      };
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
