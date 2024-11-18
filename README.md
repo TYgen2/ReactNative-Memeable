@@ -1,7 +1,7 @@
 # 😎Memeable (React Native, Express, MongoDB, AWS, Firebase, Redux, Redis)
 This project is a media-sharing platform (Just like Instagram) with the following features:
 
--	<p align="justify"><b>🔑JWT-Token-Based Authentication:</b> Implemented a secure authentication system using Express, supporting local, Google, and Facebook login/register functionalities. User credentials are securely stored in MongoDB, with a refresh token mechanism to keep user logged in (stored in Redis)</p>
+-	<p align="justify"><b>🔑JWT-Token-Based Authentication:</b> Implemented a secure authentication system using Express, supporting local, Google, and Facebook (dev only) login/register functionalities. User credentials are securely stored in MongoDB, with a refresh token mechanism to keep user logged in (stored in Redis)</p>
 -	<p align="justify"><b>👥Interactive Features:</b> The app supports essential social media functionalities such as liking posts, commenting, and adding sub-comments.</p>
 - <p align="justify"><b>🔔Push notification:</b> Integrated Firebase Cloud Messaging (FCM) to send real-time notifications for user interactions, such as likes on posts, comments, likes on comments, and new followers.</p>
 -	<p align="justify"><b>👤User Profiles:</b> Users can create and customize their profiles, including editing display names, bios, background images, and profile icons. A unique feature allows users to set a background music (BGM) track for their profile, which can be played when others visit their user profile.</p>
