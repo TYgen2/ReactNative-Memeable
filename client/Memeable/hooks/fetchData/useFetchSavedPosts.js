@@ -5,12 +5,11 @@ import { fetchSavedPosts } from "../../handleAPIs/fetchData";
 const useFetchSavedPosts = () => {
   const [savedPosts, setSavedPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isPostsLoading, setIsPostsLoading] = useState(false);
+  const [isPostsLoading, setIsPostsLoading] = useState(true);
   const [hasMore, setHasMore] = useState(false);
 
   const fetchPosts = useCallback(
     async (page, reset = false) => {
-      if (isPostsLoading) return;
       setIsPostsLoading(true);
       try {
         const response = await apiQueue.add(() => fetchSavedPosts(page, 9));

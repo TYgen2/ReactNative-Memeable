@@ -46,6 +46,7 @@ import TrackPlayer from "react-native-track-player";
 import { getData, storeData } from "./config/asyncStorage";
 import { setupPlayer } from "./utils/audioTrimmer/audioHelpers";
 import SavedPost from "./screens/mainStack/SavedPost";
+import CameraComponent from "./components/Camera";
 
 const persistor = persistStore(store);
 enableScreens();
@@ -254,6 +255,7 @@ const FunctionScreen = () => {
   return (
     <FunctionStack.Navigator screenOptions={{ headerShown: false }}>
       <FunctionStack.Screen name="Upload" component={Upload} />
+      <FunctionStack.Screen name="Camera" component={CameraComponent} />
       <FunctionStack.Screen
         name="FullscreenImage"
         component={FullscreenImage}

@@ -8,7 +8,7 @@ import {
 import PQueue from "p-queue/dist";
 
 // select image for posting
-export const selectImageForUpload = async (setImageUri, navigation) => {
+export const selectImageForUpload = async (navigation) => {
   const result = await ImagePicker.requestMediaLibraryPermissionsAsync();
   if (result.granted === true) {
     let res = await ImagePicker.launchImageLibraryAsync({
@@ -20,7 +20,6 @@ export const selectImageForUpload = async (setImageUri, navigation) => {
 
     if (!res.canceled) {
       const { uri } = res.assets[0];
-      setImageUri(uri);
       navigation.navigate("FunctionStack", {
         screen: "Upload",
         params: { imageUri: uri },

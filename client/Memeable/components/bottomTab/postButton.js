@@ -8,15 +8,13 @@ import { selectImageForUpload } from "../../utils/helper";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import useColorTheme from "../../hooks/useColorTheme";
 
-export default PostButton = () => {
+const PostButton = () => {
   const { colors } = useColorTheme();
 
   const [icon_bottom] = useState(new Animated.Value(40));
   const [icon_opacity] = useState(new Animated.Value(0));
   const [icon_folder] = useState(new Animated.Value(170));
   const [icon_camera] = useState(new Animated.Value(170));
-
-  const [imageUri, setImageUri] = useState(null);
 
   const navigation = useNavigation();
   const isFocused = useIsFocused();
@@ -42,12 +40,7 @@ export default PostButton = () => {
       onOutsidePress={() => {
         pop === true ? popOut() : null;
       }}
-      style={{
-        flex: 1,
-        elevation: 5,
-        zIndex: 5,
-        shadowColor: "transparent",
-      }}
+      style={styles.postButtonContainer}
     >
       <Animated.View
         style={[
@@ -60,7 +53,13 @@ export default PostButton = () => {
           },
         ]}
       >
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("FunctionStack", {
+              screen: "Camera",
+            })
+          }
+        >
           <IonIcon name="camera" size={30} color="white" />
         </TouchableOpacity>
       </Animated.View>
@@ -76,9 +75,7 @@ export default PostButton = () => {
           },
         ]}
       >
-        <TouchableOpacity
-          onPress={() => selectImageForUpload(setImageUri, navigation)}
-        >
+        <TouchableOpacity onPress={() => selectImageForUpload(navigation)}>
           <IonIcon name="folder-open-outline" size={30} color="white" />
         </TouchableOpacity>
       </Animated.View>
@@ -97,7 +94,15 @@ export default PostButton = () => {
   );
 };
 
+export default PostButton;
+
 const styles = StyleSheet.create({
+  postButtonContainer: {
+    flex: 1,
+    elevation: 5,
+    zIndex: 5,
+    shadowColor: "transparent",
+  },
   buttonBorder: {
     justifyContent: "center",
     alignItems: "center",
