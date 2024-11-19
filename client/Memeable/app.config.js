@@ -35,6 +35,14 @@ export default {
     },
     scheme: "com.tychow45.memeable",
     plugins: [
+      [
+        "expo-camera",
+        {
+          cameraPermission: "Allow Memeable to access your camera",
+          microphonePermission: "Allow Memeable to access your microphone",
+          recordAudioAndroid: true,
+        },
+      ],
       ["expo-image-picker"],
       [
         "react-native-fbsdk-next",

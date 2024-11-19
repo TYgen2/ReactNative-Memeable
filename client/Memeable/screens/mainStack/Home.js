@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, Image, StyleSheet, View } from "react-native";
 import { barOffset, screenWidth } from "../../utils/constants";
 import MainPost from "../../components/post/MainPost";
 import { useSelector } from "react-redux";
@@ -7,6 +7,7 @@ import { useCallback } from "react";
 import useColorTheme from "../../hooks/useColorTheme";
 import HomeHeader from "../../components/home/HomeHeader";
 import HomeEmpty from "../../components/home/HomeEmpty";
+import HomeLoading from "../../components/home/HomeLoading";
 
 const Home = ({ navigation }) => {
   const { colors } = useColorTheme();
@@ -31,6 +32,8 @@ const Home = ({ navigation }) => {
     },
     [navigation, colors, interactions]
   );
+
+  if (isLoading) return <HomeLoading colors={colors} />;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.primary }]}>

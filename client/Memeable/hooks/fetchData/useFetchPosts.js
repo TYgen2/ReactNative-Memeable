@@ -10,7 +10,7 @@ export default useFetchPosts = () => {
 
   const allPostsRef = useRef(allPosts);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [hasMore, setHasMore] = useState(false);
   const dispatch = useDispatch();
 
@@ -21,7 +21,6 @@ export default useFetchPosts = () => {
 
   const fetchPosts = useCallback(
     async (page, reset = false) => {
-      if (isLoading) return;
       setIsLoading(true);
       try {
         const response = await dispatch(

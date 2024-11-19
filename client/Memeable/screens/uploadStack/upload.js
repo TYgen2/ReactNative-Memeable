@@ -49,7 +49,7 @@ const Upload = ({ route, navigation }) => {
         onSubmit={async (values) => {
           try {
             await uploadPost(values);
-            navigation.pop();
+            navigation.navigate("HomeStack", { screen: "Home" });
           } catch (error) {
             console.error("Upload failed:", error);
           }
@@ -91,7 +91,7 @@ const Upload = ({ route, navigation }) => {
                 autoCapitalize={false}
                 autoCorrect={false}
                 style={styles.input}
-                placeholder="Hashtags (optional)"
+                placeholder="Hashtags (optional) e.g. #yeah"
                 onChangeText={props.handleChange("hashtag")}
                 value={props.values.hashtag}
               />
