@@ -64,6 +64,7 @@ const AudioPlayer = ({ userData }) => {
           iconSize={16}
           isPlaying={isPlaying}
           togglePlayback={togglePlayback}
+          hasSong={!!userData.song.songUri}
         />
       </View>
     </View>

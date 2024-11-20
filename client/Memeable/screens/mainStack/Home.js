@@ -33,26 +33,28 @@ const Home = ({ navigation }) => {
     [navigation, colors, interactions]
   );
 
-  if (isLoading) return <HomeLoading colors={colors} />;
-
   return (
     <View style={[styles.container, { backgroundColor: colors.primary }]}>
       <HomeHeader colors={colors} navigation={navigation} />
-      <FlatList
-        data={allPosts}
-        refreshing={isLoading}
-        renderItem={renderPost}
-        onRefresh={refreshPosts}
-        // prevent called when initial fetching
-        onEndReached={({ distanceFromEnd }) => {
-          if (distanceFromEnd <= 0) return;
-          loadMorePosts();
-        }}
-        onEndReachedThreshold={0.9}
-        overScrollMode="never"
-        contentContainerStyle={styles.flatlistContainer}
-        ListEmptyComponent={<HomeEmpty isLoading={isLoading} />}
-      />
+      {isLoading ? (
+        <HomeLoading colors={colors} />
+      ) : (
+        <FlatList
+          data={allPosts}
+          refreshing={isLoading}
+          renderItem={renderPost}
+          onRefresh={refreshPosts}
+          // prevent called when initial fetching
+          onEndReached={({ distanceFromEnd }) => {
+            if (distanceFromEnd <= 0) return;
+            loadMorePosts();
+          }}
+          onEndReachedThreshold={0.9}
+          overScrollMode="never"
+          contentContainerStyle={styles.flatlistContainer}
+          ListEmptyComponent={<HomeEmpty isLoading={isLoading} />}
+        />
+      )}
     </View>
   );
 };

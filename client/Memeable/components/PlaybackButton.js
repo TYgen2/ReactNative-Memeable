@@ -9,6 +9,7 @@ const PlaybackButton = ({
   iconSize,
   togglePlayback,
   isPlaying,
+  hasSong,
 }) => {
   const { colors } = useColorTheme();
 
@@ -16,10 +17,16 @@ const PlaybackButton = ({
     <TouchableOpacity
       style={[
         styles.configButton,
-        { width, height, backgroundColor: colors.secondary },
+        {
+          width,
+          height,
+          backgroundColor: colors.secondary,
+          opacity: !hasSong ? 0.5 : 1,
+        },
       ]}
       activeOpacity={0.7}
       onPress={togglePlayback}
+      disabled={!hasSong}
     >
       <Icon
         name={isPlaying ? "pause-outline" : "play-outline"}

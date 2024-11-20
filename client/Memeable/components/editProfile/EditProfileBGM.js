@@ -81,6 +81,7 @@ const EditProfileBGM = ({
           iconSize={24}
           togglePlayback={togglePlayback}
           isPlaying={isPlaying}
+          hasSong={!!songData.songUri}
         />
       </View>
     </View>
