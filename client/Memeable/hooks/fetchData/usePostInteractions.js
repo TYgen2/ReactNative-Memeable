@@ -15,15 +15,13 @@ export const usePostInteractions = (postId) => {
   useEffect(() => {
     if (!interactions) {
       fetchPostStatus(postId).then((status) => {
-        if (status.hasLiked && status.likes) {
-          dispatch(
-            handleLikePost.fulfilled({
-              postId,
-              likeAction: "like",
-              likes: status.likes,
-            })
-          );
-        }
+        dispatch(
+          handleLikePost.fulfilled({
+            postId,
+            likeAction: status.hasLiked ? "like" : "unlike",
+            likes: status.likes,
+          })
+        );
         if (status.isSaved) {
           dispatch(handleSavePost.fulfilled({ postId, saveAction: "save" }));
         }

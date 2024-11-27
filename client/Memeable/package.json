@@ -7,7 +7,8 @@
     "android:dev": "NODE_ENV=development expo run:android",
     "android:prod": "NODE_ENV=production expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "android": "expo run:android"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "4",

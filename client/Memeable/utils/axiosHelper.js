@@ -87,7 +87,7 @@ apiClient.interceptors.response.use(
 );
 
 // Also add some configuration for file uploads
-apiClient.defaults.timeout = 30000; // 30 seconds timeout
+apiClient.defaults.timeout = 10000; // 30 seconds timeout
 apiClient.defaults.maxContentLength = Infinity;
 apiClient.defaults.maxBodyLength = Infinity;
 

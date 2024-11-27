@@ -378,14 +378,16 @@ router.get(
       const postId = req.params.postId;
       const userId = req.userId;
 
-      const [likeDoc, saveDoc] = await Promise.all([
+      const [likeDoc, saveDoc, post] = await Promise.all([
         Like.findOne({ postId, userId }),
         SavedPost.findOne({ postId, userId }),
+        Post.findById(postId).select("likes"),
       ]);
 
       return res.status(200).send({
         hasLiked: !!likeDoc,
         isSaved: !!saveDoc,
+        likes: post.likes,
       });
     } catch (error) {
       console.error("Error:", error);

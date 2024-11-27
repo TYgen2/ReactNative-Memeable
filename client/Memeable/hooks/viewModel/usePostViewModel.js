@@ -6,6 +6,7 @@ import {
   handleSavePost,
 } from "../../store/actions/userActions";
 import { usePostInteractions } from "../fetchData/usePostInteractions";
+import { ToastAndroid } from "react-native";
 
 export const usePostViewModel = (initialPostData) => {
   const postModel = useMemo(
@@ -14,7 +15,6 @@ export const usePostViewModel = (initialPostData) => {
   );
 
   const dispatch = useDispatch();
-
   const interactions = usePostInteractions(postModel.id);
 
   // Initialize state with interactions data if available
@@ -48,6 +48,7 @@ export const usePostViewModel = (initialPostData) => {
         likes: prevState.liked ? prevState.likes - 1 : prevState.likes + 1,
       }));
       console.error("Error toggling like:", error);
+      ToastAndroid.show("Cannot like post, INTERNAL ERROR", ToastAndroid.SHORT);
     }
   }, [postModel.id, postState.liked, dispatch]);
 
