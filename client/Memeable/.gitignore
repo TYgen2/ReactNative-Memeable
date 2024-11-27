@@ -18,6 +18,7 @@ web-build/
 
 # android
 android/
+ios/
 
 # Metro
 .metro-health-check*
