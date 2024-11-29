@@ -20,7 +20,7 @@ const MainPost = ({
   const isOwnPost = userDetails?.userId === item.userId._id;
 
   const myIcon = getIconSource(userDetails?.userIcon);
-  const myIconBgColor = userDetails?.userIcon.bgColor || "transparent";
+  const myIconBgColor = userDetails?.userIcon?.bgColor || "transparent";
 
   const { post, postState, toggleLike, toggleSave } = usePostViewModel(item);
   const commentViewModel = useCommentViewModel(item._id);

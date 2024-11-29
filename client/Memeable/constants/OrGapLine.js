@@ -26,7 +26,7 @@ export default GapLine;
 
 const styles = StyleSheet.create({
   gapContainer: {
-    flex: 1,
+    flex: 0.5,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",

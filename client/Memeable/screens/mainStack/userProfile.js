@@ -14,12 +14,18 @@ import { LOADING_INDICATOR } from "../../utils/constants";
 const UserProfile = ({ route, navigation }) => {
   const { colors } = useColorTheme();
 
-  const { userDetails, status } = useSelector((state) => state.user);
+  const { userDetails } = useSelector((state) => state.user);
   const { isStack, targetId } = route.params || {};
   const prevUserDetailsRef = useRef(userDetails);
 
-  const { userData, setUserData, isMe, isInfoLoading, handlePressedFollow } =
-    useFetchProfileInfo(userDetails?.userId, targetId);
+  const {
+    userData,
+    setUserData,
+    isMe,
+    isInfoLoading,
+    handlePressedFollow,
+    refreshMyData,
+  } = useFetchProfileInfo(userDetails?.userId, targetId);
 
   const { userPosts, isPostsLoading, loadMorePosts, refreshPosts } =
     useFetchPostsForUser(targetId);
@@ -42,7 +48,7 @@ const UserProfile = ({ route, navigation }) => {
   );
 
   // handle first mount by local loading state
-  if (isInfoLoading || status === "loading") {
+  if (isInfoLoading) {
     return <LOADING_INDICATOR bgColor={colors.primary} />;
   }
 
@@ -66,7 +72,10 @@ const UserProfile = ({ route, navigation }) => {
       overScrollMode="never"
       onEndReached={loadMorePosts}
       refreshing={isPostsLoading}
-      onRefresh={refreshPosts}
+      onRefresh={() => {
+        if (isMe) refreshMyData();
+        refreshPosts();
+      }}
       ListEmptyComponent={
         <UserProfileEmpty isPostsLoading={isPostsLoading} colors={colors} />
       }

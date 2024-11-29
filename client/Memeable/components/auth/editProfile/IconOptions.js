@@ -1,6 +1,5 @@
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import React, { memo } from "react";
-import OrGapLine from "../../../constants/OrGapLine";
 
 const IconOptions = ({
   DEFAULT_ICONS,
@@ -10,7 +9,7 @@ const IconOptions = ({
   customIcon,
 }) => {
   return (
-    <View style={styles.optionContainer}>
+    <View style={styles.container}>
       <Text style={styles.subTitleText}>Default meme icons</Text>
       <FlatList
         data={DEFAULT_ICONS}
@@ -31,7 +30,6 @@ const IconOptions = ({
           { opacity: customIcon ? 0.3 : 1 },
         ]}
       />
-      <OrGapLine />
     </View>
   );
 };
@@ -39,12 +37,12 @@ const IconOptions = ({
 export default memo(IconOptions);
 
 const styles = StyleSheet.create({
-  optionContainer: {
+  container: {
     flex: 2,
     justifyContent: "center",
     alignItems: "center",
   },
-  subTitleText: { fontWeight: "bold", fontSize: 20, paddingBottom: 10 },
+  subTitleText: { fontWeight: "bold", fontSize: 20, marginBottom: 10 },
   flatList: {
     backgroundColor: "rgba(0,0,0, 0.1)",
     padding: 10,

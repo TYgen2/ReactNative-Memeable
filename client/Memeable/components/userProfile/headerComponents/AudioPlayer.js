@@ -8,6 +8,7 @@ import { useAutoplayBGM } from "../../../hooks/useAutoPlayBGM";
 import usePlaybackPreview from "../../../hooks/usePlaybackPreview";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import useColorTheme from "../../../hooks/useColorTheme";
+import TextTicker from "react-native-text-ticker";
 
 const AudioPlayer = ({ userData }) => {
   const { colors } = useColorTheme();
@@ -38,10 +39,10 @@ const AudioPlayer = ({ userData }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.songInfoContainer}>
-        <Text style={[styles.songName, { color: colors.text }]}>
+      <View style={styles.leftContainer}>
+        <TextTicker style={[styles.songName, { color: colors.text }]} loop>
           {formatSongName(userData.song.songName)}
-        </Text>
+        </TextTicker>
 
         <View style={styles.songCoverContainer}>
           <GlowingBorder
@@ -78,12 +79,17 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
     right: 0,
-    width: 200,
-    height: 140,
+    width: 150,
+    height: 150,
     margin: 10,
     alignItems: "center",
-    justifyContent: "flex-end",
+    justifyContent: "center",
     flexDirection: "row",
+  },
+  leftContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   songName: {
     fontSize: 16,

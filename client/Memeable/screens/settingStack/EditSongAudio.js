@@ -8,6 +8,7 @@ import useUpdateSong from "../../hooks/updateUserProfile/useUpdateSong";
 import { useProfileUpdates } from "../../context/ProfileUpdateContext";
 import TrimButton from "../../components/AudioTrimmer/TrimButton";
 import ApplyButton from "../../components/AudioTrimmer/ApplyButton";
+import { formatSongName } from "../../utils/helper";
 
 const EditSongAudio = ({ route, navigation }) => {
   const { songData, audioPath, duration, audioName } = route.params;
@@ -82,7 +83,7 @@ const EditSongAudio = ({ route, navigation }) => {
           Trim the audio with a duration between 10 - 30s
         </Text>
       </View>
-      <Text style={styles.title}>{audioName}</Text>
+      <Text style={styles.title}>{formatSongName(audioName)}</Text>
       <AudioTrimmer
         uri={trimmedAudioPath}
         duration={duration}
@@ -132,6 +133,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
+    textAlign: "center",
   },
 });
 

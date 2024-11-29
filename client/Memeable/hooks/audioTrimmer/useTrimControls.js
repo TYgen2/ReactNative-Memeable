@@ -8,7 +8,7 @@ import {
 export const useTrimControls = (duration, onTrimsChange) => {
   const [trimState, setTrimState] = useState({
     left: 0,
-    right: Math.min(duration, MAX_TRIM_DURATION),
+    right: Math.min(duration, MIN_TRIM_DURATION),
   });
 
   useEffect(() => {

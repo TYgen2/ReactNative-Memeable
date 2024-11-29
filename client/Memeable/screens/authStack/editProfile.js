@@ -7,6 +7,7 @@ import ProfileIcon from "../../components/auth/editProfile/ProfileIcon";
 import IconOptions from "../../components/auth/editProfile/IconOptions";
 import ActionButtons from "../../components/auth/editProfile/ActionButtons";
 import { useCallback } from "react";
+import OrGapLine from "../../constants/OrGapLine";
 
 const EditProfile = () => {
   const {
@@ -77,6 +78,7 @@ const EditProfile = () => {
         renderBGcolor={renderBGcolor}
         customIcon={customIcon}
       />
+      <OrGapLine />
       <ActionButtons
         selectImageForProfile={selectImageForProfile}
         setCustomIcon={setCustomIcon}

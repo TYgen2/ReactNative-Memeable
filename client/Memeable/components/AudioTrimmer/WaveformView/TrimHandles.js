@@ -92,14 +92,15 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     backgroundColor: "rgba(0, 0, 0, 0.3)",
-    borderRadius: 5,
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
   },
   handle: {
     position: "absolute",
     width: 10,
     height: "100%",
-    backgroundColor: "white",
-    borderRadius: 5,
+    backgroundColor: "black",
+    borderRadius: 10,
   },
   leftHandle: {
     borderTopRightRadius: 0,

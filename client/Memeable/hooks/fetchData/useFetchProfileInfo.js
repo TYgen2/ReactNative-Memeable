@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProfile } from "../../handleAPIs/fetchData";
-import { handleFollow } from "../../store/actions/userActions";
+import { fetchUserInfo, handleFollow } from "../../store/actions/userActions";
 import { UserProfileModel } from "../../models/UserProfileModel";
 import { apiQueue } from "../../utils/helper";
 
@@ -18,6 +18,7 @@ export default useFetchProfileInfo = (userId, targetId) => {
 
     // use global state userDetails for display
     if (isMe) {
+      dispatch(fetchUserInfo());
       setUserData(new UserProfileModel(userDetails));
       setIsInfoLoading(false);
       return;
@@ -78,6 +79,10 @@ export default useFetchProfileInfo = (userId, targetId) => {
     });
   };
 
+  const refreshMyData = () => {
+    dispatch(fetchUserInfo());
+  };
+
   return {
     userData,
     setUserData,
@@ -86,5 +91,6 @@ export default useFetchProfileInfo = (userId, targetId) => {
     handleFollowersCount,
     isMe,
     handlePressedFollow,
+    refreshMyData,
   };
 };

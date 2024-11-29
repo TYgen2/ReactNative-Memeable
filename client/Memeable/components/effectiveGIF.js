@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
   gif: {
     position: "absolute",
     zIndex: 1,
-    right: 10,
-    top: 80,
+    right: 0,
+    top: 20,
   },
 });
