@@ -1,54 +1,44 @@
 import { Image, StyleSheet, Text, View } from "react-native";
 import React, { memo } from "react";
 import EffectiveGIF from "../../EffectiveGIF";
+import { barOffset } from "../../../utils/constants";
 
 const ProfileIcon = ({ gif, customIcon, icon, bgColor }) => {
   return (
-    <>
-      <View style={styles.title}>
-        <Text style={styles.titleText}>Profile picture 😎</Text>
-      </View>
+    <View style={styles.container}>
+      {/* Title */}
+      <Text style={styles.title}>Profile picture 😎</Text>
+
+      {/* GIF */}
       <EffectiveGIF gif={gif} />
-      <View style={styles.iconContainer}>
-        <View style={styles.iconBorder}>
-          <View style={styles.iconInsideBorder}>
-            {customIcon ? (
-              <Image source={{ uri: customIcon }} style={styles.profileIcon} />
-            ) : (
-              <Image
-                source={icon.source}
-                style={[styles.profileIcon, { backgroundColor: bgColor }]}
-              />
-            )}
-          </View>
+
+      {/* Icon */}
+      <View style={styles.iconBorder}>
+        <View style={styles.iconInsideBorder}>
+          {customIcon ? (
+            <Image source={{ uri: customIcon }} style={styles.profileIcon} />
+          ) : (
+            <Image
+              source={icon.source}
+              style={[styles.profileIcon, { backgroundColor: bgColor }]}
+            />
+          )}
         </View>
       </View>
-    </>
+    </View>
   );
 };
 
 export default memo(ProfileIcon);
 
 const styles = StyleSheet.create({
-  title: {
-    flex: 0.5,
+  container: {
+    flex: 3,
     alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 60,
+    justifyContent: "space-evenly",
+    marginTop: barOffset,
   },
-  titleText: { fontWeight: "bold", fontSize: 28 },
-  gif: {
-    position: "absolute",
-    zIndex: 1,
-    right: 10,
-    top: 80,
-  },
-  iconContainer: {
-    flex: 2,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 20,
-  },
+  title: { fontWeight: "bold", fontSize: 28 },
   iconBorder: {
     alignItems: "center",
     justifyContent: "center",

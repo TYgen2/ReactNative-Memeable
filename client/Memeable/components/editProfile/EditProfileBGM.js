@@ -113,6 +113,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
   },
   imageContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },

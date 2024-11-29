@@ -47,6 +47,7 @@ import { getData, storeData } from "./config/asyncStorage";
 import { setupPlayer } from "./utils/audioTrimmer/audioHelpers";
 import SavedPost from "./screens/mainStack/SavedPost";
 import CameraComponent from "./components/Camera";
+import { fetchUserInfo } from "./store/actions/userActions";
 
 const persistor = persistStore(store);
 enableScreens();
@@ -296,6 +297,7 @@ const App = () => {
 
   const dispatch = useDispatch();
 
+  // handle audio player initialization
   useEffect(() => {
     let mounted = true;
 
@@ -324,7 +326,7 @@ const App = () => {
       dispatch(reduxLogin());
       setIsUserInfoReady(true);
     }
-  }, [userDetails, dispatch]);
+  }, [userDetails]);
 
   if (isLoading || !isPlayerReady) {
     return <Splash />;

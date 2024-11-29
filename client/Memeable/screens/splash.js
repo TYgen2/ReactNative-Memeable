@@ -19,7 +19,6 @@ const Splash = () => {
 
   const checkStatus = async () => {
     const res = await validateTokens();
-    console.log(res.message);
 
     if (res.success === false) {
       await clearTokens();

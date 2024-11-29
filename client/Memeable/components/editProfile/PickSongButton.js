@@ -3,6 +3,7 @@ import React from "react";
 import { pickAudio } from "../../utils/audioTrimmer/audioHelpers";
 import { useNavigation } from "@react-navigation/native";
 import useColorTheme from "../../hooks/useColorTheme";
+import { formatSongName } from "../../utils/helper";
 
 const PickSongButton = ({ songData }) => {
   const { colors } = useColorTheme();
@@ -20,7 +21,7 @@ const PickSongButton = ({ songData }) => {
         </Text>
       </TouchableOpacity>
       <Text style={[styles.songName, { color: colors.text }]}>
-        {songData.songName ? songData.songName : "no song yet"}
+        {songData.songName ? formatSongName(songData.songName) : "no song yet"}
       </Text>
     </View>
   );
@@ -30,6 +31,8 @@ export default PickSongButton;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
     gap: 10,
   },
@@ -48,5 +51,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "white",
+    textAlign: "center",
+    marginHorizontal: 10,
   },
 });

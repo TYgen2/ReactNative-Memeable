@@ -79,6 +79,7 @@ apiClient.interceptors.response.use(
 
     if (error.response.status === 404) {
       console.log("User not found, refreshToken GGed");
+      await clearTokens();
     }
 
     // Always return a properly structured error
