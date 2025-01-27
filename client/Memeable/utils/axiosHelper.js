@@ -1,6 +1,7 @@
 import axios from "axios";
 import { setGlobalConfig } from "axios-logger";
 import { clearTokens, getTokens, storeTokens } from "./tokenActions";
+import { ToastAndroid } from "react-native";
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const apiClient = axios.create({
@@ -64,6 +65,10 @@ apiClient.interceptors.response.use(
     // Handle cases where response doesn't exist
     if (!error.response) {
       console.error("Network error or no response from server");
+      ToastAndroid.show(
+        "Network error or no response from server",
+        ToastAndroid.LONG
+      );
       return Promise.reject({
         response: {
           data: { msg: "Network error or no response from server" },
